@@ -1,2 +1,2 @@
-# ps-categorizer
-Categorizing problem &amp; techniques in ProblemSolving, mostly based on BOJ.
+# TeamNote
+My version of the teamnote. Use at your own risk, because the code style will be horrible \*winks\*

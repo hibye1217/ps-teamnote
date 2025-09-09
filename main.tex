@@ -1,0 +1,2222 @@
+% Team Note of hibye1217.
+
+\documentclass[landscape, 8pt, a4paper, oneside, twocolumn]{extarticle}
+\usepackage{teamnote}
+
+\pagestyle{fancy}
+\lhead{Team: hibye1217 (hi12, bye17, hb27)}
+\rhead{Page \thepage  \ of \pageref{LastPage}}
+\fancyfoot{}
+
+\headsep 0.2cm
+
+\setminted{breaklines=true, tabsize=2, breaksymbolleft=}
+\usemintedstyle{perldoc}
+
+\definecolor{BOJ_RUBY_IV}{RGB}{234, 0, 83}
+\definecolor{ARENA_SSP}{RGB}{48, 161, 229}
+\definecolor{CF_RED}{RGB}{255, 0, 0}
+\definecolor{AT_YELLOW}{RGB}{192, 192, 0}
+
+\title{Team Note of \textcolor{BOJ_RUBY_IV}{\textbf{hibye1217}}}
+\author{SolvedAC: \textcolor{ARENA_SSP}{hibye1217}, CodeForces: \textcolor{CF_RED}{hibye1217}, AtCoder: \textcolor{AT_YELLOW}{hibye1217}}
+\date{Compiled on \today}
+
+%\usepackage{wasysym}
+\begin{document}
+
+\thispagestyle{fancy}
+\maketitlepage
+
+%% Start %%
+
+\section{Mathematics - Combinatorics}
+\subsection{\toadd{Combinatorics Equiations}}
+\begin{itemize}
+	\item Derangement: $dp[0] = 1; dp[1] = 0; dp[n] = (n-1)(dp[n-1] + dp[n-2])$
+	\item Catalan: $C[0] = 1; C[n+1] = 2 \cdot (2n+1) \div (n+2) \cdot C[n]$
+	\item Stirling (First): $S(0, 0) = 1, S(*, 0) = S(0, *) = 0; S(n, k) = (n-1) S(n-1, k) + S(n-1, k-1)$
+	\item Stirling (First): Counts permutation with $n$ element, $k$ cycle
+	\item Stirling (Second): $S(0, 0) = 1; S(*, 0) = S(0, *) = 0; S(n, k) = kS(n-1, k) + S(n-1, k-1)$
+	\item Stirling (Second): Counts $n$ elements, divided into $k$ non-empty sets
+	\item Bell: $B[n] = \sum\limits_{k=0}^{n} S(n, k)$
+	\item Burnside Lemma: $r|G| = \sum_{g \in G} |X_g|; X_g = \{x \in X \mid gx = x\}$.
+\end{itemize}
+\subsection{\completed{Lucas Theorem}}
+$\binom{n}{r} \equiv \binom{n \bmod p}{r \bmod p} \times \binom{n/p}{r/p} \pmod p$.
+\begin{minted}{cpp}
+int ncr(int n, int r){
+	if (0 > r || r > n){ return 0; } if (r == 0){ return 1; }
+	if (0 <= n && n < mod && 0 <= r && r < mod){ return fac[n] * inv[r] % mod * inv[n-r] % mod; }
+	return ncr(n%mod, r%mod) * ncr(n/mod, r/mod) % mod;
+}
+\end{minted}
+\subsection{\completed{Lindström-Gessel-Viennot Lemma}}
+Let $w(P)$ be the product of the weights of the edges of the path $P$. Let $D$ be the matrix with $D_{i,j}$ be the sum of $w(P)$s with $i \to j$.
+
+Then, $\det(D) = \sum_{(P_1, \ldots, P_N) \colon S \to T} \mathrm{sign}(\sigma(P)) \prod_{i=1}^{N} w(P_i)$, where $(P_1, \ldots, P_N)$ is the $N$ \textit{non-intersecting} paths, with $P_i = A_i \to B_{\sigma(i)}$.
+
+When every edge have weight $1$, $w(P) = 1$. Therefore, the lemma above will just find the number of possible non-intersecting path (with parity of the permutation).
+\section{Mathematics - Number Theory}
+\subsection{\toadd{Number Theoretic Equations}}
+\subsection{\completed{Extended Euclid's Algorithm}}
+\begin{minted}{cpp}
+pl3 egcd(ll a, ll b){
+    if (b == 0){ return { {1, 0}, 1 }; }
+    pl3 p = egcd(b, a%b);
+    ll x = p.fr.fr, y = p.fr.sc, g = p.sc;
+    ll xx = y, yy = x - a/b*y;
+    return { {xx,yy}, g };
+}
+\end{minted}
+\subsection{\completed{Chinese Remainder Theorem}}
+\begin{minted}{cpp}
+inline ll finv(ll a, ll n){ pl3 p = egcd(a, n); return (p.fr.fr%n+n)%n; }
+pl2 crt(pl2 f1, pl2 f2){
+    if (f1.sc < f2.sc){ swap(f1, f2); }
+    ll a1 = f1.fr, m1 = f1.sc; ll a2 = f2.fr, m2 = f2.sc;
+    ll g = gcd(m1, m2); ll l = lcm(m1, m2);
+    if ((a2-a1)%g != 0){ return {-1, -1}; }
+    ll mg1 = m1/g, mg2 = m2/g, ag = (a2-a1)/g;
+    ll y = ag *finv(mg1, mg2) %mg2;
+    ll x = m1*y + a1; return {(x%l+l)%l, l};
+}
+\end{minted}
+\subsection{\completed{Euler's Totient Function}}
+\begin{minted}{cpp}
+int phi(int x){ int res = 0;
+    for (int d = 2; d*d <= x; d++){
+        if (x%d == 0){
+            res /= d; res *= d-1;
+            while (x%d == 0){ x /= d; }
+        }
+    }
+    if (x != 1){ res /= x; res *= x-1; } return res;
+}
+\end{minted}
+\subsection{\completed{Möbius Function}}
+\begin{minted}{cpp}
+int phi[N+20], mob[N+20], prr[N+20];
+memset(mob, -1, sizeof(mob)); mob[1] = 1;
+for (int x = 1; x <= N; x++){ phi[x] = x; }
+for (int x = 2; x <= N; x++){
+    if (prr[x] == 0){
+        for (int a = x; a <= N; a+=x){ prr[a] = x; phi[a] -= phi[a]/x; }
+    }
+    int p = prr[x];
+    if (x/p%p == 0){ mob[x] = 0; } else{ mob[x] = mob[x/p]*mob[p]; }
+}
+\end{minted}
+\subsection{\completed{Miller-Rabin}}
+\begin{minted}{cpp}
+const vector<ll> prr = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37};
+bool prime(ll n){
+    if (n <= 40){
+        for (int p : prr){ if (n == p){ return 1; } }
+        return 0;
+    }
+    if (n%2 == 0){ return 0; }
+    int s = 0; ll d = n-1;
+    while (d%2 == 0){ s += 1; d /= 2; }
+    for (int p : prr){
+        ll res = 1, mul = p, bit = d; while (bit){
+            if (bit&1){ res = (i128)res*mul % n; }
+            mul = (i128)mul*mul % n; bit >>= 1;
+        }
+        bool chk = (res == 1);
+        for (int r = 0; r < s; r++){
+            chk |= (res == n-1); res = (i128)res*res % n;
+        } if (!chk){ return 0; }
+    }
+    return 1;
+}
+\end{minted}
+\subsection{\completed{Pollard's Rho}}
+\begin{minted}{cpp}
+vector<ll> ans;
+inline ll f(ll x, ll c, ll mod){ return ((i128)x*x + c) % mod; }
+void factor(ll n){
+    if (n == 1){ return; }
+    if (n%2 == 0){ ans.push_back(2); return factor(n/2); }
+    if (prime(n)){ ans.push_back(n); return; }
+    uniform_int_distribution<ll> rnd(1, n);
+    ll x1 = rnd(gen); ll x2 = x1;
+    ll c = rnd(gen);
+    do{
+        x1 = f(x1, c, n); x2 = f(f(x2, c, n), c, n);
+    } while (gcd(abs(x1-x2), n) == 1);
+    ll g = gcd(abs(x1-x2), n);
+    if (g == n){ return factor(n); }
+    else{ factor(g); factor(n/g); }
+}
+\end{minted}
+\subsection{\completed{Power Tower}}
+\texttt{CUT} being needed is that $a^{\phi(m)} \not\equiv 1 \pmod m$. But for $d \ge \log_2 m$, $a^{d+\phi(m)} \equiv a^{d} \pmod m$.
+\begin{minted}{cpp}
+const int CUT = 100; // >= log2(mod)
+const int LEN = 4; // (tower with length of LEN+1) > CUT
+int f(int idx, int mod){
+    if (mod == 1){ return 0; }
+    int cnt = n-idx+1; if (cnt <= LEN){
+        if (f(idx+1) <= CUT){ return fpow(arr[idx], f(idx+1), mod); }
+    }
+    return fpow(arr[idx], f(idx+1, phi[mod]) + CUT*mod, mod);
+}
+\end{minted}
+\section{Mathematics - Algebra}
+\subsection{\toadd{Fibonacci Number}}
+\subsection{\completed{Modeling - 2-SAT - Operations}}
+\begin{itemize}
+	\item $(a \vee b) \to (\neg a \implies b) \wedge (\neg b \implies a)$.
+	\item $(a \wedge b) \to (a \vee a) \wedge (b \vee b)$.
+	\item $(a \overline{\wedge} b) \to \neg (a \wedge b) \to (\neg a \vee \neg b)$.
+	\item $(a \overline{\vee} b) \to (\neq a \wedge \neg b)$.
+	\item $(a \oplus b) \to (a \vee b) \wedge (\neg a \vee \neg b)$.
+	\item $(a \overline{\oplus} b) \to (a \vee \neg b) \wedge (\neg a \vee b)$.
+\end{itemize}
+\subsection{\completed{Modeling - 2-SAT - At most 1}}
+$3$ variables ($a$, $b$, $c$) can be done with $(\neg a \vee \neg b) \wedge (\neg b \vee \neg c) \wedge (\neg c \vee \neg a)$. This can be expanded to make $\mathcal O(N^2)$ clauses.
+
+$N$ variables ($x_1$, $x_2$, \ldots, $x_N$) can be done with the following method. Let $y_i$ be true if one of $x_1$, $x_2$, \ldots, $x_i$ is true. This can be modeled as following:
+\begin{itemize}
+	\item $x_i \implies y_i$.
+	\item $y_i \implies y_{i+1}$.
+	\item $y_i \implies \neg x_{i+1}$.
+\end{itemize}
+\subsection{\completed{Modeling - Minimizing Quadratic Pseudo-Boolean Function}}
+Given $N$ boolean variables $x_{1}, x_{2}, \ldots, x_{N}$, minimize the cost $f(x_1, x_2, \ldots, x_N) = c + \sum_{i} b_i(x_i) + \sum_{i<j} a_{i,j}(x_i, x_j)$. Function $a$ must satisfies the condition $a(0,0) + a(1,1) \leq a(0,1) + a(1,0)$.
+
+This can be modeled as following. Let there be source $s$, sink $t$, and $N$ vertices $x_1$, $x_2$, \ldots, $x_N$.
+\begin{itemize}
+	\item $c$ is trivial.
+	\item $b_i(x_i = 0)$ can be modeled as $x_i \to t$ with weight $b_i(0)$.
+	\item $b_i(x_i = 1)$ can be modeled as $s \to x_i$ with weight $b_i(1)$.
+	\item $a_{i,j}(x_i, x_j)$ can be modeled as following:
+	\begin{itemize}
+		\item $s \to v_i$ with weight $a_{i,j}(1,0)$.
+		\item $v_i \to t$ with weight $a_{i,j}(0,0)$.
+		\item $s \to v_j$ with weight $a_{i,j}(1,1)-a_{i,j}(1,0)$.
+		\item $v_i \to v_j$ with weight $a_{i,j}(0,1)+a_{i,j}(1,0)-a_{i,j}(0,0)-a_{i,j}(1,1)$.
+	\end{itemize}
+\end{itemize}
+\subsection{\completed{Fast Fourier Transform \& Number Theoretic Transform}}
+\begin{minted}{cpp}
+void dft(vector<cpl>& arr, bool inv = false){ int n = arr.size();
+    for (int j=0, i=1; i < n; i++){ int bit = n>>1;
+        while (j & bit){ j ^= bit; bit >>= 1; } j ^= bit;
+        if (i < j){ swap(arr[i], arr[j]); }
+    }
+    for (int l = 1; l < n; l <<= 1){
+        if (complex){
+            ld ang = PI / l; if (inv){ ang *= -1; }
+            cpl w = {cos(ang), sin(ang)};
+        }
+        else{
+            ll w = fpow(r, (mod-1)/(2*l)); if (inv){ w = finv(w); }
+            // r is primitive root of mod. 998244353 -> 3
+        }
+        for (int i = 0; i < n; i += l<<1){
+            cpl wp = 1; for (int j = 0; j < l; j++){
+                cpl a = arr[i+j], b = arr[i+j + l] * wp;
+                arr[i+j] = a+b; arr[i+j + l] = a-b; wp *= w;
+            }
+        }
+    }
+    if (inv){ for (int i = 0; i < n; i++){ arr[i] /= n; } }
+}
+void mul(vector<cpl>& arr, vector<cpl>& brr){
+    int n = max(arr.size(), brr.size()); n = bitp(n) * 2; // power of 2
+    arr.resize(n); brr.resize(n);
+    dft(arr); dft(brr);
+    for (int i = 0; i < n; i++){ arr[i] *= brr[i]; }
+    dft(arr, -1);
+}
+\end{minted}
+\subsection{\toadd{Fast Welsh-Hadamard Transform}}
+XOR only; OR and AND convolution will be added later.
+\begin{minted}{cpp}
+void fwht(vector<ll>& arr, bool inv = false){
+    arr.resize(2*X);
+    for (int i = X; i < X+X; i++){ arr[i] = arr[i-X]; }
+    for (int l = 1; l < X; l*=2){
+        for (int p = 0; p < X; p+=l*2){
+            for (int i = 0; i < l; i++){
+                ll a = arr[p+i], b = arr[p+l+i];
+                arr[p+i] = (a+b)%mod; arr[p+l+i] = (a-b+mod)%mod;
+                if (inv){
+                    arr[p+i] = arr[p+i]*inv2 % mod;
+                    arr[p+l+i] = arr[p+l+i]*inv2 % mod;
+                }
+            }
+        }
+    }
+}
+\end{minted}
+\subsection{\completed{Gauss-Jordan Elimination}}
+Gauss-Jordan Elimination is not stable. It is recommended that you use partial pivoting, which always choose the row that has the maximum absolute value on pivoting column.
+\subsection{\completed{Floor Sum of Arithmetic Progression}}
+Let $f(a, b, c, n) = \sum_{x=0}^{n} \left\lfloor \frac{ax+b}{c} \right\rfloor$.
+
+If $a \ge c$ or $b \ge c$, then $f(a, b, c, n) = \frac{n(n+1)}{2} \left\lfloor \frac{a}{c} \right\rfloor + (n+1) \left\lfloor \frac{b}{c} \right\rfloor + f(a \bmod c, b \bmod c, c, n)$.
+
+Otherwise, we have $f(a, b, c, n) = nm - f(c, c-b-1, a, m-1)$ where $m = \left\lfloor \frac{an+b}{c} \right\rfloor$.
+\section{Mathematics - Geometry}
+\subsection{\completed{Line Intersection}}
+\begin{minted}{cpp}
+int Intersection(pl4 l1, pl4 l2){
+    pl2 p1 = l1.fr, p2 = l1.sc; pl2 p3 = l2.fr, p4 = l2.sc;
+    int c123 = ccw(p1, p2, p3), c124 = ccw(p1, p2, p4);
+    int c341 = ccw(p3, p4, p1), c342 = ccw(p3, p4, p2);
+    if (c123 == 0 && c124 == 0){
+        if (p1 > p2){ swap(p1, p2); } if (p3 > p4){ swap(p3, p4); }
+        if (p2 < p3 || p4 < p1){ /* No Intersection */ }
+        if (p2 == p3 || p4 == p1){ /* Endpoint */ }
+        /* Infinitely Many */
+    }
+    int c12 = c123*c124, c34 = c341*c342;
+    if (c12 > 0 || c34 > 0){ /* No Intersection */ }
+    if (c12 == 0 || c34 == 0){ /* Endpoint */ }
+    /* Mid-line */
+}
+\end{minted}
+\subsection{\completed{Convex Hull}}
+\begin{minted}{cpp}
+for (int i = 1; i <= n; i++){
+    if (arr[1] > arr[i]){ swap(arr[1], arr[i]); }
+} pl2 p0 = arr[1]; sort(arr+2, arr+n+1, [&p0](const pl2& p1, const pl2& p2){
+    int res = ccw(p0, p1, p2); if (res != 0){ return res > 0; }
+    return dis(p0, p1) < dis(p0, p2);
+});
+vector<pl2> stk; for (int i = 1; i <= n; i++){
+    pl2 p3 = arr[i]; while (stk.size() >= 2){
+        pl2 p1 = *prev(prev(stk.end())), p2 = *prev(stk.end());
+        if (ccw(p1, p2, p3) <= 0){ stk.pop_back(); } else{ break; } // < 0 if linear
+    } stk.push_back(p3);
+}
+for (int i = n-1; i > 1; i--){ // if linear only
+    if (ccw(stk.front(), arr[i], stk.back()) == 0){ stk.push_back(arr[i]); }
+    else{ break; }
+}
+\end{minted}
+\subsection{\completed{Point in Convex Polygon}}
+\begin{minted}{cpp}
+int st = 2, ed = n; while (st+1 <= ed-1){
+    int mid = st+ed >> 1;
+    if (ccw(arr[1], arr[mid], p) == +1){ st = mid; } else{ ed = mid; }
+} pl2 p1 = arr[1], p2 = arr[st], p3 = arr[st+1];
+int r12 = ccw(p1, p2, p), r23 = ccw(p2, p3, p), r31 = ccw(p3, p1, p);
+if (r12 < 0 || r23 < 0 || r31 < 0){ /* Outside */ }
+else{
+    if (r23 == 0 || r12 == 0 && st == 2 || r31 == 0 && st == n-1){ /* Line */ }
+    else{ /* Inside */ }
+}
+\end{minted}
+\subsection{\torevise{Point in Non-convex Polygon}}
+If the point is on the line, then whatever do what the problem says.
+
+OTherwise, send the straight line $(x, y)$ to $(x+X, y+X+1)$ with $X$ being sufficiently large integer. Then, count the number of intersections.
+\subsection{\completed{Rotating Calipers}}
+\begin{minted}{cpp}
+int j = 0; for (int i = 0; i < sp; i++){
+    while (j < sp){
+        int ip = (i+1) % sp, jp = (j+1) % sp;
+        pl2 l = { arr[ip].fr - arr[i].fr, arr[ip].sc - arr[i].sc };
+        pl2 r = { arr[jp].fr - arr[j].fr, arr[jp].sc - arr[j].sc };
+        if (ccw({0, 0}, l, r) < 0){ break; }
+        maxDist(i, j); j += 1;
+    } if (j < sp){ ans = max(ans, dist(i, j)); }
+}
+\end{minted}
+\subsection{\completed{Bulldozer Trick}}
+\begin{minted}{cpp}
+sort(arr+1, arr+n+1); for (int i = 1; i <= n; i++){ pos[i] = i; } // min y first
+for (int i = 1; i <= n; i++){
+    for (int j = i+1; j <= n; j++){
+        pl2 p = {arr[i].fr.fr-arr[j].fr.fr, arr[i].fr.sc-arr[j].fr.sc};
+        p = {p.sc, -p.fr};
+        if (p.sc < 0 || p.sc==0 && p.fr > 0){ p = {-p.fr, -p.sc}; }
+        lin.push_back({p, {i, j}}); // p as directional vector, min y first
+    }
+}
+sort(lin.begin(), lin.end(), [](pl2i2 p1, pl2i2 p2){
+    int res = ccw(pl2(0, 0), p1.fr, p2.fr); // ccw, if same then index
+    if (res != 0){ return res > 0; } else{ return p1.sc < p2.sc; }
+});
+int ans = solve(state); for (pl2i2 p : lin){
+    int i = p.sc.fr, j = p.sc.sc;
+    int pi = pos[i], pj = pos[j];
+    swap(arr[pi], arr[pj]); swap(pos[i], pos[j]); update(pi); update(pj);
+    ans = ans or newState;
+}
+\end{minted}
+\subsection{\completed{Halfplane Intersection}}
+\begin{minted}{cpp}
+inline pl2 ltov(const pl4& l){ return pl2{l.sc.fr-l.fr.fr, l.sc.sc-l.fr.sc}; }
+pair<bool, pd2> itx(const pl4& l1, const pl4& l2){
+    pl2 v1 = ltov(l1), v2 = ltov(l2);
+    if (ccw(O, v1, v2) == 0){ return {0, {0, 0}}; }
+    pl2 p1 = l1.fr, p2 = l2.fr; pl2 dp = {p2.fr-p1.fr, p2.sc-p1.sc};
+    ld a = (ld)crs(dp, v2) / crs(v1, v2);
+    return {1, {p1.fr + v1.fr*a, p1.sc + v1.sc*a}};
+}
+bool out(const pd2& p, const pl4& l){
+    return ccwd(l.fr, l.sc, p) <= 0;
+}
+bool out(const pl4& l1, const pl4& l2, const pl4& l){
+    auto res = itx(l1, l2); if (!res.fr){ return 0; }
+    return out(res.sc, l);
+}
+bool hpi(vector<pl4> v){
+    {
+        pl2 p1 = {-INF, -INF}, p2 = {-INF, INF};
+        pl2 p3 = {INF, INF}, p4 = {INF, -INF};
+        v.push_back({p1, p2}); v.push_back({p2, p3});
+        v.push_back({p3, p4}); v.push_back({p4, p1});
+    }
+    sort(v.begin(), v.end(), [](const pl4& l1, const pl4& l2){
+        pl2 v1 = ltov(l1), v2 = ltov(l2);
+        if ((v1 > O) != (v2 > O)){ return (v1 > O) > (v2 > O); }
+        return ccw(O, v1, v2) > 0;
+    });
+    //for (pl4& l : v){ cout << l.fr.sc << ' ' << l.fr.fr << " , " << l.sc.sc << ' ' << l.fr.sc << " / "; } cout << endl;
+    deque<pl4> dq; for (const pl4& l : v){
+        while (dq.size() >= 2){
+            int dql = dq.size();
+            if (out(dq[dql-2], dq[dql-1], l)){ dq.pop_back(); }
+            else{ break; }
+        }
+        while (dq.size() >= 2){
+            int dql = dq.size();
+            if (out(dq[0], dq[1], l)){ dq.pop_front(); }
+            else{ break; }
+        }
+        int dql = dq.size();
+        if (dql >= 1){
+            pl2 v1 = ltov(l), v2 = ltov(dq[dql-1]);
+            if (ccw(O, v1, v2) == 0){
+                if ((v1 > O) == (v2 > O)){
+                    pl2 p1 = l.fr;
+                    if (!out(p1, dq[dql-1])){ dq.pop_back(); dq.push_back(l); }
+                    continue;
+                } else{ return 0; }
+            }
+        }
+        if (dql < 2 || !out(dq[dql-1], l, dq[0])){ dq.push_back(l); }
+        //for (pl4& l : dq){ cout << l.fr.sc << ' ' << l.fr.fr << " , " << l.sc.sc << ' ' << l.fr.sc << " / "; } cout << endl;
+    }
+    //for (pl4& l : dq){ cout << l.fr.sc << ' ' << l.fr.fr << " , " << l.sc.sc << ' ' << l.fr.sc << " / "; } cout << endl;
+    return dq.size() >= 3;
+    // Actual Point Reconstruction is done by
+    // 0. res = []
+    // 1. for (int i = 0; i < dql; i++)
+    // 2.     l1, l2 = dq[i], dq[i+1]
+    // 3.     if (itx(l1, l2)) res.push(itx(l1, l2).point)
+}
+\end{minted}
+\subsection{\torevise{Shamos-Hoey}}
+This assumes that \textbf{none of the line is parallel to the $y$-axis}. You can just rotate the plane to ensure this.
+
+Apparently I just ran the Shamos-Hoey thrice with $(x,y)$, $(y,x)$, $(x+y,x-y)$.
+\begin{minted}{cpp}
+#define x first
+#define y second
+
+inline int sgn(ll x){ return (x > 0) - (x < 0); }
+
+pl2 operator+(const pl2& p1, const pl2& p2){ return { p1.fr+p2.fr, p1.sc+p2.sc }; }
+pl2 operator-(const pl2& p1, const pl2& p2){ return { p1.fr-p2.fr, p1.sc-p2.sc }; }
+pl2 operator*(const pl2& p, const ll& a){ return { p.fr*a, p.sc*a }; }
+pl2 operator/(const pl2& p, const ll& a){ return { p.fr/a, p.sc/a }; }
+pl2& operator+=(pl2& p1, const pl2& p2){ return p1 = p1+p2; }
+pl2& operator-=(pl2& p1, const pl2& p2){ return p1 = p1-p2; }
+pl2& operator*=(pl2& p, const ll& a){ return p = p*a; }
+pl2& operator/=(pl2& p, const ll& a){ return p = p/a; }
+
+ll operator*(const pl2& p1, const pl2& p2){ return p1.x*p2.x + p1.y*p2.y; }
+ll operator/(const pl2& p1, const pl2& p2){ return p1.x*p2.y - p1.y*p2.x; }
+
+inline int ccw(const pl2& p1, const pl2& p2){ return sgn(p1/p2); }
+inline int ccw(const pl2& p1, const pl2& p2, const pl2& p3){ return ccw(p2-p1, p3-p1); }
+
+inline ll dis(const pl2& p1, const pl2& p2){ pl2 r(p1-p2); return r*r; }
+
+ll ptr;
+class Lin{ public:
+	pl2 p1, p2;
+	Lin(){ p1 = {0, 0}; p2 = {0, 0}; }
+	Lin(pl2 a, pl2 b){ p1 = a; p2 = b; }
+};
+inline ld f(const Lin& l, ll x){
+	return (ld)(l.p2.y-l.p1.y) / (l.p2.x-l.p1.x) * (x-l.p1.x) + l.p1.y;
+}
+bool operator<(const Lin& l1, const Lin& l2){
+	ld p1 = f(l1, ptr), p2 = f(l2, ptr);
+	return p1 < p2;
+}
+
+bool crs(const Lin& l1, const Lin& l2){
+	int c11 = ccw(l1.p1, l1.p2, l2.p1), c12 = ccw(l1.p1, l1.p2, l2.p2);
+	int c21 = ccw(l2.p1, l2.p2, l1.p1), c22 = ccw(l2.p1, l2.p2, l1.p2);
+	//cout << "CCW " << c11 << ' ' << c12 << ' ' << c21 << ' ' << c22 << endl << flush;
+	if (c11 == 0 && c12 == 0){
+		ll p11, p12, p21, p22;
+		if (l1.p1.x == l1.p2.x){ p11 = l1.p1.y; p12 = l1.p2.y; p21 = l2.p1.y; p22 = l2.p2.y; }
+		else{ p11 = l1.p1.x; p12 = l1.p2.x; p21 = l2.p1.x; p22 = l2.p2.x; }
+		if (p11 > p21){ swap(p11, p21); swap(p12, p22); }
+		//cout << p11 << ' ' << p12 << " | " << p21 << ' ' << p22 << endl << flush;
+		return p12-p11 + p22-p21 >= p22-p11;
+	}
+	return c11 != c12 && c21 != c22;
+}
+
+int n;
+pl4 arr[200020], pnt[200020]; pl4 pos[400020];
+multiset<Lin> lin;
+
+bool smh(){
+	sort(pos+1, pos+n+n+1);
+	for (int i = 1; i <= n+n; i++){
+		ll x = pos[i].fr.fr; bool ed = pos[i].fr.sc;
+		ll y = pos[i].sc.fr; int idx = pos[i].sc.sc;
+		//cout << "I " << i << endl << x << ' ' << y << " / " << ed << ' ' << idx << endl << flush;
+		if (pnt[idx].fr.x == pnt[idx].sc.x){ continue; }
+		Lin l(pnt[idx].fr, pnt[idx].sc);
+		//cout << "L " << l.p1.x << ' ' << l.p1.y << " . " << l.p2.x << ' ' << l.p2.y << endl << flush;
+		ptr = x;
+		if (!ed){
+			auto it = lin.insert(l);
+			if (it != lin.begin()){ if (crs(*it, *prev(it))){ return 1; } }
+			if (next(it) != lin.end()){ if (crs(*it, *next(it))){ return 1; } }
+		}
+		else{
+			auto it = lin.lower_bound(l);
+			//cout << (*it).p1.x << ' ' << (*it).p1.y << " / "
+			// << (*it).p2.x << ' ' << (*it).p2.y << endl << flush;
+			if (it != lin.begin() && next(it) != lin.end()){
+				if (crs(*prev(it), *next(it))){ return 1; }
+			}
+			lin.erase(it);
+		}
+	}
+	return 0;
+}
+\end{minted}
+\subsection{\torevise{Faces of the Planar Graph}}
+This code is from \textit{BOJ 17442 - Tripartite Graph}.
+\begin{minted}{cpp}
+#include <bits/stdc++.h>
+#define endl '\n'
+using namespace std;
+using ll = long long;
+using ld = long double;
+using pi2 = pair<int, int>;
+using pl2 = pair<ll, ll>;
+using pi3 = pair<pi2, int>;
+#define fr first
+#define sc second
+const int PRECISION = 6;
+template <typename T> using priority_stack = priority_queue< T, vector<T>, greater<T> >;
+inline int sgn(ll x){ return (x > 0) - (x < 0); }
+template <typename T> inline void unq(vector<T>& v){
+    sort(v.begin(), v.end()); v.erase(unique(v.begin(), v.end()), v.end());
+}
+template <typename T> inline int cvt(const vector<T>& v, const T& x){
+    return lower_bound(v.begin(), v.end(), x) - v.begin() + 1;
+}
+
+inline int ccw(const pl2& p1, const pl2& p2, const pl2& p3){
+    ll a = p1.sc*p2.fr + p2.sc*p3.fr + p3.sc*p1.fr;
+    ll b = p1.sc*p3.fr + p3.sc*p2.fr + p2.sc*p1.fr;
+    return sgn(a-b);
+}
+
+pi2 arr[100020]; vector<int> xp;
+vector<int> adj[100020];
+
+vector<int> gph[100020];
+map<int, int> mp_gph[100020];
+
+pi3 qrr[200020]; int ans[200020];
+
+int deg[100020];
+
+int mn, mx;
+void dfs(int v, int u){
+    //cout << "dfs " << u << ' ' << v << endl;
+    mn = min({mn, arr[v].sc, arr[u].sc}); mx = max({mx, arr[v].sc, arr[u].sc});
+    int ui = mp_gph[u][v]; gph[u][ui] *= -1;
+    int vi = mp_gph[v][u]; vi += 1; if (vi == gph[v].size()){ vi = 0; }
+    if (gph[v][vi] <= 0){ return; }
+    else{ return dfs(gph[v][vi], v); }
+}
+bool chk[100020];
+void dfs2(int v){
+    chk[v] = 1;
+    mn = min(mn, arr[v].sc); mx = max(mx, arr[v].sc);
+    for (int w : gph[v]){
+        if (chk[w]){ continue; }
+        dfs2(w);
+    }
+}
+
+const int N = 131072;
+int fen1[131080], fen2[131080];
+void upd(int* fen, int pos, int val){
+    for (int i = pos; i < N; i+=i&-i){ fen[i] += val; }
+}
+int qry(int* fen, int pos){
+    int res = 0;
+    for (int i = pos; i > 0; i-=i&-i){ res += fen[i]; }
+    return res;
+}
+
+const int INF = 1e9;
+void Main(){
+    int n, m, q; cin >> n >> m >> q; int val = n-m;
+    for (int i = 1; i <= n; i++){
+        cin >> arr[i].sc >> arr[i].fr;
+        xp.push_back(arr[i].sc);
+    } unq(xp);
+    while (m--){
+        int v, w; cin >> v >> w;
+        adj[v].push_back(w); adj[w].push_back(v);
+    }
+    for (int i = 1; i <= q; i++){
+        cin >> qrr[i].fr.fr >> qrr[i].fr.sc;
+        qrr[i].sc = i;
+    }
+    {
+        queue<int> q;
+        for (int i = 1; i <= n; i++){
+            deg[i] = adj[i].size();
+            if (deg[i] <= 1){ deg[i] = 0; q.push(i); }
+        }
+        while (!q.empty()){
+            int v = q.front(); q.pop();
+            for (int w : adj[v]){
+                deg[w] -= 1; if (deg[w] == 1){
+                    deg[w] = 0; q.push(w);
+                }
+            }
+        }
+        for (int v = 1; v <= n; v++){
+            if (deg[v] > 0){
+                for (int w : adj[v]){
+                    if (deg[w] > 0){ gph[v].push_back(w); }
+                }
+            }
+            sort(gph[v].begin(), gph[v].end(), [v](int w1, int w2){
+                pl2 p1 = {arr[w1].fr-arr[v].fr, arr[w1].sc-arr[v].sc};
+                pl2 p2 = {arr[w2].fr-arr[v].fr, arr[w2].sc-arr[v].sc};
+                const pl2& p0 = {0, 0};
+                if ((p1 > p0) != (p2 > p0)){ return p1 > p2; }
+                return ccw(p0, p1, p2) > 0;
+            });
+            int l = gph[v].size(); for (int i = 0; i < l; i++){
+                int w = gph[v][i]; mp_gph[v][w] = i;
+            }
+        }
+    }
+    vector<pl2> faces;
+    for (int v = 1; v <= n; v++){
+        for (int w : gph[v]){
+            if (w <= 0){ continue; }
+            //cout << "face " << v << ' ' << w << endl;
+            mn = INF; mx = -INF; dfs(w, v);
+            faces.push_back({mn, mx}); val += 1;
+            //cout << "faces " << mn << ' ' << mx << endl;
+        }
+    }
+    vector<pl2> rmv;
+    for (int v = 1; v <= n; v++){
+        for (int &w : gph[v]){ w = -w; }
+    }
+    for (int v = 1; v <= n; v++){
+        if (!chk[v]){
+            mn = INF; mx = -INF; dfs2(v);
+            if (mn == mx){ continue; }
+            rmv.push_back({mn, mx}); val -= 1;
+            //cout << "nofaces " << mn << ' ' << mx << endl;
+        }
+    }
+    for (int i = 1; i <= q; i++){ ans[i] = val; }
+    //cout << "init " << val << ' ' << faces.size() << ' ' << rmv.size() << endl;
+    sort(qrr+1, qrr+q+1);
+    for (int v = 1; v <= n; v++){
+        for (int w : adj[v]){
+            if (v < w){ continue; }
+            int x1 = arr[v].sc, x2 = arr[w].sc;
+            if (x1 > x2){ swap(x1, x2); }
+            int i1 = cvt(xp, x1), i2 = cvt(xp, x2);
+            //cout << "edge1 " << x1 << ' ' << x2 << endl;
+            upd(fen1, i1, +1); upd(fen1, i2, -1);
+        }
+    }
+    for (pl2 p : faces){
+        int x1 = p.fr, x2 = p.sc;
+        int i1 = cvt(xp, x1), i2 = cvt(xp, x2);
+        //cout << "face1 " << x1 << ' ' << x2 << endl;
+        upd(fen1, i1, -1); upd(fen1, i2, +1);
+    }
+    for (pl2 p : rmv){
+        int x1 = p.fr, x2 = p.sc;
+        int i1 = cvt(xp, x1), i2 = cvt(xp, x2);
+        //cout << "noface1 " << x1 << ' ' << x2 << endl;
+        upd(fen1, i1, +1); upd(fen1, i2, -1);
+    }
+    sort(faces.begin(), faces.end()); sort(rmv.begin(), rmv.end());
+    int fi = 0, ri = 0; int fl = faces.size(), rl = rmv.size();
+    for (int i = 1; i <= q; i++){
+        int st = qrr[i].fr.fr, ed = qrr[i].fr.sc; int qi = qrr[i].sc;
+        ans[qi] += qry(fen1, cvt(xp, st)-1) + qry(fen1, cvt(xp, ed)-1);
+        while (fi < fl){
+            int l = faces[fi].fr, r = faces[fi].sc;
+            if (l > st){ break; }
+            int p = cvt(xp, r); upd(fen2, p, +1); fi += 1;
+        }
+        while (ri < rl){
+            int l = rmv[ri].fr, r = rmv[ri].sc;
+            if (l > st){ break; }
+            int p = cvt(xp, r); upd(fen2, p, -1); ri += 1;
+        }
+        ans[qi] += qry(fen2, N-1) - qry(fen2, cvt(xp, ed)-1);
+        //cout << "query " << st << ' ' << ed << " / " << val << ' ' << qry(fen1, cvt(xp, st)-1) << ' ' << qry(fen1, cvt(xp, ed)-1) << ' ' << qry(fen2, N-1) << ' ' << qry(fen2, cvt(xp, ed)-1) << endl;
+    }
+    for (int i = 1; i <= q; i++){ cout << ans[i] << endl; }
+}
+
+int main(){
+    ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+    cout.setf(ios::fixed); cout.precision(PRECISION); Main();
+}
+\end{minted}
+\section{Graph Theory - Connectivity}
+\subsection{\completed{Strongly Connected Component}}
+\complexity{$\mathcal O(V+E)$.}
+\begin{minted}{cpp}
+stack<int> stk; int scc[N+20];
+int ord[N+20], ont;
+int dfs(int now){
+    stk.push(now); int res = ord[now] = ++ont;
+    for (int nxt : adj[now]){
+        if (ord[nxt] == 0){ res = min(res, dfs(nxt)); }
+        else if (scc[nxt] == -1){ res = min(res, ord[nxt]); }
+    }
+    if (res == ord[now]){
+        while (!stk.empty()){
+            int vtx = stk.top(); stk.pop();
+            scc[vtx] = now; if (vtx == now){ break; }
+        }
+    } return res;
+}
+\end{minted}
+\subsection{\torevise{Solution of the 2-SAT}}
+This code is old, and are not recommended to directly copy this.
+\begin{minted}{cpp}
+for (int i = 1; i <= 2*n; i++){
+    for (int j : adj[i]){
+        int pi = scc[i], pj = scc[j];
+        if (pi == pj){ continue; }
+        dag[pi].push_back(pj); cnt[pj] += 1;
+    }
+}
+queue<int> q; for (int i = 1; i <= 2*n; i++){
+    if (scc[i] != i){ continue; }
+    if (cnt[i] == 0){ q.push(i); }
+}
+memset(ans, -1, sizeof(ans));
+while (!q.empty()){
+    int now = q.front(); q.pop();
+    for (int v : vtx[now]){
+        if (ans[v] != -1){ continue; }
+        ans[v] = 0; ans[ idx( -inv(v) ) ] = 1;
+    }
+    for (int nxt : dag[now]){
+        pc[nxt] -= 1; if (pc[nxt] == 0){ q.push(nxt); }
+    }
+}
+\end{minted}
+\subsection{\completed{Biconnected Component}}
+\complexity{$\mathcal O(V+E)$.}
+\begin{minted}{cpp}
+pi3 edg[100020]; // {{v, w}, color}
+vector<int> adj[100020]; // Edge Index
+stack<int> stk;
+int ord[100020], ont = 0;
+int dfs(int now, int pre){
+    int res = ord[now] = ++ont;
+    for (int ei : adj[now]){
+        int nxt = edg[ei].fr.fr ^ edg[ei].fr.sc ^ now;
+        if (nxt == pre){ continue; }
+        if (ord[now] > ord[nxt]){ stk.push(ei); }
+        if (ord[nxt] > 0){ res = min(res, ord[nxt]); }
+        else{
+            int val = dfs(nxt, now); res = min(res, val);
+            if (val >= ord[now]){
+                vector<int> v; while (!stk.empty()){
+                    int e = stk.top(); stk.pop();
+                    edg[e].sc = ei; if (e == ei){ break; }
+                }
+            }
+        }
+    }
+    return res;
+}
+\end{minted}
+\subsection{\completed{Articulation Point \& Edge}}
+\begin{itemize}
+	\item Articulation Point: Vertex with $2$ or more colors.
+	\item Articulation Edge: Edge that has unique color.
+\end{itemize}
+\section{Graph Theory - Network Flow \& Matching}
+\subsection{\completed{Dinitz}}
+\begin{minted}{cpp}
+int n, m; int src, snk, nc; ll adj[220][220];
+int dis[320];
+bool bfs(int st, int ed){
+    memset(dis, -1, sizeof(dis)); dis[st] = 0;
+    queue<int> q; q.push(st);
+    while (!q.empty()){
+        int now = q.front(); q.pop();
+        for (int nxt = 0; nxt < nc; nxt++){
+            if (adj[now][nxt] == 0){ continue; }
+            if (dis[nxt] != -1){ continue; }
+            dis[nxt] = dis[now]+1; q.push(nxt);
+        }
+    } return dis[ed] != -1;
+}
+bool chk[220]; int ptr[220];
+int pth[220], pc;
+bool dfs(int now, int idx){
+    pth[idx] = now; chk[now] = 1;
+    if (now == snk){ pc = idx; return 1; }
+    for (int& nxt = ptr[now]; nxt < nc; nxt++){
+        if (adj[now][nxt] == 0){ continue; }
+        if (dis[now]+1 != dis[nxt]){ continue; }
+        if (chk[nxt]){ continue; }
+        if (dfs(nxt, idx+1)){ return 1; }
+    }
+    return 0;
+}
+
+memset(ptr, 0, sizeof(ptr)); memset(chk, 0, sizeof(chk));
+ll ans = 0; while (bfs(src, snk)){
+    memset(ptr, 0, sizeof(ptr)); memset(chk, 0, sizeof(chk));
+    while (dfs(src, 0)){
+        memset(chk, 0, sizeof(chk));
+        ll res = INF;
+        for (int i = 1; i <= pc; i++){
+            int v = pth[i-1], w = pth[i];
+            res = min(res, adj[v][w]);
+        } ans += res;
+        for (int i = 1; i <= pc; i++){
+            int v = pth[i-1], w = pth[i];
+            adj[v][w] -= res; adj[w][v] += res;
+        }
+    }
+}
+\end{minted}
+\subsection{\tolearn{Push-Relabel}}
+\subsection{\tolearn{Bipartite Matching}}
+\subsection{\totest{Modeling - Flow with Demands}}
+\begin{itemize}
+	\item $\mathrm{req}_i = $ required flow $i$th vertex need to have
+		\begin{itemize}
+		\item $\mathrm{req}_i < 0$: Need to get it from source
+		\item $\mathrm{req}_i > 0$: Need to send it to sink
+		\end{itemize}
+	\item $v \rightarrow w$ with lower/upper bound of $l$ and $u$.
+		\begin{itemize}
+		\item $\mathrm{req}_v = l$
+		\item $\mathrm{req}_w = -l$
+		\item Capacity of $v \rightarrow w = u-l$
+		\end{itemize}
+	\item Create new source and sink, and connect the $v$ with source or sink with capacity $\mathrm{req}_v$.
+	\item From the old sink to old source, connect an edge with the capacity $\infty$.
+	\item MaxFlow should be equal to $\sum\limits_{\mathrm{req}_v > 0} \mathrm{req}_v$ in order to satisfy the original graph.
+\end{itemize}
+\subsection{\completed{Minimum Cost Maximum Flow w/ SPFA}}
+\begin{minted}{cpp}
+int src, snk, nc; pi2 adj[220][220]; // (flow, cost)
+int dis[220]; bool chk[220]; int pre[220];
+int pth[220]; int pc;
+bool spfa(int st, int ed){
+    memset(dis, 0x3f, sizeof(dis)); memset(chk, 0, sizeof(chk));
+    queue<int> q; dis[st] = 0; chk[st] = 1; q.push(st);
+    while (!q.empty()){
+        int now = q.front(); q.pop(); chk[now] = 0;
+        for (int nxt = 1; nxt <= nc; nxt++){
+            if (adj[now][nxt].fr == 0){ continue; }
+            if (dis[nxt] <= dis[now] + adj[now][nxt].sc){ continue; }
+            dis[nxt] = dis[now] + adj[now][nxt].sc; pre[nxt] = now;
+            if (!chk[nxt]){ chk[nxt] = 1; q.push(nxt); }
+        }
+    }
+    if (dis[ed] == INF){ return 0; }
+    int ptr = ed; pc = 0;
+    while (ptr != st){ pth[pc++] = ptr; ptr = pre[ptr]; } pth[pc] = ptr;
+    reverse(pth, pth+pc+1); return 1;
+}
+
+int ans = 0, res = 0; while (spfa(src, snk)){
+    int cnt = INF; for (int i = 1; i <= pc; i++){
+        int v = pth[i-1], w = pth[i];
+        cnt = min(cnt, adj[v][w].fr);
+    } res += cnt;
+    for (int i = 1; i <= pc; i++){
+        int v = pth[i-1], w = pth[i];
+        adj[v][w].fr -= cnt; adj[w][v].fr += cnt;
+        ans += cnt*adj[v][w].sc;
+    }
+}
+\end{minted}
+\subsection{\totest{Stable Marriage Problem}}
+Try matching greedily. For $i$ in $1$ to $N$, try to match the best possible matching $j$, knocking other matchings in process.
+\begin{minted}{cpp}
+int num[50020];
+vector<int> adj[50020]; map<int, int> rnk[10020];
+
+int ptr[50020]; priority_queue<pi2> res[10020];
+// pq: rank, person
+
+bool f(int i, int j, int idx){
+    //cout << "F " << i << ' ' << j << ' ' << idx << endl;
+    if (res[j].size() != num[j]){ res[j].push({rnk[j][i], i}); ptr[i] = idx; return 1; }
+    pi2 p = res[j].top();
+    if (p.fr > rnk[j][i]){
+        res[j].pop(); res[j].push({rnk[j][i], i});
+        ptr[p.sc] += 1; for (int& k = ptr[p.sc]; k < adj[p.sc].size(); k++){
+			assert(1 <= adj[p.sc][k] && adj[p.sc][k] <= 10000);
+            if (f(p.sc, adj[p.sc][k], k)){ break; }
+        }
+        return 1;
+    }
+    else{ return 0; }
+}
+
+for (int i = 1; i <= n; i++){
+	for (int& idx = ptr[i]; idx < adj[i].size(); idx++){
+		int j = adj[i][idx];
+		if (f(i, j, idx)){ break; };
+	}
+}
+\end{minted}
+\subsection{\torevise{Hungarian Algorithm}}
+\begin{minted}{cpp}
+// Max version. for Min, adj[v][w] *= -1, then print -ans.
+ll adj[520][520];
+ll l1[520], l2[520]; ll d[520]; int di[520];
+bool c1[520], c2[520]; int m1[520], m2[520];
+int par[520];
+inline ll cost(int v, int w){ return l1[v] + l2[w] - adj[v][w]; }
+void psh(int n, int v, int p){ // p -> m1[v] -> v
+    c1[v] = 1; par[v] = p;
+    for (int j = 1; j <= n; j++){
+        if (cost(v, j) < d[j]){ d[j] = cost(v, j); di[j] = v; }
+    }
+}
+
+for (int i = 1; i <= n; i++){ l1[i] = *max_element(adj[i]+1, adj[i]+n+1); }
+for (int j = 1; j <= n; j++){ l2[j] = 0; }
+for (int cnt = 0; cnt < n; cnt++){
+    memset(c1, 0, sizeof(c1)); memset(c2, 0, sizeof(c2));
+    memset(par, 0, sizeof(par));
+    queue<int> q; int st = 0;
+    for (int i = 1; i <= n; i++){
+        if (m1[i] == 0){
+            st = i; q.push(i);
+            par[i] = -1; c1[i] = 1; break;
+        }
+    }
+    for (int j = 1; j <= n; j++){ d[j] = cost(st, j); di[j] = st; }
+    int v = 0, w = 0; while (1){
+        while (!q.empty()){
+            v = q.front(); q.pop();
+            for (int j = 1; j <= n; j++){
+                if (cost(v, j) == 0 && !c2[j]){
+                    if (m2[j] == 0){ w = j; goto augment; }
+                    c2[j] = 1; q.push(m2[j]); psh(n, m2[j], v);
+                }
+            }
+        }
+        ll val = INF; for (int j = 1; j <= n; j++){
+            if (!c2[j]){ val = min(val, d[j]); }
+        }
+        for (int i = 1; i <= n; i++){ if (c1[i]){ l1[i] -= val; } }
+        for (int j = 1; j <= n; j++){
+            if (c2[j]){ l2[j] += val; } else{ d[j] -= val; }
+        }
+        while (!q.empty()){ q.pop(); }
+        for (int j = 1; j <= n; j++){
+            if (!c2[j] && d[j] == 0){
+                if (m2[j] == 0){ v = di[j]; w = j; goto augment; }
+                else{
+                    c2[j] = 1; if (!c1[m2[j]]){
+                        q.push(m2[j]); psh(n, m2[j], di[j]);
+                    }
+                }
+            }
+        }
+    } augment:
+    while (v != -1){
+        int pv = m2[w], pw = m1[v];
+        m1[v] = w; m2[w] = v; v = par[v]; w = pw;
+    }
+}
+ll ans = 0; for (int i = 1; i <= n; i++){ ans += adj[i][m1[i]]; }
+\end{minted}
+\subsection{\torevise{General Matching}}
+\begin{minted}{cpp}
+int n, m; vector<int> adj[520]; // Input: Graph
+int res[520]; // Matched Vertex
+
+int par[520]; // BFS path, before v.
+int chk[520]; // Visited? (0: no, 1: yes+odd, 2: yes+even) \
+                 odd/even comes from bipartite... kinda. \
+                 all v in q satisfies chk[v] = 1.
+void pro(int r, int v){ // Re-Match. a.k.a. Augmenting
+    int p = v; do{
+        p = par[v]; int q = res[p];
+        res[v] = p; res[p] = v; v = q;
+    } while (r != p);
+}
+
+int bls[520]; // Position of a Blossom
+bool vst[520]; // Used for lca.
+int lca(int v, int w){ // LCA on a BFS tree.
+    memset(vst, 0, sizeof(vst));
+    while (1){
+        if (v != 0){
+            if (vst[v]){ return v; }
+            vst[v] = 1; v = bls[par[res[v]]];
+        } swap(v, w);
+    }
+}
+void cyc(int v, int w, queue<int>& q){ // Cycle (fancy term = Blossom) Merging.
+    int l = lca(bls[v], bls[w]);
+    while (bls[v] != l){
+        par[v] = w; w = res[v];
+        if (chk[w] == 2){ q.push(w); chk[w] = 1; }
+        bls[v] = bls[w] = l; v = par[w];
+    }
+}
+bool bfs(int r){ // main BFS.
+    memset(chk, 0, sizeof(chk)); memset(par, 0, sizeof(par));
+    for (int v = 1; v <= n; v++){ bls[v] = v; }
+    queue<int> q; q.push(r); chk[r] = 1; while (!q.empty()){
+        int v = q.front(); q.pop();
+        for (int w : adj[v]){
+            if (chk[w] == 0){
+                par[w] = v; chk[w] = 2;
+                if (res[w] == 0){ pro(r, w); return 1; }
+                q.push(res[w]); chk[res[w]] = 1;
+            }
+            else if (chk[w] == 1 && bls[v] != bls[w]){
+                cyc(w, v, q); cyc(v, w, q);
+            }
+        }
+    } return 0;
+}
+
+void Main(){
+    cin >> n >> m; while (m--){
+        int v, w; cin >> v >> w;
+        adj[v].push_back(w); adj[w].push_back(v);
+    }
+    int ans = 0; for (int v = 1; v <= n; v++){
+        if (res[v] == 0 && bfs(v)){ ans += 1; }
+    } cout << ans;
+}
+\end{minted}
+\section{Graph Theory - Miscellaneous}
+\subsection{\totest{Eulerian Path}}
+\begin{minted}{cpp}
+vector<int> adj[1020]; int ptr[1020];
+int ind[1020], oud[1020];
+
+int cnt = 0;
+void dfs(int now){
+	//cout << "dfs " << now << endl;
+	for (int& p = ptr[now]; p < adj[now].size();){
+		int nxt = adj[now][p++];
+		cnt += 1; dfs(nxt);
+	}
+}
+\end{minted}
+\subsection{\toadd{Tree Isomorphism}}
+Only has the hash part, as apparently that was the only thing I needed back then??
+\begin{minted}{cpp}
+pi2 res = {-1, -1};
+int cent(int now, int pre){
+    int siz = 1; bool flg = 1; for (int nxt : adj[now]){
+        if (nxt == pre){ continue; }
+        int cnt = cent(nxt, now);
+        if (cnt*2 > n){ flg = 0; } siz += cnt;
+    }
+    if (flg && (n-siz)*2 <= n){ (res.fr==-1 ? res.fr : res.sc) = now; }
+    return siz;
+}
+void dfs(int now, int pre){
+    dep[now] = dep[pre]+1; dpt = max(dpt, dep[now]);
+    dpv[dep[now]].push_back(now);
+    for (int nxt : adj[now]){
+        if (nxt == pre){ continue; } dfs(nxt, now);
+    }
+}
+
+int val[N+20];
+cent(1, 1); if (res.sc != -1){
+    erase(adj[res.fr], res.sc); erase(adj[res.sc], res.fr);
+    n++; adj[res.fr].push_back(n); adj[res.sc].push_back(n);
+    adj[n].push_back(res.fr); adj[n].push_back(res.sc); res = {n, -1};
+} dfs(res.fr, res.fr); // unrooted. for rooted ignore above, just dfs(root, root).
+for (int d = dpt; d > 1; d--){
+    vector<pvi> res;
+    for (int v : dpv[d-1]){
+        res.emplace_back(); res.back().sc = v;
+        for (int w : adj[v]){
+            if (dep[w] != d){ continue; }
+            res.back().fr.push_back(val[w]);
+        }
+    }
+    for (pvi& p : res){ sort(p.fr.begin(), p.fr.end()); }
+    sort(res.begin(), res.end()); int len = res.size();
+    int x = 0; for (int i = 0; i < len; i++){
+        if (i > 0 && res[i].fr == res[i-1].fr){ val[res[i].sc] = x; }
+        else{ val[res[i].sc] = ++x; }
+    }
+}
+\end{minted}
+\section{Dynamic Programming}
+\subsection{\completed{Rerooting}}
+Tree DP, with changing root.
+
+\complexity{$\mathcal O(N)$.}
+\begin{minted}{cpp}
+void reroot(int now, int pre){
+    ans[now] = dp[now]; for (int nxt : adj[now]){
+        if (nxt == pre){ continue; }
+        int dpv = dp[now], dpw = dp[nxt];
+        dp[now] -= (dp[nxt]?); dp[nxt] += (dp[now]?);
+        reroot(nxt, now);
+        dp[now] = dpv; dp[nxt] = dpw;
+    }
+} // dpf(root, root); reroot(root, root)
+\end{minted}
+\subsection{\completed{Sum over Subset}}
+$D_S = \sum_{T \subseteq S} A_T$.
+
+\complexity{$\mathcal O(N 2^N)$.}
+\begin{minted}{cpp}
+for (int i = 0; i < X; i++){ dp[i] = arr[i]; }
+for (int b = 0; b < B; b++){
+    for (int bit = 0; bit < X; bit++){
+        if (bit>>b & 1){ dp[bit] += dp[bit ^ 1<<b]; }
+    }
+}
+\end{minted}
+\subsection{\torevise{Convex Hull Trick}}
+$D_i = \max_{j < i} a_j x_i + b_j$.
+
+\complexity{$\mathcal O(N)$ for $N$ insertions, $\mathcal O(\log N)$ for query.}
+\begin{minted}{cpp}
+inline ld crs(pl2 l1, pl2 l2){ return (ld)(l2.sc-l1.sc)/(l1.fr-l2.fr); }
+pair<pl2, ld> stk[1000020]; int sp = 0;
+inline void psh(pl2 p){
+    stk[sp].fr = p; stk[sp].sc = (sp==0 ? 0 : crs(stk[sp-1].fr, stk[sp].fr));
+    sp += 1;
+}
+inline void pop(){ sp -= 1; }
+
+// query: x
+int st = 0, ed = sp; while (st+1 <= ed-1){
+    int mid = st+ed >> 1;
+    if (x < stk[mid].sc){ ed = mid; } else{ st = mid; }
+} pl2 p = stk[st].fr; // A(j)x + B(j)
+dp[i] = p.fr*x + p.sc + C(i);
+// update: p = (A(j), B(j))
+while (sp > 0){
+    if (crs(stk[sp-1].fr, p) <= stk[sp-1].sc){ pop(); } else{ break; }
+} psh(p);
+\end{minted}
+\subsection{\torevise{Divide and Conquer Optimization}}
+$D_{k,i} = \max{j<i} D_{k-1,j} + A_{j,i}$. $\mathrm{opt}_i < \mathrm{opt}_{i+1}$.
+
+\complexity{$\mathcal O(KN \log N)$.}
+\begin{minted}{cpp}
+ll dp[2][N+20]; // Sliding Window on first index
+void dnc_opt(ll* dp1, ll* dp0, int is, int ie, int os, int oe){
+    if (is > ie){ return; } int im = is+ie >> 1;
+    int o = os; for (int p = os; p <= min(oe, im-1); p++){
+        if (f(dp0, p, im) < f(dp0, o, im)){ o = p; }
+    }
+    dp1[im] = f(dp0, o, im);
+    dnc_opt(dp1, dp0, is, im-1, os, o); dnc_opt(dp1, dp0, im+1, ie, o, oe);
+}
+\end{minted}
+\subsection{\torevise{WQS Binary Search (Aliens Trick)}}
+$D_{k,i} = \min{j<i} D_{k-1,j} + A_{j,i}$. $D_{k,N}$ must be convex.
+
+\complexity{$\mathcal O(T(N) \log X)$.}
+\begin{minted}{cpp}
+// Solve function returns the number of used elements
+// Binary Search over Lambda
+ll st = 0, ed = 1e18; ll ans = 1e18;
+while (st <= ed){
+    ll mid = st+ed >> 1;
+    int cnt = solve(n, mid); ans = min<i128>(ans, dp[n] + (i128)mid*k);
+    if (cnt <= k){ ed = mid-1; } else{ st = mid+1; }
+} cout << ans;
+\end{minted}
+\subsection{\totest{Monotone Queue Optimization}}
+$D_i = \min_{j<i} D_j + A_{j,i}$. For all pair $i < j$, there exists a point $p$ that $D_i + C_{i,p}$ and $D_j + C_{j,p}$ changes. So $k < p$ means $<$, and $\ge$ otherwise.
+
+\complexity{$\mathcal O(N \log N)$}.
+
+Code from \textit{BOJ 17439 - Flower Shop}.
+\begin{minted}{cpp}
+ll arr[50020]; ll prf[50020];
+
+deque<int> dq;
+pl2 dp[50020];
+inline ll f(int j, int i){ return (prf[i]-prf[j])*(i-j); }
+inline ll dpf(int j, int i){ return dp[j].fr + f(j, i); }
+inline int crx(int a, int b, int n){ // Assume a < b.
+    int st = b+1, ed = n; int i = n+1; while (st <= ed){
+        int mid = st+ed >> 1;
+        if (dpf(a, mid) >= dpf(b, mid)){ i = mid; ed = mid-1; }
+        else{ st = mid+1; }
+    } return i;
+}
+int solve(int n, ll x){
+    //cout << "solve " << x << ": ";
+    dp[0] = {0, 0}; for (int i = 1; i <= n; i++){
+        while (dq.size() >= 2){
+            int dql = dq.size();
+            int a = dq[dql-2], b = dq[dql-1];
+            if (crx(a, b, n) >= crx(b, i-1, n)){ dq.pop_back(); }
+            else{ break; }
+        } dq.push_back(i-1);
+        while (dq.size() >= 2){
+            int a = dq[0], b = dq[1];
+            if (crx(a, b, n) <= i){ dq.pop_front(); }
+            else{ break; }
+        } int j = dq.front();
+        dp[i] = {dpf(j, i), dp[j].sc+1};
+        //cout << dp[i].fr << " \n"[i==n];
+    } return dp[n].sc;
+}
+\end{minted}
+\subsection{\torevise{Slope Trick}}
+I think this one is easier to just say. Let $f$ be a convex piecewise linear function with integer coefficient.
+We can save this function by the points where the line changes, with one linear function.
+
+We can add two functions by merging the points without removing duplicants, and adding the linear function.
+\subsection{\torevise{Knuth Optimization}}
+$D_{i,j} = D_{i,k} + D_{k+1,j} + A_{i,j}$ where $\mathrm{opt}_{i,j-1} \le \mathrm{opt}_{i,j} \le \mathrm{opt}_{i+1,j}$.
+This is satisfied if $C$ is monge.
+
+\complexity{$\mathcal O(N^2)$}.
+\begin{minted}{cpp}
+for (int d = 0; d < n; d++){
+	for (int s=1, e=1+d; e <= n; s++, e++){
+		if (d == 0){ dp[s][e] = 0; opt[s][e] = s; }
+		else{
+			opt[s][e] = s; dp[s][e] = INF;
+			for (int p = opt[s][e-1]; p <= opt[s+1][e]; p++){
+				ll res = dp[s][p] + dp[p+1][e] + prf[e]-prf[s-1];
+				if (dp[s][e] > res){ dp[s][e] = res; opt[s][e] = p; }
+			}
+		}
+	}
+} cout << dp[1][n] << endl;
+\end{minted}
+\subsection{\completed{Kitamasa}}
+$A_n = \prod_{i=1}^{k} A_{n-d} C_{d}$. The code below uses \texttt{arr} as initial terms with index $0$ to $n-1$.
+And \texttt{f} as coefficient of $x^n - \sum_{d=1}^{k} C_{d} x^{n-d}$.
+\begin{minted}{cpp}
+const ll mod = 104857601; const ll r = 3;
+
+ll fpow(ll mul, ll bit){
+    ll res = 1; while (bit){
+        if (bit&1){ res = res*mul % mod; }
+        mul = mul*mul % mod; bit >>= 1;
+    } return res;
+} inline ll finv(ll x){ return fpow(x, mod-2); }
+
+inline void normp(vector<ll>& arr){
+    int l = arr.size(); while (l > 0){
+        if (arr[l-1] == 0){ l -= 1; } else{ break; }
+    } arr.resize(l);
+}
+inline vector<ll> trim(vector<ll> arr, int mx){
+    int l = min<int>(arr.size(), mx); return vector<ll>(arr.begin(), arr.begin()+l);
+}
+void dft(vector<ll>& arr, bool inv = false){
+    int n = arr.size();
+    for (int j=0, i=1; i < n; i++){
+        int bit = n>>1;
+        while (j&bit){ j ^= bit; bit >>= 1; } j ^= bit;
+        if (i < j){ swap(arr[i], arr[j]); }
+    }
+    for (int l = 1; l < n; l*=2){
+        ll w = fpow(r, (mod-1)/(2*l)); if (inv){ w = finv(w); }
+        for (int i = 0; i < n; i += l*2){
+            ll wp = 1; for (int j = 0; j < l; j++){
+                ll a = arr[i+j], b = arr[i+j+l]*wp % mod;
+                arr[i+j] = (a+b) % mod; arr[i+j+l] = (a-b+mod)%mod;
+                wp = wp*w % mod;
+            }
+        }
+    }
+    if (inv){
+        ll invn = finv(n);
+        for (int i = 0; i < n; i++){ arr[i] = arr[i]*invn % mod; }
+    }
+}
+vector<ll> mulp(vector<ll> arr, vector<ll> brr){ // A \times B
+    normp(arr); normp(brr);
+    int al = arr.size(), bl = brr.size();
+    int n = max(al, bl); n = 1 << (bits(n) + 1 - ((n&-n)==n));
+    arr.resize(n); brr.resize(n);
+    dft(arr); dft(brr);
+    for (int i = 0; i < n; i++){ arr[i] = arr[i]*brr[i] % mod; }
+    dft(arr, -1); arr = trim(arr, al+bl-1); return arr;
+}
+vector<ll> invp(vector<ll> arr, int k){ // A^{-1} \pmod{x^k}. Assume A[0] \neq 0.
+    arr = trim(arr, k);
+    vector<ll> res = vector<ll>{finv(arr[0])}; int m = 1;
+    while (m < k){
+        vector<ll> val = trim(mulp(trim(arr, m*2), res), m*2); int vl = val.size();
+        for (int i = 0; i < vl; i++){
+            val[i] = ((i==0)*2 + mod-val[i]) % mod;
+        } res = trim(mulp(res, val), m*2); m *= 2;
+    } res = trim(res, k); return res;
+}
+vector<ll> divp(vector<ll> arr, vector<ll> brr){ // D, where A = BQ + R with \deg R < \deg B.
+    normp(arr); normp(brr);
+    int al = arr.size(), bl = brr.size(); if (al < bl){ return vector<ll>{}; }
+    reverse(arr.begin(), arr.end()); reverse(brr.begin(), brr.end());
+    arr = trim(arr, al-bl+1); brr = trim(brr, al-bl+1);
+    vector<ll> qrr = mulp(arr, invp(brr, al-bl+1)); qrr.resize(al-bl+1);
+    reverse(qrr.begin(), qrr.end()); normp(qrr); return qrr;
+}
+vector<ll> modp(vector<ll> arr, vector<ll> brr){ // R, where A = BQ + R with \deg R < \deg B.
+    normp(arr); normp(brr);
+    int al = arr.size(), bl = brr.size(); if (al < bl){ return arr; }
+    vector<ll> qrr = divp(arr, brr); vector<ll> drr = mulp(brr, qrr);
+    for (int i = 0; i < al; i++){ arr[i] = (arr[i]-drr[i]+mod) % mod; }
+    normp(arr); return arr;
+}
+
+ll arr[30020], crr[30020];
+
+ll kth(ll k, const vector<ll>& arr, const vector<ll>& f){ // x^k \pmod f
+    int n = arr.size(); if (k < n){ return arr[k]; }
+    vector<ll> res{1}, mul{0, 1}; while (k){
+        if (k&1){ res = modp(mulp(res, mul), f); }
+        mul = modp(mulp(mul, mul), f); k >>= 1;
+    }
+    ll ans = 0; for (int i = 0; i < n; i++){ ans += res[i]*arr[i] % mod; }
+    return ans%mod;
+}
+\end{minted}
+\subsection{\torevise{Hirschberg}}
+\begin{minted}{cpp}
+string s1, s2;
+
+#define ENDL ""
+
+int dp[3][7010];
+void solve(int i1, int j1, int i2, int j2, bool top = true){
+    //cout << "solve " << i1 << ' ' << j1 << ' ' << i2 << ' ' << j2 << endl;
+    if (i1 > j1 || i2 > j2){ return; }
+    if (i1 == j1){
+        for (int p2 = i2; p2 <= j2; p2++){
+            if (s1[i1] == s2[p2]){
+                if (top){ cout << 1 << endl; }
+                cout << s1[j1] << ENDL; return;
+            }
+        }
+        if (top){ cout << 0 << endl; } return;
+    }
+    int m1 = i1+j1 >> 1;
+    for (int p1 = i1-1; p1 <= m1; p1++){
+        int b1 = p1&1; int b0 = 1-b1;
+        for (int p2 = i2-1; p2 <= j2; p2++){
+            if (p1 == i1-1 || p2 == i2-1){ dp[b1][p2] = 0; }
+            else{
+                dp[b1][p2] = max(dp[b0][p2], dp[b1][p2-1]);
+                if (s1[p1] == s2[p2]){ dp[b1][p2] = max(dp[b1][p2], dp[b0][p2-1]+1); }
+            }
+        }
+    }
+    if ((m1&1) == 0){
+        for (int p2 = i2-1; p2 <= j2; p2++){ dp[1][p2] = dp[0][p2]; }
+    }
+    for (int p1 = j1; p1 > m1; p1--){
+        int b1 = p1&1; int b0 = 1-b1; b1 <<= 1; b0 <<= 1;
+        for (int p2 = j2; p2 >= i2-1; p2--){
+            if (p1 == j1 || p2 == j2){ dp[b1][p2] = 0; }
+            else{
+                dp[b1][p2] = max(dp[b0][p2], dp[b1][p2+1]);
+                if (s1[p1+1] == s2[p2+1]){ dp[b1][p2] = max(dp[b1][p2], dp[b0][p2+1]+1); }
+            }
+        }
+    }
+    if ((m1+1&1) == 0){
+        for (int p2 = i2-1; p2 <= j2; p2++){ dp[2][p2] = dp[0][p2]; }
+    }
+    int mx = 0; pi2 mxp = {0, 0}; for (int p2 = i2-1; p2 <= j2; p2++){
+        int x = dp[1][p2]+dp[2][p2];
+        if (x > mx){ mx = x; mxp = {0, p2}; }
+    }
+    for (int p2 = i2; p2 <= j2; p2++){
+        if (s1[m1+1] == s2[p2]){
+            int x = dp[1][p2-1]+dp[2][p2]+1;
+            if (x > mx){ mx = x; mxp = {1, p2}; }
+        }
+    }
+    if (top){ cout << mx << endl; }
+    if (mx == 0){ return; }
+    if (mxp.fr == 0){
+        int p2 = mxp.sc;
+        solve(i1, m1, i2, p2, 0); solve(m1+1+1, j1, p2+1, j2, 0);
+    }
+    else{
+        int p2 = mxp.sc;
+        solve(i1, m1, i2, p2-1, 0); cout << s2[p2] << ENDL; solve(m1+1+1, j1, p2+1, j2, 0);
+    }
+}
+
+void Main(){
+    cin >> s1 >> s2; int l1 = s1.size(), l2 = s2.size();
+    s1 = " " + s1; s2 = " " + s2;
+    solve(1, l1, 1, l2);
+}
+\end{minted}
+\subsection{\torevise{Connection Profile}}
+Single Connected Region, with DP condition.
+
+\complexity{$\mathcal O(NM B_M)$, $B_9 = 21\,147$. Actual state is about $2\,000$?}
+\begin{minted}{cpp}
+int n, m; int arr[10][10];
+inline int f(string& bit){
+    int cvt[10] = {}; int val = 0;
+    for (char& c : bit){
+        int x = c-'0'; if (x == 0){ continue; }
+        if (cvt[x] == 0){ cvt[x] = ++val; }
+        c = cvt[x]+'0';  
+    } return val;
+}
+const ll INF = 1e18;
+map<string, ll> dp[10][10];
+ll dpf(int y, int x, string bit){ int cnt = f(bit);
+    if (x == m){ y += 1; x = 0; }
+    if (y == n){ return cnt <= 1 ? 0 : INF; }
+    if (dp[y][x].count(bit)){ return dp[y][x][bit]; }
+    dp[y][x][bit] = INF;
+    bool flg = bit.front() == '0';
+    for (int b = 1; b < m; b++){ flg |= bit[0] == bit[b]; }
+    if (flg){
+        string nxt = bit.substr(1, m-1) + '0';
+        dp[y][x][bit] = min(dp[y][x][bit], dpf(y, x+1, nxt));
+    }
+    char u = bit.front(), l = bit.back(); if (x == 0){ l = '0'; }
+    if (u == '0' && l == '0'){
+        string nxt = bit.substr(1, m-1) + (char)(cnt+1+'0');
+        dp[y][x][bit] = min(dp[y][x][bit], dpf(y, x+1, nxt) + arr[y][x]);
+    }
+    else if (u == '0' || l == '0'){
+        string nxt = bit.substr(1, m-1) + (u=='0' ? l : u);
+        dp[y][x][bit] = min(dp[y][x][bit], dpf(y, x+1, nxt) + arr[y][x]);
+    }
+    else{
+        string nxt = bit.substr(1, m-1) + u;
+        for (char& c : nxt){ if (c == l){ c = u; } }
+        dp[y][x][bit] = min(dp[y][x][bit], dpf(y, x+1, nxt) + arr[y][x]);
+    }
+    if (cnt <= 1){ dp[y][x][bit] = min<ll>(dp[y][x][bit], 0); }
+    return dp[y][x][bit];
+}
+dpf(0, 0, string(m, '0')); // minimize the sum of arr[i][j], connected.
+\end{minted}
+\subsection{\torevise{Permutation DP}}
+Let $D_{i,j}$ be the number of pre-permutations that uses the value from $1$ to $i$, and has $j$ components.
+The transition is to:
+\begin{itemize}
+	\item Create new component: $(i, j) \to (i+1, j+1)$.
+	\item Append $i+1$ to one of the component: $(i, j) \to (i+1, j)$.
+	\item Connect two components using $i+1$: $(i, j) \to (i+1, j-1)$.
+\end{itemize}
+
+When the starting/ending point is specified, you need to be careful about the number of \textit{open}-ended points.
+\subsection{\totest{Berlekamp-Massey}}
+Use with \textit{Kitamasa}.
+\begin{minted}{cpp}
+vector<ll> mulp(vector<ll> arr, vector<ll> brr){ // A \times B
+    normp(arr); normp(brr);
+    int al = arr.size(), bl = brr.size();
+    vector<ll> res(al+bl-1);
+    for (int i = 0; i < al; i++){
+        for (int j = 0; j < bl; j++){
+            res[i+j] += arr[i]*brr[j] % mod; res[i+j] %= mod;
+        }
+    } return res;
+}
+vector<ll> solve(vector<ll> arr){
+    int n = arr.size();
+    vector<ll> res, val; int pos = -1;
+    for (int i = 0; i < n; i++){
+        int rl = res.size();
+        ll d = arr[i]; for (int j = 0; j < rl; j++){
+            d -= res[j]*arr[i-j-1] % mod; d = (d+mod)%mod;
+        } if (d == 0){ continue; }
+        if (pos == -1){
+            res.resize(i+1); for (int j = 0; j <= i; j++){ res[j] = 1; }
+            pos = i;
+        } else{
+            vector<ll> v{1}; for (ll x : val){ v.push_back((mod-x)%mod); }
+            int vl = v.size();
+            ll c = 0; for (int j = 0; j < vl; j++){
+                c += v[j]*arr[pos-j] % mod; c %= mod;
+            } c = d*finv(c) % mod;
+            for (ll& x : v){ x = x*c % mod; }
+            vector<ll> tmp(i-pos-1, 0); for (ll x : v){ tmp.push_back(x); }
+            if (i - res.size() >= pos - val.size()){ val = res; pos = i; }
+            int rl = max(res.size(), tmp.size()); res.resize(rl); 
+            for (int i = 0; i < rl; i++){ res[i] = (res[i]+tmp[i]) % mod; }
+        }
+    } return res;
+}
+\end{minted}
+\section{String}
+\subsection{\completed{Knuth-Morris-Pratt}}
+\begin{minted}{cpp}
+int j = 0; for (int i = 1; i < m; i++){
+    while (j != 0){
+        if (t[i] == t[j]){ break; } else{ j = jmp[j-1]; }
+    } if (t[i] == t[j]){ j += 1; jmp[i] = j; }
+}
+j = 0; for (int i = 0; i < n; i++){
+    while (j != 0){
+        if (s[i] == t[j]){ break; } else{ j = jmp[j-1]; } 
+    } if (s[i] == t[j]){
+        if (j+1 == m){ /* matched on (i-m, i] */ j = jmp[j]; }
+        else{ j += 1; }
+    }
+}
+\end{minted}
+\subsection{\torevise{Z Algorithm}}
+\begin{minted}{cpp}
+int l = 0, r = 0;
+for (int i = 1; i < sl; i++){
+    if (i < r){ z[i] = min(r-i, z[i-l]); }
+    while (i+z[i] < sl){
+        if (s[z[i]] == s[i+z[i]]){ z[i] += 1; }
+        else{ break; }
+    }
+    if (r < i+z[i]){ l = i; r = i+z[i]; }
+} z[0] = sl;
+\end{minted}
+\subsection{\torevise{Aho-Corasick}}
+\begin{minted}{cpp}
+int q; cin >> q; while (q--){
+    string s; cin >> s; /* Trie */ psh(s);
+}
+queue<int> q; q.push(0); /* Root */ while (!q.empty()){
+    int now = q.front(); q.pop();
+    for (int nxi : nxtSet){
+        int nxt = trie[now].nxt[nxi]; if (nxt == 0){ continue; }
+        if (now == 0){ trie[nxt].jmp = now; }
+        else{
+            int ptr = trie[now].jmp; while (ptr != 0){
+                if (trie[ptr].nxt[nxi] != 0){ break; } else{ ptr = trie[ptr].jmp; }
+            } if (trie[ptr].nxt[nxi] != 0){ ptr = trie[ptr].nxt[nxi]; }
+            trie[nxt].jmp = ptr;
+        } q.push(nxt);
+        trie[nxt].chk |= trie[trie[nxt].jmp].chk;
+    }
+}
+int ptr = 0; for (int nxi : s){
+    while (ptr != 0){
+        if (trie[ptr].nxt[nxi] != 0){ break; } else{ ptr = trie[ptr].jmp; }
+    } if (trie[ptr].nxt[nxi] != 0){ ptr = trie[ptr].nxt[nxi]; }
+    if (trie[ptr].chk){ ans += 1; }
+}
+\end{minted}
+\subsection{\completed{Suffix Array \& Longest Common Prefix Array}}
+\begin{minted}{cpp}
+int k, sl; int sa[200020], res[200020];
+int pos[200020], lcp[200020];
+bool cmp(int s1, int s2){
+    if (pos[s1] != pos[s2]){ return pos[s1] < pos[s2]; }
+    int ss1 = s1+k, ss2 = s2+k;
+    if (ss1 >= sl || ss2 >= sl){ return ss1 > ss2; }
+    return pos[ss1] < pos[ss2];
+}
+
+for (int i = 0; i < sl; i++){ sa[i] = i; pos[i] = s[i]; }
+for (k = 1; ; k*=2){
+    sort(sa, sa+sl, cmp);
+    res[0] = 0; for (int i = 1; i < sl; i++){
+        res[i] = res[i-1]; if (cmp(sa[i-1], sa[i])){ res[i] += 1; }
+    }
+    for (int i = 0; i < sl; i++){ pos[ sa[i] ] = res[i]; }
+    if (res[sl-1] == sl-1){ break; }
+}
+k = 0; for (int i = 0; i < sl; i++){
+    k = max(k-1, 0);
+    int i1 = pos[i], i2 = pos[i]-1;
+    if (i2 < 0){ continue; }
+    int p1 = sa[i1], p2 = sa[i2];
+    while (p1+k < sl && p2+k < sl){
+        if (s[p1+k] != s[p2+k]){ break; } else{ k += 1; }
+    }
+    lcp[ pos[i] ] = k;
+}
+\end{minted}
+\subsection{\totest{Suffix Array - Traversing}}
+\texttt{qry(st, ed)} denotes the minimum value of $\mathrm{LCP}[st, ed)$.
+\begin{minted}{cpp}
+// sa[st..ed][i..j) -> t more eat, res jumped
+void solve(int st, int ed, int i, int t, int res){
+	res += 1; pi2 p = qry(st, ed); int mid = p.sc, j = min(p.fr, n);
+	int len = j-i; int cnt = prf[sa[st] + j-1] - prf[sa[st] + i];
+	//cout << "solve " << st << ' ' << ed << ' ' << i << ' ' << t << ' ' << res << " / " << mid << ' ' << j << ' ' << len << ' ' << cnt << endl << flush;
+	if (cnt < t){
+		if (j >= n){ cout << -1; exit(0); }
+		solve(st, mid, j, t-cnt, res + len-1 - cnt);
+		solve(mid+1, ed, j, t-cnt, res + len-1 - cnt);
+	}
+	else{
+		int d = prf[sa[st] + i] + t;
+		auto p = lower_bound(prf, prf+n+n+1, d) - prf; p -= sa[st];
+		int l = p-i; res += l-t; ans = max(ans, res);
+		return;
+	}
+}
+\end{minted}
+\subsection{\torevise{Manacher's}}
+\begin{minted}{cpp}
+string s = "#"; for (char c : inp){ s += c; s += '#'; }
+int sl = s.size(); int ptr = -1, mid = -1;
+for (int i = 0; i < sl; i++){
+    if (ptr >= i){ pos[i] = min(ptr-i, pos[mid + mid-i]); }
+    else{ pos[i] = 0; }
+    int i1 = i-pos[i], i2 = i+pos[i];
+    while (0 <= i1-1 && i2+1 < sl){
+        if (s[i1-1] == s[i2+1]){ i1--; i2++; pos[i] += 1; }
+        else{ break; }
+    }
+    if (i2 > ptr){ ptr = i2; mid = i; }
+} // length = *max_element(pos, pos+sl);
+\end{minted}
+\subsection{\torevise{Rolling Hash \& Rabin-Karp}}
+\begin{minted}{cpp}
+const int H = 2;
+typedef array<ll, H> alH;
+const ll mod[H] = {993244853, 998244853};
+const ll mul[H] = {31, 37};
+ll ppw[H][N+20], prf[H][N+20];
+void init(int hi, const string& s){ int sl = s.size();
+    ppw[hi][0] = 1; for (int i = 1; i <= N; i++){ ppw[hi][i] = ppw[hi][i-1]*mul[hi] % mod[hi]; }
+    for (int i = 1; i <= sl; i++){ prf[hi][i] = (prf[hi][i-1]*mul[hi] + s[i]) % mod[hi]; }
+}
+inline alH hsh(int st, int ed){
+    alH res; for (int hi = 0; hi < H; hi++){
+        res[hi] = (prf[hi][ed] - prf[hi][st-1]*ppw[hi][ed-st+1] % mod[hi] + mod[hi]) % mod[hi];
+    }
+    return res;
+}
+\end{minted}
+\section{Data Structures}
+\subsection{\completed{Li-Chao Tree}}
+Find $\max f_i(x) = a_ix + b_i$, with line insertion update.
+
+\complexity{$\mathcal O(\log N)$ per update/query.}
+\begin{minted}{cpp}
+// Max version. if Min then use the commentated version.
+inline ll f(pl2 l, ll x){ return l.fr*x + l.sc; }
+struct Node{ pl2 l = {0, -INF /* INF */}; pi2 nxt = {0, 0}; };
+vector<Node> seg;
+void upd(int ni, ll ns, ll ne, pl2 l1){
+    pl2 l2 = seg[ni].l;
+    if (f(l1, ns) < /* > */ f(l2, ns)){ swap(l1, l2); }
+    if (f(l1, ne) >= /* <= */ f(l2, ne)){ seg[ni].l = l1; return; }
+    ll nm = ns+ne >> 1;
+    if (f(l1, nm) >= /* <= */ f(l2, nm)){
+        seg[ni].l = l1; if (seg[ni].nxt.sc == 0){
+            seg[ni].nxt.sc = seg.size(); seg.emplace_back();
+        } upd(seg[ni].nxt.sc, nm+1, ne, l2);
+    }
+    else{
+        seg[ni].l = l2; if (seg[ni].nxt.fr == 0){
+            seg[ni].nxt.fr = seg.size(); seg.emplace_back();
+        } upd(seg[ni].nxt.fr, ns, nm, l1);
+    }
+} inline void upd(pl2 l){ return upd(0, -X, X, l); }
+ll qry(int ni, ll ns, ll ne, ll x){
+    pl2 l = seg[ni].l; ll nm = ns+ne >> 1;
+    int nxt = (x <= nm ? seg[ni].nxt.fr : seg[ni].nxt.sc);
+    if (nxt == 0){ return f(l, x); }
+    else{
+        if (x <= nm){ return max /* min */(f(l, x), qry(nxt, ns, nm, x)); }
+        else{ return max /* min */(f(l, x), qry(nxt, nm+1, ne, x)); }
+    }
+} inline ll qry(ll x){ return qry(0, -X, X, x); }
+\end{minted}
+\subsection{\torevise{Multi-Dimensional Segment Tree}}
+\begin{minted}{cpp}
+const int N = 1024;
+int seg[2050][2050];
+void updx(int yp, int x, int val){ int xp = x+N-1;
+	if (yp >= N){ seg[yp][xp] = val; }
+	else{ seg[yp][xp] = max(seg[yp<<1][xp], seg[yp<<1|1][xp]); }
+	xp >>= 1;
+	while (xp){ seg[yp][xp] = max(seg[yp][xp<<1], seg[yp][xp<<1|1]); xp >>= 1; }
+}
+void upd(int y, int x, int val){ int yp = y+N-1;
+	updx(yp, x, val); yp >>= 1;
+	while (yp){ updx(yp, x, val); yp >>= 1; }
+}
+int qryx(int yp, int x1, int x2){ x1 += N-1; x2 += N-1;
+	int res = 0;
+	while (x1 <= x2){
+		if (x1 & 1){ res = max(seg[yp][x1], res); x1 += 1; }
+		if (~x2 & 1){ res = max(seg[yp][x2], res); x2 -= 1; }
+		if (x1 > x2){ break; } x1 >>= 1; x2 >>= 1;
+	}
+	return res;
+}
+int qry(int y1, int y2, int x1, int x2){ y1 += N-1; y2 += N-1;
+	int res = 0;
+	while (y1 <= y2){
+		if (y1 & 1){ res = max(qryx(y1, x1, x2), res); y1 += 1; }
+		if (~y2 & 1){ res = max(qryx(y2, x1, x2), res); y2 -= 1; }
+		if (y1 > y2){ break; } y1 >>= 1; y2 >>= 1;
+	}
+	return res;
+}
+\end{minted}
+\subsection{\torevise{Persistent Segment Tree}}
+\begin{minted}{cpp}
+const int N = 1000000;
+struct Node{ int sum; int nxt[2]; };
+vector<Node> seg; vector<int> root;
+
+void upd(int ni, int ns, int ne, int qi, int qx){
+    if (ns == ne){ seg[ni].sum += qx; return; }
+    int nm = ns+ne >> 1; int nxi = (qi <= nm ? 0 : 1);
+    int p = seg[ni].nxt[nxi]; seg[ni].nxt[nxi] = seg.size();
+    seg.push_back(seg[p]);
+    if (qi <= nm){ upd(seg[ni].nxt[nxi], ns, nm, qi, qx); }
+    else{ upd(seg[ni].nxt[nxi], nm+1, ne, qi, qx); }
+    seg[ni].sum += qx;
+}
+inline void upd(int idx, int pos, int val){
+    root.push_back(seg.size()); seg.push_back(seg[root[idx]]);
+    upd(root.back(), 0, N, pos, val);
+}
+
+int qry(int ni, int ns, int ne, int qs, int qe){
+    if (qs <= ns && ne <= qe){ return seg[ni].sum; }
+    int nm = ns+ne >> 1;
+    int res = 0;
+    if (qs <= nm && seg[ni].nxt[0]){ res += qry(seg[ni].nxt[0], ns, nm, qs, qe); }
+    if (nm+1 <= qe && seg[ni].nxt[1]){ res += qry(seg[ni].nxt[1], nm+1, ne, qs, qe); }
+    return res;
+}
+inline int qry(int idx, int st, int ed){
+    return qry(root[idx], 0, N, st, ed);
+}
+\end{minted}
+\subsection{\totest{Segment Tree Beats}}
+Lazy Segtree, but less lazy and more planning.
+
+\complexity{$\mathcal O(Q \log N)$, amortized.}
+\begin{minted}{cpp}
+struct Node{ int mx1, mx2, mxc; int sum; int laz; }; // update on a = min(a, x)
+inline Node mrg(const Node& l, const Node& r){ Node p;
+    p.mx1 = max(l.mx1, r.mx1);
+    p.mx2 = max((l.mx1 == p.mx1 ? l.mx2 : l.mx1), (r.mx1 == p.mx1 ? r.mx2 : r.mx1));
+    p.mxc = (l.mx1 == p.mx1 ? l.mxc : 0) + (r.mx1 == p.mx1 ? r.mxc : 0);
+    p.sum = l.sum + r.sum;
+    p.laz = INF; return p;
+}
+Node seg[2097152];
+inline void pro(int ni, int ns, int ne){
+    if (ns != ne){
+        seg[ni<<1].laz = min(seg[ni<<1].laz, seg[ni].laz);
+        seg[ni<<1|1].laz = min(seg[ni<<1|1].laz, seg[ni].laz);
+    }
+    ll dif = seg[ni].laz - seg[ni].mx1; if (dif <= 0){
+        seg[ni].sum += dif * seg[ni].mxc;
+        seg[ni].mx1 += dif;
+    } seg[ni].laz = INF;
+}
+void upd(int ni, int ns, int ne, int qs, int qe, int qx){
+    pro(ni, ns, ne);
+    if (qe < ns || ne < qs || seg[ni].mx1 <= qx){ return; }
+    if (qs <= ns && ne <= qe && seg[ni].mx2 < qx){ seg[ni].laz = qx; return pro(ni, ns, ne); }
+    int nm = ns+ne >> 1;
+    upd(ni<<1, ns, nm, qs, qe, qx); upd(ni<<1|1, nm+1, ne, qs, qe, qx);
+    seg[ni] = mrg(seg[ni<<1], seg[ni<<1|1]);
+} inline void upd(int st, int ed, int val){ return upd(1, 1, N, st, ed, val); }
+Node qry(int ni, int ns, int ne, int qs, int qe){
+    pro(ni, ns, ne);
+    if (qe < ns || ne < qs){ return {-1, -1, 0, 0, INF}; }
+    if (qs <= ns && ne <= qe){ return seg[ni]; }
+    int nm = ns+ne >> 1;
+    return mrg(qry(ni<<1, ns, nm, qs, qe), qry(ni<<1|1, nm+1, ne, qs, qe));
+} inline Node qry(int st, int ed){ return qry(1, 1, N, st, ed); }
+\end{minted}
+\subsection{\torevise{Splay Tree}}
+\complexity{$\mathcal O(Q \log N)$, amortized.}
+\begin{minted}{cpp}
+struct Node{ Node *p, *l, *r; int sum; bool flp; }; Node *root;
+void propagate(Node *nod){
+    if (nod->flp == 0){ return; }
+    swap(nod->l, nod->r);
+    if (nod->l){ nod->l->flp ^= 1; } if (nod->r){ nod->r->flp ^= 1; }
+    nod->flp = 0;
+}
+void update(Node *nod){
+    if (nod->l){ /* Left Value, swap if l->flp */ }
+    if (nod->r){ /* Right Value, swap if r->flp */ }
+    /* update nod */
+}
+void rotate(Node *now){
+    Node *par = now->p; if (!par){ return; }
+    Node *pre = par->p; if (pre){
+        if (pre->l == par){ pre->l = now; } else{ pre->r = now; }
+        now->p = pre;
+    } else{ root = now; now->p = nullptr; }
+    Node *nxt;
+    if (par->l == now){ par->l = nxt = now->r; now->r = par; }
+    else{ par->r = nxt = now->l; now->l = par; }
+    par->p = now; if (nxt){ nxt->p = par; }
+    update(par); update(now);
+}
+void splay(Node *now, Node *top = nullptr){
+    while (now->p != top){
+        Node *par = now->p; Node *pre = par->p;
+        if (pre != top){
+            if ( (pre->l==par) == (par->l==now) ){ rotate(par); } else{ rotate(now); }
+        } rotate(now);
+    }
+}
+int num = 1;
+void insert(int val){ // Insert to Rightmost Only
+    if (!root){ root = new Node; return; }
+    Node *ptr = root; while (ptr->r){ ptr = ptr->r; }
+    ptr->r = new Node; ptr->r->p = ptr;
+    ptr = ptr->r; ptr->val = ptr->mxl = ptr->mxr = ptr->ans = val;
+    ptr->index = num; num += 1;
+    splay(ptr);
+}
+void kth(int k){ k += 1;
+    Node *ptr = root; while (1){
+        propagate(ptr);
+        if (ptr->l){
+            if (ptr->l->cnt >= k){ ptr = ptr->l; continue; }
+            if (ptr->l->cnt+1 < k){ k -= ptr->l->cnt+1; ptr = ptr->r; continue; }
+            break;
+        }
+        else{
+            if (k != 1){ k -= 1; ptr = ptr->r; } else{ break; }
+        }
+    }
+    splay(ptr);
+}
+void segmentate(int st, int ed){ // Desired Node in root->r->l.
+    kth(ed+1); Node* nod = root; kth(st-1); splay(nod, root);
+}
+void reverse(int st, int ed){
+    segmentate(st, ed); Node* nod = root->r->l; nod->flp ^= 1; propagate(nod);
+}
+\end{minted}
+\subsection{\torevise{Link-Cut Tree}}
+\begin{minted}{cpp}
+struct Node{ Node *l, *r, *p; int idx; };
+inline bool isRoot(Node* now){
+    if (!now->p){ return 1; }
+    return now->p->l != now && now->p->r != now;
+}
+void rotate(Node *now){
+    if (isRoot(now)){ return; }
+    Node *par = now->p; Node *pre = par->p;
+    if (isRoot(par)){ now->p = pre; }
+    else{
+        if (pre->l == par){ pre->l = now; } else{ pre->r = now; }
+        now->p = pre;
+    }
+    Node *nxt;
+    if (par->l == now){ par->l = nxt = now->r; now->r = par; }
+    else{ par->r = nxt = now->l; now->l = par; }
+    par->p = now; if (nxt){ nxt->p = par; }
+}
+void splay(Node *now){
+    while (!isRoot(now)){
+        Node *par = now->p; Node *pre = par->p;
+        if (!isRoot(par)){
+            if ((par->l==now) == (pre->l==par)){ rotate(par); } else{ rotate(now); }
+        } rotate(now);
+    }
+}
+void access(Node *now){
+    splay(now); now->r = nullptr;
+    while (now->p){
+        splay(now->p); now->p->r = now; splay(now);
+    }
+}
+void link(Node *now, Node *par){
+    access(now); access(par);
+    now->l = par; par->p = now;
+}
+void cut(Node *now){
+    access(now); now->l->p = nullptr; now->l = nullptr;
+}
+Node* lca(Node *v, Node *w){
+    access(v); access(w); spl(v);
+    if (v->p){ return v->p; } else{ return v; }
+}
+Node *vtx[N+20]; vtx[i]->idx = i; // might be a good idea to directly access the node
+\end{minted}
+\section{Query \& Decomposition}
+\subsection{\completed{Heavy-Light Decomposition}}
+\complexity{$\mathcal O(T(N) \log N)$ per update/query.}
+\begin{minted}{cpp}
+vector<int> adj[500020]; int par[500020];
+int siz[500020], dep[500020];
+void dfs1(int now, int pre){
+    siz[now] = 1; par[now] = pre; erase(adj[now], pre);
+    for (int& nxt : adj[now]){
+        dep[nxt] = dep[now]+1; dfs1(nxt, now);
+        siz[now] += siz[nxt];
+        if (siz[nxt] >= siz[adj[now][0]]){ swap(nxt, adj[now][0]); }
+    }
+}
+pi2 ord[500020]; int ont;
+int chn[500020];
+void dfs2(int now, int pre){
+    ord[now].fr = ++ont;
+    for (int nxt : adj[now]){
+        if (nxt == adj[now][0]){ chn[nxt] = chn[now]; }
+        else{ chn[nxt] = nxt; } dfs2(nxt, now);
+    }
+    ord[now].sc = ont;
+}
+// dfs1(root, root); chn[root] = root; dfs2(root, root);
+void upd_pth(int v, int w, int x){
+    while (chn[v] != chn[w]){
+        if (dep[chn[v]] > dep[chn[w]]){ swap(v, w); }
+        upd(ord[chn[w]].fr, ord[w].fr, x); w = par[chn[w]];
+    }
+    if (dep[v] > dep[w]){ swap(v, w); } upd(ord[v].fr, ord[w].fr, p);
+    // if Edge Weight: if v == w then no update. otherwise v = chl[v][0] before update
+}
+u32 qry_pth(int v, int w){
+    u32 res = 0; while (chn[v] != chn[w]){
+        if (dep[chn[v]] > dep[chn[w]]){ swap(v, w); }
+        res += qry(ord[chn[w]].fr, ord[w].fr); w = par[chn[w]];
+    }
+    if (dep[v] > dep[w]){ swap(v, w); }
+    return res+qry(ord[v].fr, ord[w].fr);
+    // if Edge Weight: if v == w then no query. otherwise v = chl[v][0] before query
+}
+\end{minted}
+\subsection{\completed{Centroid Decomposition}}
+\complexity{$\mathcal O(N \log N)$.}
+\begin{minted}{cpp}
+bool chk[200020];
+int siz[100020];
+void szf(int now, int pre){
+    siz[now] = 1;
+    for (int nxt : adj[now]){ if (chk[nxt]){ continue; }
+        if (nxt == pre){ continue; }
+        szf(nxt, now); siz[now] += siz[nxt];
+    }
+}
+int cen(int now){
+    szf(now, -1); int pre = -1, tar = siz[now]/2;
+    while (1){
+        bool flg = 1;
+        for (int nxt : adj[now]){ if (chk[nxt]){ continue; }
+            if (nxt == pre){ continue; }
+            if (siz[nxt] <= tar){ continue; }
+            pre = now; now = nxt; flg = 0; break;
+        } if (flg){ return now; }
+    }
+}
+int ans[100020];
+void dnc(int now, int pre){
+    now = cen(now);
+    /* Conquer Part */
+    chk[now] = 1; for (int nxt : adj[now]){
+        if (chk[nxt]){ continue; }
+        dnc(nxt, now);
+    }
+}
+\end{minted}
+\subsection{\completed{Tree Compression}}
+\complexity{$\mathcal O(K \log N)$ per query.}
+\begin{minted}{cpp}
+vector<int> arr;
+for (int i = 1; i <= n; i++){ int v; cin >> v; arr.push_back(v); }
+sort(arr.begin(), arr.end(), [](int v, int w){ return ord[v] < ord[w]; });
+for (int i = 1; i < n; i++){
+    int v = arr[i-1], w = arr[i]; arr.push_back(lca(v, w));
+}
+sort(arr.begin(), arr.end(), [](int v, int w){ return ord[v] < ord[w]; });
+arr.erase(unique(arr.begin(), arr.end()), arr.end());
+int al = arr.size(); for (int i = 1; i < al; i++){
+    ll l = lca(arr[i-1], arr[i]);
+    adj[cvt(arr, l)].push_back({i, dis[arr[i]]-dis[l]});
+    adj[i].push_back({cvt(arr, l), dis[arr[i]]-dis[l]});
+}
+\end{minted}
+\subsection{\completed{Mo's}}
+\complexity{$\mathcal O(Q \sqrt N)$.}
+\begin{minted}{cpp}
+int n, m; cin >> n >> m; int sq = sqrt(n);
+for (int i = 1; i <= n; i++){ cin >> arr[i]; }
+int q; cin >> q; for (int i = 1; i <= q; i++){
+    cin >> qrr[i].fr.fr >> qrr[i].fr.sc; qrr[i].sc = i;
+}
+sort(qrr+1, qrr+q+1, [sq](pi3 p1, pi3 p2){
+    int b1 = p1.fr.fr/sq, b2 = p2.fr.fr/sq;
+    if (b1 != b2){ return b1 < b2; }
+    return p1.fr.sc < p2.fr.sc;
+});
+int p1 = 1, p2 = 0; for (int i = 1; i <= q; i++){
+    int q1 = qrr[i].fr.fr, q2 = qrr[i].fr.sc;
+    while (q1 < p1){ upd(arr[--p1], +1); }
+    while (p2 < q2){ upd(arr[++p2], +1); }
+    while (q1 > p1){ upd(arr[p1++], -1); }
+    while (p2 > q2){ upd(arr[p2--], -1); }
+    ans[qrr[i].sc] = qry(/* Value */);
+}
+\end{minted}
+\subsection{\torevise{Parallel Binary Search}}
+\complexity{$\mathcal O(Q \log X)$.}
+\begin{minted}{cpp}
+// Binary Search: path available after ans-th event.
+// 0-th event: impossible as nothing is active
+// m-th event: possible as everything is connected
+struct Query{ int st, ed; int idx; int v, w; };
+Query qrr[100020];
+while (1){
+    sort(qrr+1, qrr+q+1, [](Query& q1, Query& q2){
+        return (q1.st+q1.ed)/2 < (q2.st+q2.ed)/2;
+    });
+    for (int i = 1; i <= n; i++){ par[i] = -1; }
+    bool flg = 0;
+    int qi = 1; for (int ei = 0; ei <= n; ei++){
+        if (ei > 0){ // Update
+            int v = evt[ei].fr;
+            par[v] = v; for (pi2 p : adj[v]){
+                int w = p.fr; if (par[w] != -1){ uni(v, w); }
+            }
+        }
+        while (qi <= q){ // Try answering the queries
+            if (qrr[qi].st+1 > qrr[qi].ed-1){ qi++; continue; }
+            int mid = qrr[qi].st+qrr[qi].ed >> 1; flg = 1;
+            if (mid != ei){ break; }
+            int v = qrr[qi].v, w = qrr[qi].w;
+            if (par[v] != -1 && par[w] != -1 && fnd(v) == fnd(w)){ qrr[qi].ed = mid; }
+            else{ qrr[qi].st = mid; } qi++;
+        }
+    }
+    if (!flg){ break; }
+}
+sort(qrr+1, qrr+q+1, [](Query& q1, Query& q2){ return q1.idx < q2.idx; });
+for (int i = 1; i <= q; i++){ cout << evt[qrr[i].ed].sc << endl; } // ed = first possible
+\end{minted}
+\subsection{\torevise{Offline Dynamic Query}}
+\complexity{$\mathcal O(T(N) \times Q \log Q)$.}
+\begin{minted}{cpp}
+// BOJ 24272: 루트 노트가 많은 트리일수록 좋은 트리이다
+inline pi3 f(int& v, int& w, string& s){
+    if (v > w){ swap(v, w); swap(s[0], s[1]); }
+    return {{v, w}, s=="--" ? 0 : s[0]=='-' ? +1 : -1};
+}
+
+map<pi2, pi2> mp;
+
+int N = 131072;
+vector<pi3> qrr[262150];
+void upd(int ni, int ns, int ne, int qs, int qe, pi3 p){
+    if (qe < ns || ne < qs){ return; }
+    if (qs <= ns && ne <= qe){ qrr[ni].push_back(p); return; }
+    int nm = ns+ne >> 1;
+    upd(ni<<1, ns, nm, qs, qe, p); upd(ni<<1|1, nm+1, ne, qs, qe, p);
+} inline void upd(int st, int ed, pi3 p){ return upd(1, 1, N, st, ed, p); }
+
+int par[100020]; int siz[100020]; int ind[100020], oud[100020]; int ans;
+struct State{ int qi, typ; int v, w; int ans; };
+stack<State> stk;
+void init(int n){
+    for (int i = 1; i <= n; i++){ par[i] = i; siz[i] = 1; ind[i] = oud[i] = 0; }
+    ans = n;
+}
+void undo(int qi){
+    while (!stk.empty()){
+        State p = stk.top(); if (p.qi != qi){ break; } stk.pop();
+        if (p.typ == 1){
+            oud[p.w] -= oud[p.v]; ind[p.w] -= ind[p.v];
+            siz[p.w] -= siz[p.v]; par[p.v] = p.v; ans = p.ans;
+        }
+        if (p.typ == 2){
+            ind[p.w] -= 1; oud[p.v] -= 1; ans = p.ans;
+        }
+    }
+}
+int fnd(int v){ return par[v]==v ? v : fnd(par[v]); }
+void uni(int qi, int v, int w){ // v -- w
+    v = fnd(v); w = fnd(w); if (siz[v] > siz[w]){ swap(v, w); }
+    stk.push({qi, 1, v, w, ans});
+    if (ind[w] && ind[v]){ ans = 0; }
+    if (ans > 0 && ind[w] == 0 && ind[v] > 0){ ans -= siz[w]; }
+    if (ans > 0 && ind[v] == 0 && ind[w] > 0){ ans -= siz[v]; }
+    par[v] = w; siz[w] += siz[v];
+    ind[w] += ind[v]; oud[w] += oud[v];
+}
+void dir(int qi, int v, int w){ // v -> w
+    v = fnd(v); w = fnd(w);
+    stk.push({qi, 2, v, w, ans});
+    if (ind[w]){ ans = 0; }
+    if (ans > 0 && ind[w] == 0){ ans -= siz[w]; }
+    oud[v] += 1; ind[w] += 1;
+}
+
+void dnc(int ni, int ns, int ne){
+    for (pi3 p : qrr[ni]){
+        int v = p.fr.fr, w = p.fr.sc, d = p.sc;
+        if (d == -1){ swap(v, w); d = +1; }
+        if (d == 0){ uni(ni, v, w); }
+        if (d == +1){ dir(ni, v, w); }
+    }
+    if (ns != ne){
+        int nm = ns+ne >> 1;
+        dnc(ni<<1, ns, nm); dnc(ni<<1|1, nm+1, ne);
+    }
+    else{ cout << ans << endl; }
+    undo(ni);
+} void dnc(){ return dnc(1, 1, N); }
+
+void Main(){
+    int n; cin >> n;
+    for (int i = 1; i < n; i++){
+        int v, w; string d; cin >> v >> d >> w; pi3 p = f(v, w, d);
+        mp[p.fr] = {0, p.sc};
+    }
+    int q; cin >> q; N = q;
+    for (int i = 1; i <= q; i++){
+        int v, w; string d; cin >> v >> d >> w; pi3 p = f(v, w, d);
+        upd(mp[p.fr].fr, i-1, {p.fr, mp[p.fr].sc}); mp[p.fr] = {i, p.sc};
+    }
+    for (pair<pi2, pi2> kv : mp){
+        upd(kv.sc.fr, q, {kv.fr, kv.sc.sc});
+    }
+    init(n); dnc();
+}
+\end{minted}
+\subsection{\totest{Range Minimum Query w/ Sparse Table}}
+$P_{k,i} = \min_{i \le p < i+2^{k}} A_p$.
+Let $l$ be the largest integer such that $l \le j-i+1$. Then $\min_{i \le p \le j} = \min(P_{l,i}, P_{l,j-2^{l}+1})$
+\section{Heuristics}
+\subsection{\tolearn{Simulated Annealing}}
+\subsection{\tolearn{Diversified Late-Acceptance Search}}
+\section{Code Snippet - C++}
+\subsection{\completed{Randomization}}
+\begin{minted}{cpp}
+const time_t TIME = chrono::high_resolution_clock::now().time_since_epoch().count();
+mt19937 gen(TIME);
+uniform_int_distribution<int> rng(a, b); // [a, b] range
+int value = rng(gen); shuffle(begin, end, gen);
+\end{minted}
+\subsection{\completed{Bitwise Function}}
+\begin{minted}{cpp}
+inline int bitc(int x){ return __builtin_popcount(x); }
+inline int bitl(int x){ return x==0 ? 32 : __builtin_clz(x); }
+inline int bitp(int x){ return x==0 ? 32 : __builtin_ctz(x); }
+\end{minted}
+\subsection{\completed{Policy Based Data Structure}}
+\begin{minted}{cpp}
+#include <ext/pb_ds/tree_policy.hpp>
+#include <ext/pb_ds/assoc_container.hpp>
+using namespace __gnu_pbds;
+template <typename T> using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+
+ordered_set<int> s; s.insert(x);
+s.find_by_order(k); // 0-based, returns iterator
+s.order_of_key(x); // 0-based, lower_bound
+\end{minted}
+\subsection{\completed{Custom Comparison}}
+\begin{minted}{cpp}
+bool cmp(int a, int b){ return a < b; }
+sort(begin, end, cmp); // a -> b
+set<int, decltype(&cmp)> s(cmp); // a -> b (inorder)
+priority_queue<int, vector<int>, decltype(&cmp)> pq(cmp); // b on top
+
+sort(v.begin(), v.end(), [](pi2 a, pi2 b){ return a.fr+a.sc < b.fr+b.sc; });
+auto st = lower_bound(v.begin(), v.end(), x, [](pi2 p, int x){ return p.fr+p.sc < x; });
+auto ed = upper_bound(v.begin(), v.end(), x, [](int x, pi2 p){ return x < p.fr+p.sc; });
+// [st, ed) is where p.fr+p.sc == x
+\end{minted}
+\subsection{\completed{Custom Hash}}
+\begin{minted}{cpp}
+struct custom_hash {
+    static uint64_t splitmix64(uint64_t x) {
+        x += 0x9e3779b97f4a7c15;
+        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
+        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
+        return x ^ (x >> 31);
+    }
+
+    size_t operator()(uint64_t x) const {
+        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
+        return splitmix64(x + FIXED_RANDOM);
+    }
+};
+
+unordered_map<ll, int, custom_hash> mp;
+\end{minted}
+\section{Code Snippet - Python}
+\subsection{\torevise{Arbitrary Pricision}}
+\begin{minted}{python}
+from fractions import * # Fraction, no limit
+x = Fraction(10)
+
+from decimal import * # Decimal, limited
+getcontext().prec = 28 # Number of precision = digits
+x = Decimal(20)
+\end{minted}
+\subsection{\torevise{Data Structure}}
+\begin{minted}{python}
+import heapq # Heap
+pq = []
+heapq.heappush(pq) # push
+x = heapq.heappop(pq) # pop
+\end{minted}
+\subsection{\torevise{Custom Comparison}}
+\begin{minted}{python}
+from functools import cmp_to_key
+def cmp(a, b): return sgn(a-b) # a < b then -, a > b then +, otherwise 0
+l.sort(key=cmp_to_key(cmp)); sorted(l, key=cmp_to_key(cmp))
+l.reverse(); l = list(reversed(l))
+\end{minted}
+\subsection{\torevise{Anti-Hashing}}
+\begin{minted}{python}
+import time; TIME = int(time.time() * 1000)
+dict[(x, TIME)] # anti-hash
+\end{minted}
+\section{Miscellaneous}
+\subsection{\toadd{ASCII Table}}
+\subsection{\toadd{List of Prime}}
+\subsection{\toadd{List of Highly Composite Number}}
+
+%% End %%
+
+\end{document}
