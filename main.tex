@@ -170,7 +170,7 @@ int f(int idx, int mod){
 	\item $(a \vee b) \to (\neg a \implies b) \wedge (\neg b \implies a)$.
 	\item $(a \wedge b) \to (a \vee a) \wedge (b \vee b)$.
 	\item $(a \overline{\wedge} b) \to \neg (a \wedge b) \to (\neg a \vee \neg b)$.
-	\item $(a \overline{\vee} b) \to (\neq a \wedge \neg b)$.
+	\item $(a \overline{\vee} b) \to (\neg a \wedge \neg b)$.
 	\item $(a \oplus b) \to (a \vee b) \wedge (\neg a \vee \neg b)$.
 	\item $(a \overline{\oplus} b) \to (a \vee \neg b) \wedge (\neg a \vee b)$.
 \end{itemize}
@@ -2132,11 +2132,16 @@ void Main(){
 \end{minted}
 \subsection{\totest{Range Minimum Query w/ Sparse Table}}
 $P_{k,i} = \min_{i \le p < i+2^{k}} A_p$.
-Let $l$ be the largest integer such that $l \le j-i+1$. Then $\min_{i \le p \le j} = \min(P_{l,i}, P_{l,j-2^{l}+1})$
+Let $l$ be the largest integer such that $l \le j-i+1$. Then $\min_{i \le p \le j} A_p = \min(P_{l,i}, P_{l,j-2^{l}+1})$
 \section{Heuristics}
 \subsection{\tolearn{Simulated Annealing}}
 \subsection{\tolearn{Diversified Late-Acceptance Search}}
 \section{Code Snippet - C++}
+\subsection{\completed{Line Input}}
+\begin{minted}{cpp}
+string s; getline(cin, s); // No newline at the end
+cin.ignore(); // Use it between getlines and cins
+\end{minted}
 \subsection{\completed{Randomization}}
 \begin{minted}{cpp}
 const time_t TIME = chrono::high_resolution_clock::now().time_since_epoch().count();
