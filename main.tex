@@ -1547,33 +1547,41 @@ int ptr = 0; for (int nxi : s){
 \end{minted}
 \subsection{\completed{Suffix Array \& Longest Common Prefix Array}}
 \begin{minted}{cpp}
-int k, sl; int sa[200020], res[200020];
-int pos[200020], lcp[200020];
-bool cmp(int s1, int s2){
-    if (pos[s1] != pos[s2]){ return pos[s1] < pos[s2]; }
-    int ss1 = s1+k, ss2 = s2+k;
-    if (ss1 >= sl || ss2 >= sl){ return ss1 > ss2; }
-    return pos[ss1] < pos[ss2];
-}
-
-for (int i = 0; i < sl; i++){ sa[i] = i; pos[i] = s[i]; }
-for (k = 1; ; k*=2){
-    sort(sa, sa+sl, cmp);
-    res[0] = 0; for (int i = 1; i < sl; i++){
-        res[i] = res[i-1]; if (cmp(sa[i-1], sa[i])){ res[i] += 1; }
+int sa1[100020]; int pos1[100020], lcp1[100020];
+int tmp[100020], cnt[100020], res[100020];
+void init(string s, int* sa, int* pos, int* lcp){
+    s.push_back('$'); int sl = s.size();
+    for (int i = 0; i < sl; i++){ sa[i] = i; }
+    sort(sa, sa+sl, [&s](int s1, int s2){ return s[s1] < s[s2]; });
+    res[sa[0]] = 0; for (int i = 1; i < sl; i++){
+        int s1 = sa[i-1], s2 = sa[i]; res[s2] = res[s1] + (s[s1] != s[s2]);
     }
-    for (int i = 0; i < sl; i++){ pos[ sa[i] ] = res[i]; }
-    if (res[sl-1] == sl-1){ break; }
-}
-k = 0; for (int i = 0; i < sl; i++){
-    k = max(k-1, 0);
-    int i1 = pos[i], i2 = pos[i]-1;
-    if (i2 < 0){ continue; }
-    int p1 = sa[i1], p2 = sa[i2];
-    while (p1+k < sl && p2+k < sl){
-        if (s[p1+k] != s[p2+k]){ break; } else{ k += 1; }
+    for (int k = 1; ; k *= 2){
+        /*cout << k << endl << flush;
+        cout << "SA  "; for (int i = 0; i < sl; i++){ cout << sa[i] << ' '; } cout << endl;
+        cout << "RES "; for (int i = 0; i < sl; i++){ cout << res[i] << ' '; } cout << endl;
+        if (k > 10000000){ break; }*/
+        for (int i = 0; i < sl; i++){ cnt[i] = 0; tmp[i] = (sa[i]-k%sl+sl)%sl; }
+        for (int i = 0; i < sl; i++){ cnt[res[i]] += 1; }
+        for (int i = 1; i < sl; i++){ cnt[i] += cnt[i-1]; }
+        for (int i = sl-1; i >= 0; i--){
+            int sp = tmp[i]; int r = res[sp];
+            int p = cnt[r]; sa[p-1] = sp; cnt[r] -= 1;
+        }
+        tmp[sa[0]] = 0; for (int i = 1; i < sl; i++){
+            int s1 = sa[i-1], s2 = sa[i];
+            int t1 = (s1+k)%sl, t2 = (s2+k)%sl;
+            tmp[s2] = tmp[s1] + (res[s1] != res[s2] || res[t1] != res[t2]);
+        } memcpy(res, tmp, sizeof(res)); if (res[sa[sl-1]] == sl-1){ break; }
+    } s.pop_back(); sl -= 1;
+    for (int i = 0; i < sl; i++){ sa[i] = sa[i+1]; }
+    for (int i = 0; i < sl; i++){ pos[sa[i]] = i; }
+    int l = 0; for (int i = 0; i < sl; i++){
+        l = max(l-1, 0); int p1 = pos[i], p2 = pos[i]-1; if (p2 < 0){ continue; }
+        int s1 = sa[p1], s2 = sa[p2]; while (s1+l < sl && s2+l < sl){
+            if (s[s1+l] != s[s2+l]){ break; } else{ l += 1; }
+        } lcp[p1] = l;
     }
-    lcp[ pos[i] ] = k;
 }
 \end{minted}
 \subsection{\totest{Suffix Array - Traversing}}
