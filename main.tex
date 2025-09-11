@@ -62,7 +62,7 @@ When every edge have weight $1$, $w(P) = 1$. Therefore, the lemma above will jus
 \subsection{\completed{Extended Euclid's Algorithm}}
 \begin{minted}{cpp}
 pl3 egcd(ll a, ll b){
-    if (b == 0){ return { {1, 0}, a }; }
+    if (b == 0){ return {{1, 0}, a}; }
     pl3 p = egcd(b, a%b);
     ll x = p.fr.fr, y = p.fr.sc, g = p.sc;
     ll xx = y, yy = x - a/b*y;
