@@ -348,6 +348,43 @@ int j = 0; for (int i = 0; i < sp; i++){
     } if (j < sp){ ans = max(ans, dist(i, j)); }
 }
 \end{minted}
+\subsection{\torevise{Minimum Enclosing Circle}}
+\begin{minted}{cpp}
+inline ld dis(const pd2& p1, const pd2& p2){
+    ld y = p1.fr-p2.fr, x = p1.sc-p2.sc;
+    return sqrtl(y*y + x*x);
+}
+inline bool inside(const pd2& o, const ld& r, const pd2& p){
+    return dis(o, p) <= r+eps;
+}
+inline int ccw(const pl2& p1, const pl2& p2, const pl2& p3){
+    ll a = p1.sc-p2.fr + p2.sc*p3.fr + p3.sc*p1.fr;
+    ll b = p1.sc-p3.fr + p3.sc*p2.fr + p2.sc*p1.fr;
+    return sgn(a-b);
+}
+
+inline pd2 circumcenter(const pd2& p1, const pd2& p2, const pd2& p3){
+    ld d1 = dis(p2, p3), d2 = dis(p3, p1), d3 = dis(p1, p2);
+    d1 *= d1; d2 *= d2; d3 *= d3;
+    ld w1 = d1*(d2+d3-d1), w2 = d2*(d3+d1-d2), w3 = d3*(d1+d2-d3); ld w = w1+w2+w3;
+    w1 /= w; w2 /= w; w3 /= w;
+    return pd2(w1*p1.fr + w2*p2.fr + w3*p3.fr, w1*p1.sc + w2*p2.sc + w3*p3.sc);
+}
+
+shuffle(arr+1, arr+n+1, gen);
+pd2 o = {0, 0}; ld r = 0; for (int i = 1; i <= n; i++){
+	if (inside(o, r, arr[i])){ continue; }
+	o = arr[i]; r = 0;
+	for (int j = 1; j < i; j++){
+		if (inside(o, r, arr[j])){ continue; }
+		o = {(arr[i].fr+arr[j].fr)/2, (arr[i].sc+arr[j].sc)/2}; r = dis(o, arr[i]);
+		for (int k = 1; k < j; k++){
+			if (inside(o, r, arr[k])){ continue; }
+			o = circumcenter(arr[i], arr[j], arr[k]); r = dis(o, arr[i]);
+		}
+	}
+} // center O, radius R.
+\end{minted}
 \subsection{\completed{Bulldozer Trick}}
 \begin{minted}{cpp}
 sort(arr+1, arr+n+1); for (int i = 1; i <= n; i++){ pos[i] = i; } // min y first
