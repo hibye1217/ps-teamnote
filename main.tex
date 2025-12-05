@@ -43,6 +43,8 @@
 	\item Checking variants of the problem?
 	\item Trying to come up with a counterexample of the claim? Why does it (or does it not) work?
 	\item Thinking about why a certain hard technique you tried failed, and/or convincing yourself that it cannot work?
+	\item Start from scratch, with completely different ideas?
+	\item Stop whining and start implementing?
 \end{itemize}
 \subsection{\completed{Hard Techniques}}
 \begin{itemize}
@@ -327,8 +329,10 @@ void fwht(vector<ll>& arr, bool inv = false){
 	if (inv && XOR){ for (int i = 0; i < n; i++){ arr[i] *= invn; } }
 }
 \end{minted}
-\subsection{\toadd{Gauss-Jordan Elimination}}
+\subsection{\torevise{Gauss-Jordan Elimination}}
 Gauss-Jordan Elimination is not stable. It is recommended that you use partial pivoting, which always choose the row that has the maximum absolute value on pivoting column.
+
+For each column $c$: Let $r$ be the argmax of $|A_{r, c}|$, $r \ge p$. swap $r$-th and $p$-th row, then apply $A_{r, c} = 1$, then apply $A_{i, c} = 0$ for all $i \neq p$.
 \subsection{\completed{Floor Sum of Arithmetic Progression}}
 Let $f(a, b, c, n) = \sum_{x=0}^{n} \left\lfloor \frac{ax+b}{c} \right\rfloor$.
 
@@ -470,7 +474,7 @@ int j = 0; for (int i = 0; i < sp; i++){
 	} if (j < sp){ ans = max(ans, dist(i, j)); }
 }
 \end{minted}
-\subsection{\torevise{Minimum Enclosing Circle}}
+\subsection{\completed{Minimum Enclosing Circle}}
 \begin{minted}{cpp}
 inline ld dis(const pd2& p1, const pd2& p2){
 	ld y = p1.fr-p2.fr, x = p1.sc-p2.sc;
@@ -1000,16 +1004,16 @@ ll ans = 0; while (bfs(src, snk)){
 \subsection{\totest{Modeling - Flow with Demands}}
 \begin{itemize}
 	\item $\mathrm{req}_i = $ required flow $i$th vertex need to have
-		\begin{itemize}
+	\begin{itemize}
 		\item $\mathrm{req}_i < 0$: Need to get it from source
 		\item $\mathrm{req}_i > 0$: Need to send it to sink
-		\end{itemize}
+	\end{itemize}
 	\item $v \rightarrow w$ with lower/upper bound of $l$ and $u$.
-		\begin{itemize}
+	\begin{itemize}
 		\item $\mathrm{req}_v = l$
 		\item $\mathrm{req}_w = -l$
 		\item Capacity of $v \rightarrow w = u-l$
-		\end{itemize}
+	\end{itemize}
 	\item Create new source and sink, and connect the $v$ with source or sink with capacity $\mathrm{req}_v$.
 	\item From the old sink to old source, connect an edge with the capacity $\infty$.
 	\item MaxFlow should be equal to $\sum\limits_{\mathrm{req}_v > 0} \mathrm{req}_v$ in order to satisfy the original graph.
@@ -1051,6 +1055,8 @@ int ans = 0, res = 0; while (spfa(src, snk)){
 \end{minted}
 \subsection{\totest{Stable Marriage Problem}}
 Try matching greedily. For $i$ in $1$ to $N$, try to match the best possible matching $j$, knocking other matchings in process.
+
+\citationneeded{This matching is best for proposer $i$ while worst for proposee $j$.}
 \begin{minted}{cpp}
 int num[50020];
 vector<int> adj[50020]; map<int, int> rnk[10020];
@@ -1067,10 +1073,8 @@ bool f(int i, int j, int idx){
 		ptr[p.sc] += 1; for (int& k = ptr[p.sc]; k < adj[p.sc].size(); k++){
 			assert(1 <= adj[p.sc][k] && adj[p.sc][k] <= 10000);
 			if (f(p.sc, adj[p.sc][k], k)){ break; }
-		}
-		return 1;
-	}
-	else{ return 0; }
+		} return 1;
+	} else{ return 0; }
 }
 
 for (int i = 1; i <= n; i++){
@@ -1080,7 +1084,7 @@ for (int i = 1; i <= n; i++){
 	}
 }
 \end{minted}
-\subsection{\torevise{Hungarian Algorithm}}
+\subsection{\completed{Hungarian Algorithm}}
 \begin{minted}{cpp}
 // Max version. for Min, adj[v][w] *= -1, then print -ans.
 ll adj[520][520];
@@ -1144,7 +1148,7 @@ for (int cnt = 0; cnt < n; cnt++){
 }
 ll ans = 0; for (int i = 1; i <= n; i++){ ans += adj[i][m1[i]]; }
 \end{minted}
-\subsection{\torevise{General Matching}}
+\subsection{\completed{General Matching}}
 \begin{minted}{cpp}
 int n, m; vector<int> adj[520]; // Input: Graph
 int res[520]; // Matched Vertex
@@ -1215,7 +1219,6 @@ int ind[1020], oud[1020];
 
 int cnt = 0;
 void dfs(int now){
-	//cout << "dfs " << now << endl;
 	for (int& p = ptr[now]; p < adj[now].size();){
 		int nxt = adj[now][p++];
 		cnt += 1; dfs(nxt);
@@ -1282,6 +1285,7 @@ void reroot(int now, int pre){
 	}
 } // dpf(root, root); reroot(root, root)
 \end{minted}
+\subsection{\tolearn{Rerooting - All Directions}}
 \subsection{\completed{Sum over Subset}}
 $D_S = \sum_{T \subseteq S} A_T$.
 
@@ -1294,7 +1298,7 @@ for (int b = 0; b < B; b++){
 	}
 }
 \end{minted}
-\subsection{\torevise{Convex Hull Trick}}
+\subsection{\completed{Convex Hull Trick}}
 $D_i = \max_{j < i} a_j x_i + b_j$.
 
 \complexity{$\mathcal O(N)$ for $N$ insertions, $\mathcal O(\log N)$ for query.}
@@ -1318,7 +1322,7 @@ while (sp > 0){
 	if (crs(stk[sp-1].fr, p) <= stk[sp-1].sc){ pop(); } else{ break; }
 } psh(p);
 \end{minted}
-\subsection{\torevise{Divide and Conquer Optimization}}
+\subsection{\completed{Divide and Conquer Optimization}}
 $D_{k,i} = \max{j<i} D_{k-1,j} + A_{j,i}$. $\mathrm{opt}_i < \mathrm{opt}_{i+1}$.
 
 \complexity{$\mathcal O(KN \log N)$.}
@@ -1328,17 +1332,16 @@ void dnc_opt(ll* dp1, ll* dp0, int is, int ie, int os, int oe){
 	if (is > ie){ return; } int im = is+ie >> 1;
 	int o = os; for (int p = os; p <= min(oe, im-1); p++){
 		if (f(dp0, p, im) < f(dp0, o, im)){ o = p; }
-	}
-	dp1[im] = f(dp0, o, im);
+	} dp1[im] = f(dp0, o, im);
 	dnc_opt(dp1, dp0, is, im-1, os, o); dnc_opt(dp1, dp0, im+1, ie, o, oe);
 }
 \end{minted}
-\subsection{\torevise{WQS Binary Search (Aliens Trick)}}
+\subsection{\completed{WQS Binary Search (Aliens Trick)}}
 $D_{k,i} = \min{j<i} D_{k-1,j} + A_{j,i}$. $D_{k,N}$ must be convex.
 
 \complexity{$\mathcal O(T(N) \log X)$.}
 \begin{minted}{cpp}
-// Solve function returns the number of used elements
+// solve(n, mid) returns the number of used elements
 // Binary Search over Lambda
 ll st = 0, ed = 1e18; ll ans = 1e18;
 while (st <= ed){
@@ -1347,7 +1350,7 @@ while (st <= ed){
 	if (cnt <= k){ ed = mid-1; } else{ st = mid+1; }
 } cout << ans;
 \end{minted}
-\subsection{\totest{Monotone Queue Optimization}}
+\subsection{\torevise{Monotone Queue Optimization}}
 $D_i = \min_{j<i} D_j + A_{j,i}$. For all pair $i < j$, there exists a point $p$ that $D_i + C_{i,p}$ and $D_j + C_{j,p}$ changes. So $k < p$ means $<$, and $\ge$ otherwise.
 
 \complexity{$\mathcal O(N \log N)$}.
@@ -1386,12 +1389,12 @@ int solve(int n, ll x){
 	} return dp[n].sc;
 }
 \end{minted}
-\subsection{\torevise{Slope Trick}}
+\subsection{\completed{Slope Trick}}
 I think this one is easier to just say. Let $f$ be a convex piecewise linear function with integer coefficient.
 We can save this function by the points where the line changes, with one linear function.
 
 We can add two functions by merging the points without removing duplicants, and adding the linear function.
-\subsection{\torevise{Knuth Optimization}}
+\subsection{\completed{Knuth Optimization}}
 $D_{i,j} = D_{i,k} + D_{k+1,j} + A_{i,j}$ where $\mathrm{opt}_{i,j-1} \le \mathrm{opt}_{i,j} \le \mathrm{opt}_{i+1,j}$.
 This is satisfied if $C$ is monge.
 
@@ -1574,10 +1577,10 @@ void Main(){
 	solve(1, l1, 1, l2);
 }
 \end{minted}
-\subsection{\torevise{Connection Profile}}
+\subsection{\completed{Connection Profile}}
 Single Connected Region, with DP condition.
 
-\complexity{$\mathcal O(NM B_M)$, $B_9 = 21\,147$. Actual state is about $2\,000$?}
+\complexity{$\mathcal O(NM B_M)$, $B_9 = 21\,147$. \citationneeded{Actual state is about $2\,000$?}}
 \begin{minted}{cpp}
 int n, m; int arr[10][10];
 inline int f(string& bit){
@@ -1620,7 +1623,7 @@ ll dpf(int y, int x, string bit){ int cnt = f(bit);
 }
 dpf(0, 0, string(m, '0')); // minimize the sum of arr[i][j], connected.
 \end{minted}
-\subsection{\torevise{Permutation DP}}
+\subsection{\completed{Permutation DP}}
 Let $D_{i,j}$ be the number of pre-permutations that uses the value from $1$ to $i$, and has $j$ components.
 The transition is to:
 \begin{itemize}
@@ -1630,7 +1633,7 @@ The transition is to:
 \end{itemize}
 
 When the starting/ending point is specified, you need to be careful about the number of \textit{open}-ended points.
-\subsection{\totest{Berlekamp-Massey}}
+\subsection{\completed{Berlekamp-Massey}}
 Use with \textit{Kitamasa}.
 \begin{minted}{cpp}
 vector<ll> mulp(vector<ll> arr, vector<ll> brr){ // A \times B
@@ -1686,19 +1689,17 @@ j = 0; for (int i = 0; i < n; i++){
 	}
 }
 \end{minted}
-\subsection{\torevise{Z Algorithm}}
+\subsection{\completed{Z Algorithm}}
 \begin{minted}{cpp}
-int l = 0, r = 0;
-for (int i = 1; i < sl; i++){
+int l = 0, r = 0; for (int i = 1; i < sl; i++){
 	if (i < r){ z[i] = min(r-i, z[i-l]); }
 	while (i+z[i] < sl){
 		if (s[z[i]] == s[i+z[i]]){ z[i] += 1; }
 		else{ break; }
-	}
-	if (r < i+z[i]){ l = i; r = i+z[i]; }
+	} if (r < i+z[i]){ l = i; r = i+z[i]; }
 } z[0] = sl;
 \end{minted}
-\subsection{\torevise{Aho-Corasick}}
+\subsection{\completed{Aho-Corasick}}
 \begin{minted}{cpp}
 int q; cin >> q; while (q--){
 	string s; cin >> s; /* Trie */ psh(s);
@@ -1784,7 +1785,7 @@ void solve(int st, int ed, int i, int t, int res){
 	}
 }
 \end{minted}
-\subsection{\torevise{Manacher's}}
+\subsection{\completed{Manacher's}}
 \begin{minted}{cpp}
 string s = "#"; for (char c : inp){ s += c; s += '#'; }
 int sl = s.size(); int ptr = -1, mid = -1;
@@ -1795,11 +1796,10 @@ for (int i = 0; i < sl; i++){
 	while (0 <= i1-1 && i2+1 < sl){
 		if (s[i1-1] == s[i2+1]){ i1--; i2++; pos[i] += 1; }
 		else{ break; }
-	}
-	if (i2 > ptr){ ptr = i2; mid = i; }
+	} if (i2 > ptr){ ptr = i2; mid = i; }
 } // length = *max_element(pos, pos+sl);
 \end{minted}
-\subsection{\torevise{Rolling Hash \& Rabin-Karp}}
+\subsection{\completed{Rolling Hash \& Rabin-Karp}}
 \begin{minted}{cpp}
 const int H = 2;
 typedef array<ll, H> alH;
@@ -1813,8 +1813,7 @@ void init(int hi, const string& s){ int sl = s.size();
 inline alH hsh(int st, int ed){
 	alH res; for (int hi = 0; hi < H; hi++){
 		res[hi] = (prf[hi][ed] - prf[hi][st-1]*ppw[hi][ed-st+1] % mod[hi] + mod[hi]) % mod[hi];
-	}
-	return res;
+	} return res;
 }
 \end{minted}
 \section{Data Structures}
@@ -1853,37 +1852,32 @@ ll qry(int ni, ll ns, ll ne, ll x){
 	}
 } inline ll qry(ll x){ return qry(0, -X, X, x); }
 \end{minted}
-\subsection{\torevise{Multi-Dimensional Segment Tree}}
+\subsection{\completed{Multi-Dimensional Segment Tree}}
 \begin{minted}{cpp}
 const int N = 1024;
 int seg[2050][2050];
 void updx(int yp, int x, int val){ int xp = x+N-1;
 	if (yp >= N){ seg[yp][xp] = val; }
 	else{ seg[yp][xp] = max(seg[yp<<1][xp], seg[yp<<1|1][xp]); }
-	xp >>= 1;
-	while (xp){ seg[yp][xp] = max(seg[yp][xp<<1], seg[yp][xp<<1|1]); xp >>= 1; }
+	xp >>= 1; while (xp){ seg[yp][xp] = max(seg[yp][xp<<1], seg[yp][xp<<1|1]); xp >>= 1; }
 }
 void upd(int y, int x, int val){ int yp = y+N-1;
 	updx(yp, x, val); yp >>= 1;
 	while (yp){ updx(yp, x, val); yp >>= 1; }
 }
 int qryx(int yp, int x1, int x2){ x1 += N-1; x2 += N-1;
-	int res = 0;
-	while (x1 <= x2){
+	int res = 0; while (x1 <= x2){
 		if (x1 & 1){ res = max(seg[yp][x1], res); x1 += 1; }
 		if (~x2 & 1){ res = max(seg[yp][x2], res); x2 -= 1; }
 		if (x1 > x2){ break; } x1 >>= 1; x2 >>= 1;
-	}
-	return res;
+	} return res;
 }
 int qry(int y1, int y2, int x1, int x2){ y1 += N-1; y2 += N-1;
-	int res = 0;
-	while (y1 <= y2){
+	int res = 0; while (y1 <= y2){
 		if (y1 & 1){ res = max(qryx(y1, x1, x2), res); y1 += 1; }
 		if (~y2 & 1){ res = max(qryx(y2, x1, x2), res); y2 -= 1; }
 		if (y1 > y2){ break; } y1 >>= 1; y2 >>= 1;
-	}
-	return res;
+	} return res;
 }
 \end{minted}
 \subsection{\torevise{Persistent Segment Tree}}
@@ -2024,6 +2018,7 @@ void reverse(int st, int ed){
 }
 \end{minted}
 \subsection{\torevise{Link-Cut Tree}}
+Use with \textit{Splay Tree}.
 \begin{minted}{cpp}
 struct Node{ Node *l, *r, *p; int idx; };
 inline bool isRoot(Node* now){
@@ -2154,8 +2149,7 @@ for (int i = 1; i <= n; i++){ int v; cin >> v; arr.push_back(v); }
 sort(arr.begin(), arr.end(), [](int v, int w){ return ord[v] < ord[w]; });
 for (int i = 1; i < n; i++){
 	int v = arr[i-1], w = arr[i]; arr.push_back(lca(v, w));
-}
-sort(arr.begin(), arr.end(), [](int v, int w){ return ord[v] < ord[w]; });
+} sort(arr.begin(), arr.end(), [](int v, int w){ return ord[v] < ord[w]; });
 arr.erase(unique(arr.begin(), arr.end()), arr.end());
 int al = arr.size(); for (int i = 1; i < al; i++){
 	ll l = lca(arr[i-1], arr[i]);
@@ -2163,7 +2157,7 @@ int al = arr.size(); for (int i = 1; i < al; i++){
 	adj[i].push_back({cvt(arr, l), dis[arr[i]]-dis[l]});
 }
 \end{minted}
-\subsection{\torevise{Parallel Binary Search}}
+\subsection{\completed{Parallel Binary Search}}
 \complexity{$\mathcal O(Q \log X)$.}
 \begin{minted}{cpp}
 // Binary Search: path available after ans-th event.
@@ -2192,13 +2186,11 @@ while (1){
 			if (par[v] != -1 && par[w] != -1 && fnd(v) == fnd(w)){ qrr[qi].ed = mid; }
 			else{ qrr[qi].st = mid; } qi++;
 		}
-	}
-	if (!flg){ break; }
-}
-sort(qrr+1, qrr+q+1, [](Query& q1, Query& q2){ return q1.idx < q2.idx; });
+	} if (!flg){ break; }
+} sort(qrr+1, qrr+q+1, [](Query& q1, Query& q2){ return q1.idx < q2.idx; });
 for (int i = 1; i <= q; i++){ cout << evt[qrr[i].ed].sc << endl; } // ed = first possible
 \end{minted}
-\subsection{\torevise{Offline Dynamic Query}}
+\subsection{\completed{Offline Dynamic Query}}
 \complexity{$\mathcal O(T(N) \times Q \log Q)$.}
 \begin{minted}{cpp}
 // BOJ 24272: 루트 노트가 많은 트리일수록 좋은 트리이다
@@ -2288,7 +2280,38 @@ void Main(){
 }
 \end{minted}
 \section{Greedy}
-\subsection{\toadd{Job Scheduling w/ Deadline \& Duration}}
+\subsection{\completed{Job Scheduling w/ Deadline \& Duration}}
+\begin{minted}{cpp}
+pl2 arr[250020]; // {deadline, duration}
+sort(arr+1, arr+n+1, [](pl2 p1, pl2 p2){ return p1.fr > p2.fr; });
+priority_stack<ll> pq; int ans = 0;
+int i = 1; while (i <= n){
+	int j = i; while (j <= n){
+		if (arr[i].fr == arr[j].fr){ j += 1; } else{ break; }
+	}
+	for (int p = i; p < j; p++){ pq.push(arr[p].sc); }
+	ll tim = arr[i].fr - arr[j].fr; while (tim > 0){
+		if (pq.empty()){ break; } ll t = pq.top(); pq.pop();
+		ll d = min(t, tim); if (t-d == 0){ tim -= d; ans += 1; }
+		else{ tim -= d; t -= d; pq.push(t); }
+	} i = j;
+} cout << ans;
+\end{minted}
+\subsection{\completed{Bounded Scheduling}}
+If $x \ge B_i$, then $x \leftarrow x + A_i$. $B_i + A_i \ge 0$.
+\begin{minted}{cpp}
+pl2 arr[100020]; // (A[i], B[i])
+sort(arr+1, arr+n+1, [](pl2 p1, pl2 p2){
+	ll a1 = p1.fr, b1 = p1.sc;
+	ll a2 = p2.fr, b2 = p2.sc;
+	if ((a1 >= 0) != (a2 >= 0)){ return (a1 >= 0) > (a2 >= 0); }
+	if (a1 >= 0){ return b1 < b2; } else{ return a1+b1 > a2+b2; }
+});
+ll x = 0; for (int i = 1; i <= n; i++){
+	if (x < arr[i].sc){ /* Impossible; Quit */ }
+	x += arr[i].fr;
+} /* Possible */
+\end{minted}
 \section{Heuristics}
 \subsection{\toadd{Simulated Annealing}}
 \subsection{\toadd{Diversified Late Acceptance Search}}
@@ -2326,7 +2349,7 @@ template <typename T> inline void erase(vector<T>& v, const T& x){
 	v.erase(remove(v.begin(), v.end(), x), v.end());
 } // removes every x in v
 \end{minted}
-\subsection{\totest{Bitwise Function}}
+\subsection{\completed{Bitwise Function}}
 \begin{minted}{cpp}
 inline int bit1(int x){ return __builtin_popcount(x); } // # of 1
 inline int bit2(int x){ return x==0 ? 32 : __builtin_ctz(x); } // max k s.t. n | 2^k
@@ -2442,4 +2465,34 @@ def cmp(a, b): return sgn(a-b) # a < b then -, a > b then +, otherwise 0
 l.sort(key=cmp_to_key(cmp)); sorted(l, key=cmp_to_key(cmp))
 \end{minted}
 \section{Miscellaneous}
+\subsection{\toadd{List of Primes}}
+\subsection{\completed{List of Highly Composite Numbers}}
+\begin{itemize}
+	\item $840$: $32$ divisors
+	\item $720\,720$: $240$ divisors
+	\item $735\,134\,400$: $1\,344$ divisors
+	\item $963\,761\,198\,400$: $6\,720$ divisors
+	\item $897\,612\,484\,786\,617\,600$: $103\,680$ divisors
+\end{itemize}
+\subsection{\completed{ASCII Table}}
+\begin{minted}{text}
+  |  0   1   2   3   4   5   6   7
+--+--------------------------------
+0 | NUL DLE  SP  0   @   P   `   p
+1 | SOH DC1  !   1   A   Q   a   q
+2 | STX DC2  "   2   B   R   b   r
+3 | ETX DC3  #   3   C   S   c   s
+4 | EOT DC4  $   4   D   T   d   t
+5 | ENQ NAK  %   5   E   U   e   u
+6 | ACK SYN  &   6   F   V   f   v
+7 | BEL ETB  '   7   G   W   g   w
+8 |  BS CAN  (   8   H   X   h   x
+9 | TAB  EM  )   9   I   Y   i   y
+A |  LF SUB  *   :   J   Z   j   z
+B |  VT ESC  +   ;   K   [   k   {
+C |  FF  FS  ,   <   L   \   l   |
+D |  CR  GS  -   =   M   ]   m   }
+E |  SO  RS  .   >   N   ^   n   ~
+F |  SI  US  /   ?   O   _   o  DEL
+\end{minted}
 \end{document}
