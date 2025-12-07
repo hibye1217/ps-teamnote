@@ -51,7 +51,7 @@
 	\item Any of the algorithms listed below?
 	\item Greedy? or a Network Flow?
 	\item Randomization?
-	\item Square Root Decomposition? Or other bucket size?
+	\item Square Root Decomposition? Or other bucket size like $B = O(\sqrt{N \log N})$?
 	\item Sparse Table to bypass $O(\log N)$ query time?
 	\item Backtracking? With some pruning?
 	\item Heuristics?
@@ -1880,7 +1880,7 @@ int qry(int y1, int y2, int x1, int x2){ y1 += N-1; y2 += N-1;
 	} return res;
 }
 \end{minted}
-\subsection{\torevise{Persistent Segment Tree}}
+\subsection{\completed{Persistent Segment Tree}}
 \begin{minted}{cpp}
 const int N = 1000000;
 struct Node{ int sum; int nxt[2]; };
@@ -1952,118 +1952,186 @@ Node qry(int ni, int ns, int ne, int qs, int qe){
 	return mrg(qry(ni<<1, ns, nm, qs, qe), qry(ni<<1|1, nm+1, ne, qs, qe));
 } inline Node qry(int st, int ed){ return qry(1, 1, N, st, ed); }
 \end{minted}
-\subsection{\torevise{Splay Tree}}
+\subsection{\completed{Splay Tree}}
+$k$ is $1$-indexed, assuming dummy on both end. \texttt{insert} inserts after $k$-th vertex (front if $k = 0$).
+
 \complexity{$\mathcal O(Q \log N)$, amortized.}
 \begin{minted}{cpp}
-struct Node{ Node *p, *l, *r; int sum; bool flp; }; Node *root;
-void propagate(Node *nod){
-	if (nod->flp == 0){ return; }
-	swap(nod->l, nod->r);
-	if (nod->l){ nod->l->flp ^= 1; } if (nod->r){ nod->r->flp ^= 1; }
-	nod->flp = 0;
+const int INF = 1e9;
+struct Node{
+	int p = -1, l = -1, r = -1; bool flp = 0; int val = 0;
+	int cnt = 1; ll sum = 0; int mn = INF, mx = -INF;
+}; vector<Node> tree; int root = -1;
+Node init(int x){
+	Node p; p.cnt = 1; p.val = x;
+	p.sum = p.mn = p.mx = x; return p;
+} void put(int ni, const Node p){
+	tree[ni].cnt = p.cnt; tree[ni].sum = p.sum; tree[ni].mn = p.mn; tree[ni].mx = p.mx;
 }
-void update(Node *nod){
-	if (nod->l){ /* Left Value, swap if l->flp */ }
-	if (nod->r){ /* Right Value, swap if r->flp */ }
-	/* update nod */
+Node mrg(int li, int ri){
+	const Node &l = tree[li], &r = tree[ri];
+	Node p; p.cnt = l.cnt + r.cnt;
+	p.sum = l.sum + r.sum; p.mn = min(l.mn, r.mn); p.mx = max(l.mx, r.mx);
+	return p;
 }
-void rotate(Node *now){
-	Node *par = now->p; if (!par){ return; }
-	Node *pre = par->p; if (pre){
-		if (pre->l == par){ pre->l = now; } else{ pre->r = now; }
-		now->p = pre;
-	} else{ root = now; now->p = nullptr; }
-	Node *nxt;
-	if (par->l == now){ par->l = nxt = now->r; now->r = par; }
-	else{ par->r = nxt = now->l; now->l = par; }
-	par->p = now; if (nxt){ nxt->p = par; }
-	update(par); update(now);
+void propagate(int ni){
+	if (ni == -1){ return; } if (tree[ni].flp == 0){ return; }
+	swap(tree[ni].l, tree[ni].r);
+	if (tree[ni].l != -1){ tree[tree[ni].l].flp ^= 1; }
+	if (tree[ni].r != -1){ tree[tree[ni].r].flp ^= 1; }
+	tree[ni].flp = 0;
 }
-void splay(Node *now, Node *top = nullptr){
-	while (now->p != top){
-		Node *par = now->p; Node *pre = par->p;
-		if (pre != top){
-			if ( (pre->l==par) == (par->l==now) ){ rotate(par); } else{ rotate(now); }
-		} rotate(now);
-	}
+void update(int ni){
+	put(ni, init(tree[ni].val));
+	if (tree[ni].l != -1){ propagate(tree[ni].l); put(ni, mrg(tree[ni].l, ni)); }
+	if (tree[ni].r != -1){ propagate(tree[ni].r); put(ni, mrg(ni, tree[ni].r)); }
+} inline void update(int ni, ll val){ tree[ni].val = val; return update(ni); }
+void rotate(int ni){
+	propagate(tree[ni].p); propagate(ni);
+	int p1 = tree[ni].p; if (p1 == -1){ return; }
+	int p2 = tree[p1].p; if (p2 != -1){
+		(tree[p2].l == p1 ? tree[p2].l : tree[p2].r) = ni;
+		tree[ni].p = p2;
+	} else{ root = ni; tree[ni].p = -1; }
+	int p3 = -1; if (tree[p1].l == ni){
+		tree[p1].l = p3 = tree[ni].r; tree[ni].r = p1;
+	} else{
+		tree[p1].r = p3 = tree[ni].l; tree[ni].l = p1;
+	} tree[p1].p = ni; if (p3 != -1){ tree[p3].p = p1; }
+	update(p1); update(ni);
 }
-int num = 1;
-void insert(int val){ // Insert to Rightmost Only
-	if (!root){ root = new Node; return; }
-	Node *ptr = root; while (ptr->r){ ptr = ptr->r; }
-	ptr->r = new Node; ptr->r->p = ptr;
-	ptr = ptr->r; ptr->val = ptr->mxl = ptr->mxr = ptr->ans = val;
-	ptr->index = num; num += 1;
-	splay(ptr);
+int splay(int ni, int top = -1){
+	while (tree[ni].p != top){
+		propagate(tree[tree[ni].p].p); propagate(tree[ni].p); propagate(ni);
+		int p1 = tree[ni].p; int p2 = tree[p1].p;
+		if (p2 != top){ rotate((tree[p2].l==p1) == (tree[p1].l==ni) ? p1 : ni); }
+		rotate(ni);
+	} propagate(ni); return ni;
 }
-void kth(int k){ k += 1;
-	Node *ptr = root; while (1){
-		propagate(ptr);
-		if (ptr->l){
-			if (ptr->l->cnt >= k){ ptr = ptr->l; continue; }
-			if (ptr->l->cnt+1 < k){ k -= ptr->l->cnt+1; ptr = ptr->r; continue; }
-			break;
+int kth(int k){
+	int ni = root; while (1){
+		propagate(ni);
+		int cnt = (tree[ni].l == -1 ? 0 : tree[tree[ni].l].cnt);
+		if (cnt == k){ break; }
+		if (k < cnt){ ni = tree[ni].l; }
+		else{ k -= cnt+1; ni = tree[ni].r; }
+	} return splay(ni);
+}
+int segment(int st, int ed){
+	kth(ed+1); int r = root; kth(st-1); splay(r, root); return tree[tree[root].r].l;
+}
+void insert(int k, int val){
+	if (root == -1){ root = tree.size(); tree.push_back(init(val)); return; }
+	int ni = root; while (1){
+		int cnt = (tree[ni].l == -1 ? 0 : tree[tree[ni].l].cnt);
+		if (k < cnt){
+			if (tree[ni].l == -1){
+				tree[ni].l = tree.size(); tree.push_back(init(val));
+				tree[tree[ni].l].p = ni; ni = tree[ni].l; break;
+			} else{ ni = tree[ni].l; }
+		} else{
+			if (tree[ni].r == -1){
+				tree[ni].r = tree.size(); tree.push_back(init(val));
+				tree[tree[ni].r].p = ni; ni = tree[ni].r; break;
+			} else{ k -= cnt+1; ni = tree[ni].r; }
 		}
-		else{
-			if (k != 1){ k -= 1; ptr = ptr->r; } else{ break; }
-		}
-	}
-	splay(ptr);
+	} splay(ni);
 }
-void segmentate(int st, int ed){ // Desired Node in root->r->l.
-	kth(ed+1); Node* nod = root; kth(st-1); splay(nod, root);
+void erase(int k){
+	segment(k, k); tree[tree[root].r].l = -1; splay(tree[root].r);
 }
-void reverse(int st, int ed){
-	segmentate(st, ed); Node* nod = root->r->l; nod->flp ^= 1; propagate(nod);
+
+void rev(int st, int ed){
+	if (st > ed){ return; }
+	int ni = segment(st, ed); tree[ni].flp ^= 1; propagate(ni);
 }
 \end{minted}
-\subsection{\torevise{Link-Cut Tree}}
-Use with \textit{Splay Tree}.
+\subsection{\totest{Link-Cut Tree}}
+Use with \textit{Splay Tree}. Path Update not tested.
 \begin{minted}{cpp}
-struct Node{ Node *l, *r, *p; int idx; };
-inline bool isRoot(Node* now){
-	if (!now->p){ return 1; }
-	return now->p->l != now && now->p->r != now;
+bool isroot(int ni){
+	if (tree[ni].p == -1){ return 1; }
+	return tree[tree[ni].p].l != ni && tree[tree[ni].p].r != ni;
 }
-void rotate(Node *now){
-	if (isRoot(now)){ return; }
-	Node *par = now->p; Node *pre = par->p;
-	if (isRoot(par)){ now->p = pre; }
-	else{
-		if (pre->l == par){ pre->l = now; } else{ pre->r = now; }
-		now->p = pre;
+void rotate(int ni){
+	propagate(tree[ni].p); propagate(ni);
+	int p1 = tree[ni].p; if (isroot(ni)){ return; }
+	int p2 = tree[p1].p; if (!isroot(p1)){
+		(tree[p2].l == p1 ? tree[p2].l : tree[p2].r) = ni;
+		tree[ni].p = p2;
+	} else{ tree[ni].p = p2; }
+	int p3 = -1; if (tree[p1].l == ni){
+		tree[p1].l = p3 = tree[ni].r; tree[ni].r = p1;
+	} else{
+		tree[p1].r = p3 = tree[ni].l; tree[ni].l = p1;
+	} tree[p1].p = ni; if (p3 != -1){ tree[p3].p = p1; }
+	update(p1); update(ni);
+}
+int splay(int ni, int top = -1){
+	while (!isroot(ni)){
+		propagate(tree[tree[ni].p].p); propagate(tree[ni].p); propagate(ni);
+		int p1 = tree[ni].p; int p2 = tree[p1].p;
+		if (!isroot(p1)){ rotate((tree[p2].l==p1) == (tree[p1].l==ni) ? p1 : ni); }
+		rotate(ni);
+	} propagate(ni); return ni;
+}
+void access(int ni){
+	splay(ni); tree[ni].r = -1;
+	while (tree[ni].p != -1){
+		splay(tree[ni].p); tree[tree[ni].p].r = ni; splay(ni);
 	}
-	Node *nxt;
-	if (par->l == now){ par->l = nxt = now->r; now->r = par; }
-	else{ par->r = nxt = now->l; now->l = par; }
-	par->p = now; if (nxt){ nxt->p = par; }
 }
-void splay(Node *now){
-	while (!isRoot(now)){
-		Node *par = now->p; Node *pre = par->p;
-		if (!isRoot(par)){
-			if ((par->l==now) == (pre->l==par)){ rotate(par); } else{ rotate(now); }
-		} rotate(now);
+void reroot(int ni){
+	access(ni); splay(ni); tree[ni].flp ^= 1;
+}
+int parent(int ni){
+	access(ni); propagate(ni);
+	if (tree[ni].l == -1){ return -1; }
+	ni = tree[ni].l; propagate(ni);
+	while (tree[ni].r != -1){ ni = tree[ni].r; propagate(ni); }
+	return splay(ni);
+}
+int find(int ni){
+	access(ni); propagate(ni);
+	if (0){
+		int n = tree.size();
+		for (int i = 0; i < n; i++){
+			cout << "Node " << i << ": " << tree[i].p << ", " << tree[i].l << ' ' << tree[i].r << endl;
+			cout << tree[i].flp << ' ' << tree[i].val << ' ' << tree[i].sum << endl;
+		} cout << endl << flush;
 	}
+	while (tree[ni].l != -1){ ni = tree[ni].l; propagate(ni); }
+	return splay(ni);
 }
-void access(Node *now){
-	splay(now); now->r = nullptr;
-	while (now->p){
-		splay(now->p); now->p->r = now; splay(now);
-	}
+void link(int ni, int pi){
+	reroot(ni); access(ni); access(pi); tree[ni].l = pi; tree[pi].p = ni; update(ni);
 }
-void link(Node *now, Node *par){
-	access(now); access(par);
-	now->l = par; par->p = now;
+void cut(int ni){
+	access(ni); tree[tree[ni].l].p = -1; tree[ni].l = -1; update(ni);
 }
-void cut(Node *now){
-	access(now); now->l->p = nullptr; now->l = nullptr;
+int lca(int vi, int wi){
+	access(vi); access(wi); splay(vi);
+	if (tree[vi].p != -1){ return tree[vi].p; } else{ return vi; }
 }
-Node* lca(Node *v, Node *w){
-	access(v); access(w); spl(v);
-	if (v->p){ return v->p; } else{ return v; }
+
+// Connected? find(vi) == find(wi)
+void upd(int vi, ll x){
+	splay(vi); update(vi, x);
 }
-Node *vtx[N+20]; vtx[i]->idx = i; // might be a good idea to directly access the node
+void upd(int vi, int wi, ll x){
+	int r = find(vi);
+	reroot(vi); access(wi); splay(vi); tree[vi].laz += x; propagate(vi);
+	reroot(r);
+	// Edge Update: v - l - w excluding l.
+	int li = lca(vi, wi);
+	access(li); splay(li); propagate(li); update(li, tree[li].val-x);
+}
+ll qry(int vi, int wi){
+	int li = lca(vi, wi); ll res = tree[li].val;
+	access(vi); splay(li); if (tree[li].r != -1){ res += tree[tree[li].r].sum; }
+	access(wi); splay(li); if (tree[li].r != -1){ res += tree[tree[li].r].sum; }
+	return res;
+}
 \end{minted}
 \section{Query \& Decomposition}
 \subsection{\completed{Heavy-Light Decomposition}}

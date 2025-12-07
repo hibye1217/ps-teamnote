@@ -10,6 +10,9 @@ My version of the teamnote. Use at your own risk, because god this code is terri
 
 Anything that are written in gray texts are untested statements i.e. might be false.
 
+## Future Works
+- 
+
 ## References
 - teamnote.sty by ho94949
 - various codes by jhnah917
