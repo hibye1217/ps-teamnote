@@ -445,16 +445,22 @@ Polygon is always given as counter-clockwise order, with no $3$ points in a line
 \subsection{\completed{Well-known Formulas}}
 \begin{itemize}
 	\item Distance of Point $(x', y')$ and Line $ax + by + c = 0$: $\frac{|ax' + by' + c|}{\sqrt{a^2 + b^2}}$.
+	\item Volume of Polygonal Pyramid: $\mathrm{Base} \times \mathrm{Height} / 3$.
+	\item Volume of a Sphere: $4 \pi r^3 / 3$. Surface Area: $4 \pi r^2$.
 	\item $\sin(\alpha \pm \beta) = \sin \alpha \cos \beta \pm \cos \alpha \sin \beta$; $\sin^2(\theta/2) = (1 - \cos \theta) / 2$.
 	\item $\cos(\alpha \pm \beta) = \cos \alpha \cos \beta \mp \sin \alpha \sin \beta$; $\cos^2(\theta/2) = (1 + \cos \theta) / 2$.
 	\item $\tan(\alpha \pm \beta) = \frac{\tan \alpha \pm \tan \beta}{1 \mp \tan \alpha \tan \beta}$; $\tan^2(\theta/2) = \frac{1 - \cos \theta}{1 + \cos \theta}$.
 	\item Let $a$, $b$, $c$ be the length; $A$, $B$, $C$ be the angle of a triangle.
-	\item Let $s = (a+b+c)/2$. Then area $S = \sqrt{s(s-a)(s-b)(s-c)}$.
+	\item Let $s = (a+b+c)/2$. Then area $S = \sqrt{s(s-a)(s-b)(s-c)}$. $S = (bc \sin A) / 2$.
 	\item Radius of Circumcircle $R = abc/4S$; Radius of Incircle $r = S/s$.
 	\item $a/\sin A = 2R$; $a^2 = b^2 + c^2 - 2bc \cos A$; $\frac{a+b}{a-b} = \frac{\tan((A+B)/2)}{\tan{((A-B)/2)}}$.
 	\item Let $\mathcal A = b^2 + c^2 - a^2$. $\mathcal B$ and $\mathcal C$ is defined similarly. Map $(a)$ as $(a : b : c)$, cyclic.
 	\item Incenter: $(a)$; Circumcenter: $(a^2\mathcal A)$; Centroid: $(1)$; Orthocenter: $\mathcal B \mathcal C$.
 	\item Excenter(A): $(-a : b : c)$; Nine-point: $(a^2(b^2+b^2) - (b^2-c^2)^2)$.
+	\item Given a center $P$, Let $D$ be the intersection of $AP$ and $BC$. $E$ and $F$ is defined similarly.
+	\item Incenter $I$: $AI$ is also an angle bisector. Circumcenter $O$: Circle passes $A$, $B$, and $C$.
+	\item Orthocenter $H$: $AH$ and $BC$ are orthic i.e. angle is $90$ deg. Centroid: $AG : GD = 2 : 1$ and $|BD| = |DC|$.
+	\item $\mathrm{proj}_{\mathbf{u}} \mathbf{v} = \frac{\mathbf{u} \cdot \mathbf{v}}{\mathbf{v} \cdot \mathbf{v}} \mathbf{v}$.
 \end{itemize}
 \subsection{\completed{Line Intersection}}
 \begin{minted}{cpp}
