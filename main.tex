@@ -159,33 +159,72 @@ int solve(int idx, int mod){
 }
 \end{minted}
 \section{Mathematics - Combinatorics}
-\subsection{\completed{Lucas Theorem}}
-$\binom{n}{r} \equiv \binom{n \bmod p}{r \bmod p} \times \binom{n/p}{r/p} \pmod p$.
-\begin{minted}{cpp}
-int ncr(int n, int r){
-	if (0 > r || r > n){ return 0; } if (r == 0){ return 1; }
-	if (0 <= n && n < mod && 0 <= r && r < mod){ return fac[n] * inv[r] % mod * inv[n-r] % mod; }
-	return ncr(n%mod, r%mod) * ncr(n/mod, r/mod) % mod;
-}
-\end{minted}
 \subsection{\completed{Well-known Sequences}}
-Derangement is the number of permutation with $P_i \neq i$ for all $i$. \\
+Let $x^{(k)}$ be the product of $x$ to $x+k-1$, and $x_{(k)}$ be the product of $x$ to $x-k+1$.
+Let $C_{n, r} = \binom{n}{r}$ and $H_{n, r} = \binom{n+r-1}{r}$. Let $P_{n, r} = n! / r!$.
+
+Derangement is the number of permutation with $\pi_i \neq i$ for all $i$. \\
 $D_0 = 1$; $D_1 = 0$; $D_n = (n-1)(D_{n-1} + D_{n-2})$.
 
 Catalan Number is the number of valid Regular Bracket Sequence with $n$ pairs. \\
-$C_0 = 1$; $C_{n+1} = (4n+2) C_n / (n+2)$.
+$C_0 = 1$; $C_{n+1} = (4n+2) C_n / (n+2)$. Def: $C_{n+1} = \sum_{k=0}^{n} C_k C_{n-k}$.
 
 Stirling Number of the First Kind is the number of permutation with $n$ elements and $k$ cycles. \\
 $s_{0, 0} = 1$; $s_{n, 0} = s_{0, k} = 0$; $s_{n, k} = (n-1) s_{n-1, k} + s_{n-1, k-1}$.
 
-Stirling Number of the Second Kind is the number of ways to partition a set of $n$ different objects unto $k$ non-empty subsets. \\
+Stirling Number of the Second Kind is the number of ways to partition a set of $n$ distinct objects onto $k$ non-empty subsets. \\
 $S_{0, 0} = 1$; $S_{n, 0} = S_{0, k} = 0$; $S_{n, k} = k S_{n-1, k} + S_{n-1, k-1}$.
 
-Bell Number is the number of ways to partition a set of $n$ different objects. \\
-$B_n = \sum_{k=0}^{n} S_{n, k}$.
+Bell Number is the number of ways to partition a set of $n$ distinct objects. \\
+$B_n = \sum_{k=0}^{n} S_{n, k} = \sum_{k=0}^{n} C_{n, k} B_k$.
 
-Partition Number is the number of ways to partition $n$ into $k$ parts. \\
-$p_{k}(n) = p_{k-1}(n-1) + p_{k}(n-k)$. $p(n) = \sum_{k=1}^{n} p_k(n)$.
+Partition Number is the number of ways to partition $n$ nondistinct objects into collection of $k$ non-empty bunches. \\
+$p_{n, k} = p_{n-1, k-1} + p_{n-k, k}$. $p_n = \sum_{k=1}^{n} p_{n, k}$.
+\subsection{\completed{Well-known Formulas}}
+\begin{itemize}
+	\item Lucas's Theorem: $C_{n, r} \equiv C_{n \bmod p, r \bmod p} C_{n/p, r/p} \pmod p$.
+	\item Vamdermonde's Identity: $\sum_{k=0}^{r} C_{n, k} C_{m, r-k} = C_{n+m, r}$.
+	\item Hockey-Stick Identity: Assuming $n > r$, $\sum_{k=r}^{n} C_{k, r} = C_{n+1, r+1}$.
+	\item $\sum_{k=r}^{n} C_{n, k} C_{k, r} = 2^{n-k}$.
+	\item $\sum_{k=1}^{n} C_{n, k} C_{c-1, k-1} = C_{2n-1, n-1}$.
+	\item $\sum_{k \text{ is odd}}^{k \le n} C_{n, k} a^{n-k} b^k = ((a+b)^n - (a-b)^n)/2$.
+	\item $\sum_{k=0}^{n} C_{r, k} / C_{n, k} = C_{n+1, n-r+1} / C_{n, r}$.
+	\item Number of involutions: $I_0 = I_1 = 1$; $I_{n} = I_{n-1} + (n-1) I_{n-2}$.
+	\item Number of permutations of size $n$ where every cycles have length $\le k$: $T_{n,k} = n! \text{ if } n \le k \text{ else } n T_{n-1, k} - (n-1)_{(k)} T_{n-k-1, k}$.
+	\item Catalan Number = Number of permutations of length $n$ that avoids the pattern $123$.
+	\item Number of prefix RBS of length $n+k$ with $n$ opens and $k$ closes: $C_{n+k, k} (n-k+1)/(n+1)$.
+	\item Number of RBS of length $2n$ with exactly $k$ `()'s: $C_{n, k} C_{n, k-1} / n$.
+	\item Stirling Number of the Second Kind but each subset's size $\ge r$: \\ $S_{r, n+1, k} = k S_{r, n, k} + C_{n, r-1} S_{r, n-r+1, k-1}$.
+	\item Stirling Number of the Second Kind but pairwise distance $\ge d$: $S_{n-d+1, k-d+1}$, assuming $n \ge k \ge d$.
+\end{itemize}
+\subsection{\completed{Thirtyfold Way}}
+Given $n$ items, divide it up to $k$ batches. $n, k \ge 1$. Batches can be empty on Problem 0, 1, 2.
+\begin{itemize}
+	\item A: Distinguishable items onto Sequence of Lists.
+	\item B: Distinguishable items onto Sequence of Sets.
+	\item C: Indistinguishable items onto Sequence of Bunches.
+	\item D: Distinguishable items onto Collection of Lists.
+	\item E: Distinguishable items onto Collection of Sets.
+	\item F: Indistinguishable items onto Collection of Bunches.
+	\item 0: You are given sequence $a$ that $\sum i a_i = n$ and $\sum a_i = k$. There must be exactly $a_i$ batches that have size $i$.
+	\item 1: Each Batch must contain at most $1$ item.
+	\item 2: It's fine as long as you have $k$ batches.
+	\item 3: Each Batch must contain at least $1$ item.
+	\item 4: You are only given $n$, and are to find sum of Problem 3 for all $b$.
+\end{itemize}
+For Problem 0, define $\alpha = \left< a_0, a_1, \ldots, a_n \right>$. Let $\iota = \left< 1, \ldots, 1, 2, \ldots, 2, \ldots, n, \ldots, n \right>$ where $x$ appears $a_x$ times.
+
+Let $\alpha! = a_0! a_1! \cdots a_n!$ and $\alpha^+! = a_1! a_2! \cdots a_n!$. Let $\iota! = 1! \cdots 1! 2! \cdots 2! \cdots n! \cdots n!$. \\
+Let $C(k, \alpha) = k! / \alpha!$ and $C(n, \iota) = n! / \iota!$. \\ 
+\begin{tabular}{|c|c|c|c|c|c|c|} \hline
+  & 0                            & 1           & 2                                   & 3                    & 4                                   \\ \hline
+A & $n! C_{k, \alpha}$           & $k_{(n)}$   & $k^{(n)}$                           & $C_{n-1, k-1} n!$    & $2^{n-1} n!$                        \\ \hline
+B & $C_{k, \alpha} C_{n, \iota}$ & $k_{(n)}$   & $k^n$                               & $k! S_{n, k}$        & $\sum_{k=1}^{n} k! S_{n, k}$        \\ \hline
+C & $C_{k, \alpha}$              & $C_{k, n}$  & $H_{k, n}$                          & $C_{n-1, k-1}$       & $2^{n-1}$                           \\ \hline
+D & $m! / \alpha^+!$             & $[n \le k]$ & $\sum_{i=1}^{k} C_{n-1, k-1} n!/i!$ & $C_{n-1, k-1} n!/k!$ & $\sum_{k=1}^{n} C_{n-1, k-1} n!/k!$ \\ \hline
+E & $C_{m, \iota} / \alpha^+!$   & $[n \le k]$ & $\sum_{i=1}^{k} S_{n, i}$           & $S_{n, k}$           & $B_n$                               \\ \hline
+F & $1$                          & $[n \le k]$ & $\sum_{i=1}^{k} p_{n, i}$           & $p_{n, k}$           & $p_n$                               \\ \hline
+\end{tabular}
 \subsection{\completed{Lindström-Gessel-Viennot Lemma}}
 Let $w(P)$ be the product of the weights of the edges of the path $P$. Let $D$ be the matrix with $D_{i,j}$ be the sum of $w(P)$s with $i \to j$.
 
@@ -224,14 +263,29 @@ Let $A(x)$ be the GF of the sequence $a_i$. $a$ is $0$-indexed.
 	\item $\frac{1}{(1-x)^k} = \sum_{n=0}^{\infty} \binom{n+k-1}{n} x^n = \sum_{n=0}^{\infty} {}_{k}H_{n} x^n$.
 \end{itemize}
 \section{Mathematics - Algebra}
+\subsection{\completed{Well-known Formulas}}
+\begin{itemize}
+	\item $\sum_{n=0}^{\infty} n/2^n = 2$.
+	\item Lagrange's Identity: $(\sum_{i} a_i^2)(\sum_{i} b_i^2) - (\sum_{i} a_i b_i)^2 = \sum_{i < j} (a_i b_j - a_j b_i)^2$.
+	\item Vieta's Formula: For a polynomial $\sum_i a_i x^i$, $\sum_{i_1 < i_2 < \cdots < i_k} \prod_{j=1}^{k} r_{i_j} = (-1)^k a_{n-k} / a_n$.
+	\item Let Fibonacci Number be $F_n = n \text{ if } n \le 1 \text{ else } F_{n-1} + F_{n-2}$.
+	\item $\sum_{k=0}^{n} F_k = F_{n+2} - 1$ and $\sum_{k=0}^{n} F_k^2 = F_{n} F_{n-1}$.
+	\item $\sum_{k=0}^{n-1} F_{2k+1} = F_{2n}$ and $\sum_{k=0}^{n} F_{2k} = F_{2n+1}-1$.
+	\item $F_{m} F_{n+1} + F_{m-1} F_{n} = F_{m+n}$ and $F_{m} F_{n+1} - F_{m-1} F_{n} = (-1)^n F_{m-n}$.
+	\item $F_{2n} = F_{n+1}^2 - F_{n-1}^2 = F_n(F_{n+1} + F_{n-1})$.
+	\item $\mathrm{gcd}(F_m, F_n) = F_{\mathrm{gcd}(m, n)}$.
+	\item Fibonacci Number mod $p$ have period with at most $6n$.
+	\item Given $m > n > 0$ with $\mathrm{gcd}(m, n) = 1$ and $2 \mid mn$, $(m^2-n^2, 2mn, m^2+n^2)$ is primitive Pythagorean triple.
+	\item The number of Pythagorean triple with $a, b \le c = n$ is $(\prod_{p^\alpha \mid\mid n} (2\alpha + 1) - 1) / 2$, where $\alpha$ is the highest exponent s.t. $p^\alpha$ divides $n$.
+\end{itemize}
 \subsection{\completed{Modeling - 2-SAT - Operations}}
 \begin{itemize}
-	\item $(a \vee b) \to (\neg a \implies b) \wedge (\neg b \implies a)$.
-	\item $(a \wedge b) \to (a \vee a) \wedge (b \vee b)$.
-	\item $(a \overline{\wedge} b) \to \neg (a \wedge b) \to (\neg a \vee \neg b)$.
-	\item $(a \overline{\vee} b) \to (\neg a \wedge \neg b)$.
-	\item $(a \oplus b) \to (a \vee b) \wedge (\neg a \vee \neg b)$.
-	\item $(a \overline{\oplus} b) \to (a \vee \neg b) \wedge (\neg a \vee b)$.
+	\item OR: $(a \vee b) \to (\neg a \implies b) \wedge (\neg b \implies a)$.
+	\item AND: $(a \wedge b) \to (a \vee a) \wedge (b \vee b)$.
+	\item NAND: $(a \overline{\wedge} b) \to \neg (a \wedge b) \to (\neg a \vee \neg b)$.
+	\item NOR: $(a \overline{\vee} b) \to (\neg a \wedge \neg b)$.
+	\item XOR: $(a \oplus b) \to (a \vee b) \wedge (\neg a \vee \neg b)$.
+	\item XNOR: $(a \overline{\oplus} b) \to (a \vee \neg b) \wedge (\neg a \vee b)$.
 \end{itemize}
 \subsection{\completed{Modeling - 2-SAT - At most 1}}
 $3$ variables ($a$, $b$, $c$) can be done with $(\neg a \vee \neg b) \wedge (\neg b \vee \neg c) \wedge (\neg c \vee \neg a)$. This can be expanded to make $\mathcal O(N^2)$ clauses.
@@ -388,6 +442,20 @@ pair<ld, vector<ld>> solve(){
 \section{Mathematics - Geometry}
 Note that \texttt{(first, second)} is $(y, x)$.
 Polygon is always given as counter-clockwise order, with no $3$ points in a line.
+\subsection{\completed{Well-known Formulas}}
+\begin{itemize}
+	\item Distance of Point $(x', y')$ and Line $ax + by + c = 0$: $\frac{|ax' + by' + c|}{\sqrt{a^2 + b^2}}$.
+	\item $\sin(\alpha \pm \beta) = \sin \alpha \cos \beta \pm \cos \alpha \sin \beta$; $\sin^2(\theta/2) = (1 - \cos \theta) / 2$.
+	\item $\cos(\alpha \pm \beta) = \cos \alpha \cos \beta \mp \sin \alpha \sin \beta$; $\cos^2(\theta/2) = (1 + \cos \theta) / 2$.
+	\item $\tan(\alpha \pm \beta) = \frac{\tan \alpha \pm \tan \beta}{1 \mp \tan \alpha \tan \beta}$; $\tan^2(\theta/2) = \frac{1 - \cos \theta}{1 + \cos \theta}$.
+	\item Let $a$, $b$, $c$ be the length; $A$, $B$, $C$ be the angle of a triangle.
+	\item Let $s = (a+b+c)/2$. Then area $S = \sqrt{s(s-a)(s-b)(s-c)}$.
+	\item Radius of Circumcircle $R = abc/4S$; Radius of Incircle $r = S/s$.
+	\item $a/\sin A = 2R$; $a^2 = b^2 + c^2 - 2bc \cos A$; $\frac{a+b}{a-b} = \frac{\tan((A+B)/2)}{\tan{((A-B)/2)}}$.
+	\item Let $\mathcal A = b^2 + c^2 - a^2$. $\mathcal B$ and $\mathcal C$ is defined similarly. Map $(a)$ as $(a : b : c)$, cyclic.
+	\item Incenter: $(a)$; Circumcenter: $(a^2\mathcal A)$; Centroid: $(1)$; Orthocenter: $\mathcal B \mathcal C$.
+	\item Excenter(A): $(-a : b : c)$; Nine-point: $(a^2(b^2+b^2) - (b^2-c^2)^2)$.
+\end{itemize}
 \subsection{\completed{Line Intersection}}
 \begin{minted}{cpp}
 inline ll cross(const pl2& v1, const pl2& v2){ return v1.sc*v2.fr - v2.sc*v1.fr; }
@@ -1216,6 +1284,18 @@ queue<pi2> q; q.push({c0.fr, c1.fr}); while (!q.empty()){
 }
 cout << "JAH" << endl; for (int i = 1; i <= n; i++){ cout << ans[i]-1 << endl; }
 \end{minted}
+\subsection{\completed{Graph Realization Problem}}
+Simple Undirected Graph with Degree Sequence $d_1 \ge d_2 \ge \cdots \ge g_n$ exists iff $\sum_i d_i$ is even and $\sum_{i=1}^{k} d_i \le k(k-1) + \sum_{i=k+1}^{n} \min(d_i, k)$ holds for every $1 \le k \le n$.
+
+You can construct the graph by picking $d_1$ and connecting it to $2, 3, \ldots, d_{d_1+1}$ and pass everything else as induction. Note that $d_2, d_3, \ldots, d_{d_1+1}$ also decreases by $1$ by doing this, and thus might need reordering.
+
+Simple Directed Graph with In/Outdegree Sequence $(a_1, b_1), (a_2, b_2), \ldots, (a_n, b_n)$ with $a$ being nonincreaing exists iff $\sum_i a_i = \sum_i b_i$ and $\sum_{i=1}^{k} a_i \le \sum_{i=1}^{k} \min(b_i, k-1) + \sum_{i=k+1}^{n} \min(b_i, k)$.
+
+You can construct the graph by picking max $b_i$ and connecting it to vertices with max $a_j$s.
+
+Simple Bipartite Graph with Degree sequence $a_1 \ge a_2 \ge \ldots \ge a_n$ and $b_1 \ge b_2 \ge \cdots \ge b_m$ exists iff $\sum_i a_i = \sum_j b_j$ and $\sum_{i=1}^{k} a_i \le \sum_{i=1}^{m} \min(b_i, k)$ for all $1 \le k \le n$.
+
+You can construct the graph by greedily matching $a_i$ with max $b_j$s, for $i$ in $1$ to $n$.
 \section{Dynamic Programming}
 \subsection{\completed{Rerooting}}
 Tree DP, with changing root.
@@ -2203,6 +2283,27 @@ while (1){
 } sort(qrr+1, qrr+q+1, [](Query& q1, Query& q2){ return q1.idx < q2.idx; });
 for (int i = 1; i <= q; i++){ cout << evt[qrr[i].ed].sc << endl; } // ed = first possible
 \end{minted}
+\subsection{\completed{CDQ Divide and Conquer}}
+3D LIS. Find longest chain $(A_i, B_i, C_i)$ s.t. $A_i < A_j$; $B_i < B_j$; $C_i < C_j$ holds.
+\begin{minted}{cpp}
+// upd(p, x, t) / t = 0: A[p] = x / t = 1: A[p] = max(A[p], x)
+// qry(s, e) / max A[s..e]
+// Assume arr is sorted via A.
+void dnc(int st, int ed){
+	if (st == ed){ arr[st].dp = max(arr[st].dp, 1); return; }
+	int mid = st+ed >> 1; dnc(st, mid);
+	sort(arr+st, arr+mid+1, [](const T& a, const T& b){ return a.b < b.b; });
+	vector<int> qrr; for (int i = mid+1; i <= ed; i++){ qrr.push_back(i); }
+	sort(qrr.begin(), qrr.end(), [](int i1, int i2){ return arr[i1].b < arr[i2].b; });
+	int ptr = st; for (int i : qrr){
+		while (ptr <= mid){
+			if (arr[ptr].b < arr[i].b){ upd(arr[ptr].c, arr[ptr].dp); ptr += 1; }
+			else{ break; }
+		} arr[i].dp = max(arr[i].dp, qry(1, arr[i].c)+1);
+	} for (int i = st; i <= mid; i++){ upd(arr[i].c, 0); }
+	return dnc(mid+1, ed);
+}
+\end{minted}
 \section{Greedy}
 \subsection{\completed{Job Scheduling w/ Deadline \& Duration}}
 \begin{minted}{cpp}
@@ -2389,34 +2490,41 @@ def cmp(a, b): return sgn(a-b) # a < b then -, a > b then +, otherwise 0
 l.sort(key=cmp_to_key(cmp)); sorted(l, key=cmp_to_key(cmp))
 \end{minted}
 \section{Miscellaneous}
-\subsection{\toadd{List of Primes}}
+\subsection{\completed{List of Primes}}
+\begin{itemize}
+	\item $\le 10^3$: $168$ primes, max $997$.
+	\item $\le 10^5$: $1\,229$ primes, max $99\,991$.
+	\item $\le 10^6$: $9\,592$ primes, max $999\,983$.
+	\item $\le 10^9$: $50\,847\,534$ primes, max $999\,999\,937$.
+	\item $\le 10^{12}$: max $999\,999\,999\,989$.
+	\item $\le 10^{18}$: max $999\,999\,999\,999\,999\,989$.
+	\item $998\,244\,353 = 119 \times 2^{23}$ with $\omega = 3$.
+	\item $167\,772\,161 = 5 \times 2^{26}$ with $\omega = 3$.
+	\item $469\,762\,049 = 13 \times 2^{27}$ with $\omega = 3$.
+	\item $2\,281\,701\,377 = 17 \times 2^{27}$ with $\omega = 3$.
+	\item $2\,483\,027\,969 = 37 \times 2^{26}$ with $\omega = 3$.
+	\item $2\,013\,265\,921 = 15 \times 2^{27}$ with $\omega = 31$.
+\end{itemize}
 \subsection{\completed{List of Highly Composite Numbers}}
 \begin{itemize}
-	\item $840$: $32$ divisors
-	\item $720\,720$: $240$ divisors
-	\item $735\,134\,400$: $1\,344$ divisors
-	\item $963\,761\,198\,400$: $6\,720$ divisors
-	\item $897\,612\,484\,786\,617\,600$: $103\,680$ divisors
+	\item $840$: $32$ divisors (3, 1, 1, 1)
+	\item $83\,160$: $128$ divisors (3, 3, 1, 1, 1)
+	\item $720\,720$: $240$ divisors (4, 2, 1, 1, 1, 1)
+	\item $735\,134\,400$: $1\,344$ divisors (6, 3, 2, 1, 1, 1, 1)
+	\item $963\,761\,198\,400$: $6\,720$ divisors (6, 4, 2, 1, 1, 1, 1, 1, 1)
+	\item $897\,612\,484\,786\,617\,600$: $103\,680$ divisors (8, 4, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1)
 \end{itemize}
 \subsection{\completed{ASCII Table}}
 \begin{minted}{text}
-  |  0   1   2   3   4   5   6   7
---+--------------------------------
-0 | NUL DLE  SP  0   @   P   `   p
-1 | SOH DC1  !   1   A   Q   a   q
-2 | STX DC2  "   2   B   R   b   r
-3 | ETX DC3  #   3   C   S   c   s
-4 | EOT DC4  $   4   D   T   d   t
-5 | ENQ NAK  %   5   E   U   e   u
-6 | ACK SYN  &   6   F   V   f   v
-7 | BEL ETB  '   7   G   W   g   w
-8 |  BS CAN  (   8   H   X   h   x
-9 | TAB  EM  )   9   I   Y   i   y
-A |  LF SUB  *   :   J   Z   j   z
-B |  VT ESC  +   ;   K   [   k   {
-C |  FF  FS  ,   <   L   \   l   |
-D |  CR  GS  -   =   M   ]   m   }
-E |  SO  RS  .   >   N   ^   n   ~
-F |  SI  US  /   ?   O   _   o  DEL
+  |  0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F 
+--+---------------------------------------------------------------- 
+0 | NUL SOH STX ETX EOT ENQ ACK BEL  BS TAB  LF  VT  FF  CR  SO  SI
+1 | DLE DC1 DC2 DC3 DC4 NAK SYN ETB CAN  EM SUB ESC  FS  GS  RS  US
+2 |  SP  !   "   #   $   %   &   '   (   )   *   +   ,   -   .   /
+3 |  0   1   2   3   4   5   6   7   8   9   :   ;   <   =   >   ?
+4 |  @   A   B   C   D   E   F   G   H   I   J   K   L   M   N   O
+5 |  P   Q   R   S   T   U   V   W   X   Y   Z   [   \   ]   ^   _
+6 |  `   a   b   c   d   e   f   g   h   i   j   k   l   m   n   o
+7 |  p   q   r   s   t   u   v   w   x   y   z   {   |   }   ~  DEL
 \end{minted}
 \end{document}
