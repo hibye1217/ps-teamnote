@@ -158,6 +158,19 @@ int solve(int idx, int mod){
 	return fpow(arr[idx], solve(idx+1, m) + CUT*m, mod);
 }
 \end{minted}
+\subsection{\completed{Iterating Floor of k/n}}
+\begin{minted}{cpp}
+vector<pl2> v; // saves {floor(k/n), # of k}.
+ll sq = (ll)sqrt(n);
+for (ll i = 1; i <= sq; i++){
+	ll val = n/i; if (v.empty() || v.back().fr != val){ v.push_back({val, 1}); }
+	else{ v.back().sc += 1; }
+}
+for (ll x = sq; x >= 1; x--){
+	ll st = max(sq+1, n/(x+1)+1), ed = n/x;
+	if (st <= ed){ v.push_back({x, ed-st+1}); }
+}
+\end{minted}
 \section{Mathematics - Combinatorics}
 \subsection{\completed{Well-known Sequences}}
 Let $x^{(k)}$ be the product of $x$ to $x+k-1$, and $x_{(k)}$ be the product of $x$ to $x-k+1$.
@@ -196,6 +209,12 @@ $p_{n, k} = p_{n-1, k-1} + p_{n-k, k}$. $p_n = \sum_{k=1}^{n} p_{n, k}$.
 	\item Number of RBS of length $2n$ with exactly $k$ `()'s: $C_{n, k} C_{n, k-1} / n$.
 	\item Stirling Number of the Second Kind but each subset's size $\ge r$: \\ $S_{r, n+1, k} = k S_{r, n, k} + C_{n, r-1} S_{r, n-r+1, k-1}$.
 	\item Stirling Number of the Second Kind but pairwise distance $\ge d$: $S_{n-d+1, k-d+1}$, assuming $n \ge k \ge d$.
+	\item Burnside: Let $G$ be a group. $r = \sum_{g \in G} |X_g|/|G|$. $|X_g|$ is the number of elements that $gx = x$ holds.
+	\item Linearity of Expectation: $\mathbb{E}[aX + bY] = a \mathbb{E}[X] + b \mathbb{E}[Y]$. If independent, $\mathbb{E}[XY] = \mathbb{E}[X] \mathbb{E}[Y]$.
+	\item Variance: $\mathrm{Var}(X+a)= \mathrm{Var}(X)$; $\mathrm{Var}(aX) = a^2 \mathrm{Var}(X)$.
+	\item Covariance: $\mathrm{cov}(X, Y) = \mathbb{E}[(X-\mathbb{E}[x])(Y-\mathbb{E}[Y])] = \mathbb{E}[XY] - \mathbb{E}[X] \mathbb{E}[Y]$.
+	\item $\mathrm{Var}(X) = \mathrm{cov}(X, X)$; $\mathrm{cov}(aX + bY, cW + dV) = ac \mathrm{cov}(X, W) + (\text{cyclic})$.
+	\item $\mathrm{Var}(aX + bY) = a^2 \mathrm{Var}(X) + b^2 \mathrm{Var}(Y) + 2ab \mathrm{cov}(X, Y)$.
 \end{itemize}
 \subsection{\completed{Thirtyfold Way}}
 Given $n$ items, divide it up to $k$ batches. $n, k \ge 1$. Batches can be empty on Problem 0, 1, 2.
@@ -277,7 +296,48 @@ Let $A(x)$ be the GF of the sequence $a_i$. $a$ is $0$-indexed.
 	\item Fibonacci Number mod $p$ have period with at most $6n$.
 	\item Given $m > n > 0$ with $\mathrm{gcd}(m, n) = 1$ and $2 \mid mn$, $(m^2-n^2, 2mn, m^2+n^2)$ is primitive Pythagorean triple.
 	\item The number of Pythagorean triple with $a, b \le c = n$ is $(\prod_{p^\alpha \mid\mid n} (2\alpha + 1) - 1) / 2$, where $\alpha$ is the highest exponent s.t. $p^\alpha$ divides $n$.
+	\item Bernoulli Number $b_n$: $\sum_{k=1}^{n} k^c = \frac{(-1)^k}{c+1} C_{c+1, k} b_k n^{c+1-k}$; $b_0 = 1$; $b_n = \frac{-1}{c+1} \sum_{r=0}^{r-1} C_{n+1, r} b_r$.
 \end{itemize}
+\subsection{\completed{Well-known Linear Algebra}}
+\begin{itemize}
+	\item Matrix: $\mathrm{tr}(AB) = \mathrm{tr}(BA)$; $(A^{-1})^{\mathrm{T}} = (A^{\mathrm{T}})^{-1}$.
+	\item Determinant: Row Swap $\times -1$; Multiply Row $\times a$; Add to Other Row $\pm 0$.
+	\item Determinant of a Diagonal Matrix is the product of the diagonal entries.
+	\item $\mathrm{det} M = \mathrm{det} M^{\mathrm{T}}$; $\mathrm{det}(AB) = \mathrm{det} A \mathrm{det} B$.
+	\item Adjoint: Let $(\mathrm{adj} M)_{i, j}$ be the cofactor of $M$ at $(i, j)$. $M^{-1} = \mathrm{adj} M / \mathrm{det} M$.
+	\item Characteristic Polynomial: Let $P_M(\lambda) = \mathrm{det}(\lambda I - M)$.
+	\item Eigenvalue: $\lambda$s where $P_M(\lambda) = 0$; Eigenvector: $(M - \lambda I) X = 0$ for each $\lambda$ we got.
+	\item Least Square: $A$ be a matrix and $b$ be a vector. $\min_{x \in \mathbb{R}^n} ||Ax - b||^2$; $A^{\mathrm{T}} A x = A^{\mathrm{T}} b$.
+	\item $AB = C$ using Randomization in $O(N^2)$: Create random vector $v$, and see $A(Bv) = Cv$.
+\end{itemize}
+\subsection{\completed{Well-known Calculus}}
+\begin{itemize}
+	\item $(f(x) g(x))' = f'(x) g(x) + f(x) g'(x)$; $(f(x)/g(x))' = (f'(x) g(x) - f(x) g'(x)) / g(x)^2$.
+	\item $(f(g(x)))' = f'(g(x)) g(x)$. $\int u dv = uv - \int v du$.
+	\item Let $x = g(t)$. Then $\int f(x) dx = \int f(g(t)) g'(t) dt$.
+	\item $(a^x)' = a^x \ln a$; $\int a^x \,dx= a^x / \ln a + C$.
+	\item $(\log_b |x|)' = 1/(x \ln b)$. $\int 1/x \,dx = \ln |x| + C$.
+	\item $\sec$, $\csc$, $cot$ is $1/\cos$, $1/\sin$, $1/\tan$ resp.
+	\item $\arcsin$, $\arccos$, $\arctan$ is inverse of $\sin$, $\cos$, $\tan$ resp.
+	\item $\sinh$, $\cosh$, $\tanh$ is $(e^x - e^{-x})/2$, $(e^x + e^{-x})/2$, $\sinh/\cosh$ resp.
+	\item $x$ axis Rotation Volume: Assume $f(x) \ge 0$, $f$ is continuous in $[a, b]$. $\int_{a}^{b} 2 \pi x f(x) dx$.
+\end{itemize}
+
+\begin{tabular}{|c|c|c|} \hline
+Derivative                  & $f(x)$        & Integral (w/ $+C$)               \\ \hline
+$\cos x$                    & $\sin x$      & $-cos x$                         \\ \hline
+$-\sin x$                   & $\cos x$      & $\sin x$                         \\ \hline
+$sec^2 x$                   & $\tan x$      & $\ln |\sec x|$                   \\ \hline
+$\sec x \tan x$             & $\sec x$      & $\ln|\sec x + \tan x|$           \\ \hline
+$-\csc x \cot x$            & $\csc x$      & $\ln|\csc x - \cot x|$           \\ \hline
+$-\csc^2 x$                 & $\cot x$      & $\ln |\sin x|$                   \\ \hline
+$1 / \sqrt{1 - x^2}$        & $\arcsin x$   & $x \arcsin x + \sqrt{1 - x^2}$   \\ \hline
+$-1 / \sqrt{1 - x^2}$       & $\arccos x$   & $x \arccos x - \sqrt{1 - x^2}$   \\ \hline
+$1 / (1 + x^2)$             & $\arctan x$   & $x \arctan x - \ln(x^2 + 1)/2$   \\ \hline
+$1 / (|x| \sqrt{x^2 - 1})$  & $\sec^{-1} x$ & $x \sec^{-1} x - \cosh^{-1} |x|$ \\ \hline
+$-1 / (|x| \sqrt{x^2 - 1})$ & $\csc^{-1} x$ & $x \csc^{-1} x + \cosh^{-1} |x|$ \\ \hline
+$-1 / (1 + x^2)$            & $\cot^{-1} x$ & $x \cos^{-1} x + \ln(x^2+1)/2$   \\ \hline
+\end{tabular}
 \subsection{\completed{Modeling - 2-SAT - Operations}}
 \begin{itemize}
 	\item OR: $(a \vee b) \to (\neg a \implies b) \wedge (\neg b \implies a)$.
@@ -462,6 +522,22 @@ Polygon is always given as counter-clockwise order, with no $3$ points in a line
 	\item Orthocenter $H$: $AH$ and $BC$ are orthic i.e. angle is $90$ deg. Centroid: $AG : GD = 2 : 1$ and $|BD| = |DC|$.
 	\item $\mathrm{proj}_{\mathbf{u}} \mathbf{v} = \frac{\mathbf{u} \cdot \mathbf{v}}{\mathbf{v} \cdot \mathbf{v}} \mathbf{v}$.
 \end{itemize}
+\subsection{\completed{Nearest Pair of Point}}
+\begin{minted}{cpp}
+sort(arr+1, arr+n+1, [](pl2 p1, pl2 p2){ return pl2(p1.sc, p1.fr) < pl2(p2.sc, p2.fr); });
+int ans = dis(arr[1], arr[2]);
+set<pl2> s; s.insert(arr[1]); s.insert(arr[2]);
+int st = 1; for (int i = 3; i <= n; i++){
+	while (st < i){
+		ll x = (p[st].sc-p[i].sc); if (x*x <= ans){ break; }
+		else{ s.erase(arr[st]); st += 1; }
+	} int d = (int)sqrt(ans)+1;
+	auto l = s.lower_bound({p[i].fr-d, -INF-1});
+	auto r = s.upper_bound({p[i].fr+d, INF+1});
+	for (auto j = l; j != r; j++){ ans = min(ans, dis(p[i], *j)); }
+	s.insert(p[i]);
+}
+\end{minted}
 \subsection{\completed{Line Intersection}}
 \begin{minted}{cpp}
 inline ll cross(const pl2& v1, const pl2& v2){ return v1.sc*v2.fr - v2.sc*v1.fr; }
@@ -579,6 +655,39 @@ int tangent(const pl2& p, int dir){
 	if (ed != n+1 && locate(p, arr[prv(ed)], arr[ed], arr[nxt(ed)], dir)){ return fix(p, ed, dir); }
 	return -1;
 }
+\end{minted}
+\subsection{\completed{Mincowski Sum of Convex Polygons}}
+\begin{minted}{cpp}
+pl2 operator+(const pl2& p1, const pl2& p2){ return {p1.y+p2.y, p1.x+p2.x}; }
+pl2 operator-(const pl2& p1, const pl2& p2){ return {p1.y-p2.y, p1.x-p2.x}; }
+
+for (int t = 1; t <= n; t++){
+	for (int i = 0; i < m; i++){
+		int j = i+1; if (j >= m){ j -= m; }
+		pl2 p1 = stk[i], p2 = stk[j];
+		pl2 d = p2-p1; d = {-d.x, d.y};
+		evt.push_back({d, p2-p1});
+	}
+	for (int i = 0; i < m; i++){
+		int jl = i-1; if (jl < 0){ jl += m; }
+		int jr = i+1; if (jr >= m){ jr -= m; }
+		pl2 pl = stk[jl], p = stk[i], pr = stk[jr];
+		pl2 dl = p-pl, dr = pr-p; dl = {-dl.x, dl.y}; dr = {-dr.x, dr.y};
+		if (pl2(-dl.y, dl.x) > pl2(0, 0) && pl2(-dr.y, dr.x) < pl2(0, 0)){ res = res+p; }
+	}
+}
+sort(evt.begin(), evt.end(), [](const pl4& pp1, const pl4& pp2){
+	pl2 p1 = pp1.fr, p2 = pp2.fr;
+	pl2 O = {0, 0}; if ((p1 > O) != (p2 > O)){ return (p1 > O) > (p2 > O); }
+	int res = ccw(O, p1, p2); return res > 0;
+});
+ans = max(ans, dis(res)); for (pl4& p : evt){
+	if (p.fr.y == 0 && p.fr.x > 0){ continue; }
+	res = res+p.sc; ans = max(ans, dis(res));
+} for (pl4& p : evt){
+	if (!(p.fr.y == 0 && p.fr.x > 0)){ continue; }
+	res = res+p.sc; ans = max(ans, dis(res));
+} cout << ans;
 \end{minted}
 \subsection{\completed{Minimum Enclosing Circle}}
 \begin{minted}{cpp}
@@ -977,6 +1086,10 @@ int dfs(int now, int pre){
 	\item Articulation Edge: Edge that has unique color.
 \end{itemize}
 \section{Graph Theory - Network Flow \& Matching}
+\subsection{\completed{Kőnig's Theorem (and More)}}
+On a Bipartite Graph, Size of Minimum Vertex Cover is equal to the size of Maximum Matching.
+
+Size of Maximum Independent Set is $V$ - size of Minimum Vertex Cover.
 \subsection{\completed{Hall's Marriage Theorem}}
 A bipartite graph $G = (X+Y, E)$ has a perfect $X$-matching iff for all subset $V \subseteq X$, $|V| \le |N_G(V)|$.
 
@@ -1024,6 +1137,12 @@ ll ans = 0; while (bfs(src, snk)){
 	}
 }
 \end{minted}
+\subsection{\completed{Minimum Path Cover}}
+Given a DAG, Minimum Vertex Path Cover can be computed as follow.
+Divide the vertex $v$ onto $v_l$ and $v_r$. For each edge $v \rightarrow w$, connect $v_l$ and $w_r$.
+Number of path you need to use is the $V$ - Maximum Matching.
+
+Minimum Edge Path Cover is just Eulerian Path in disguise.
 \subsection{\completed{Modeling - Flow with Demands}}
 \begin{itemize}
 	\item $\mathrm{req}_i = $ required flow $i$th vertex need to send
@@ -1302,9 +1421,16 @@ You can construct the graph by picking max $b_i$ and connecting it to vertices w
 Simple Bipartite Graph with Degree sequence $a_1 \ge a_2 \ge \ldots \ge a_n$ and $b_1 \ge b_2 \ge \cdots \ge b_m$ exists iff $\sum_i a_i = \sum_j b_j$ and $\sum_{i=1}^{k} a_i \le \sum_{i=1}^{m} \min(b_i, k)$ for all $1 \le k \le n$.
 
 You can construct the graph by greedily matching $a_i$ with max $b_j$s, for $i$ in $1$ to $n$.
+\subsection{\completed{Number of Spanning Trees}}
+Let $c_{i, j}$ be the number of edges. Let $M_{i, j}$ be $-c_{i, j}$ if $i \neq j$, and $\mathrm{deg} i$ otherwise.
+Then the number of spanning trees of the graph is the any cofactor of $M$.
+
+For directed spanning tree, $c_{i, j} = (i \rightarrow j)$ and $c_{i, i} = \mathrm{indeg} i$.
+The number of spanning trees are the cofactor of $(r, r)$.
 \section{Dynamic Programming}
+Monge (intersection is better than containment): CHT, DnC opt, WQS, MonoQ, Knuth.
 \subsection{\completed{Rerooting}}
-Tree DP, with changing root.
+Tree DP, with changing root. For all direction: Edge $v \rightarrow w$, set root as $v$ and record subtree $w$.
 
 \complexity{$\mathcal O(N)$.}
 \begin{minted}{cpp}
@@ -1369,7 +1495,7 @@ void dnc_opt(ll* dp1, ll* dp0, int is, int ie, int os, int oe){
 }
 \end{minted}
 \subsection{\completed{WQS Binary Search (Aliens Trick)}}
-$D_{k,i} = \min{j<i} D_{k-1,j} + A_{j,i}$. $D_{k,N}$ must be convex.
+$D_{k,i} = \min_{j<i} D_{k-1,j} + A_{j,i}$. $D_{k,N}$ must be convex.
 
 \complexity{$\mathcal O(T(N) \log X)$.}
 \begin{minted}{cpp}
@@ -1382,8 +1508,8 @@ while (st <= ed){
 	if (cnt <= k){ ed = mid-1; } else{ st = mid+1; }
 } cout << ans;
 \end{minted}
-\subsection{\torevise{Monotone Queue Optimization}}
-$D_i = \min_{j<i} D_j + A_{j,i}$. For all pair $i < j$, there exists a point $p$ that $D_i + C_{i,p}$ and $D_j + C_{j,p}$ changes. So $k < p$ means $<$, and $\ge$ otherwise.
+\subsection{\completed{Monotone Queue Optimization}}
+$D_i = \min_{j<i} D_j + A_{j,i}$. For all pair $i < j$, there exists a unique point $p$ that $D_i + C_{i,p}$ and $D_j + C_{j,p}$ changes. So $k < p$ means $<$, and $\ge$ otherwise.
 
 \complexity{$\mathcal O(N \log N)$}.
 
@@ -1421,13 +1547,13 @@ int solve(int n, ll x){
 }
 \end{minted}
 \subsection{\completed{Slope Trick}}
-I think this one is easier to just say. Let $f$ be a convex piecewise linear function with integer coefficient.
+Let $f$ be a convex piecewise linear function with integer coefficient.
 We can save this function by the points where the line changes, with one linear function.
 
 We can add two functions by merging the points without removing duplicants, and adding the linear function.
+Use \texttt{priority\_queue} if needed.
 \subsection{\completed{Knuth Optimization}}
 $D_{i,j} = D_{i,k} + D_{k+1,j} + A_{i,j}$ where $\mathrm{opt}_{i,j-1} \le \mathrm{opt}_{i,j} \le \mathrm{opt}_{i+1,j}$.
-This is satisfied if $C$ is monge.
 
 \complexity{$\mathcal O(N^2)$}.
 \begin{minted}{cpp}
@@ -1534,15 +1660,13 @@ ll kth(ll k, const vector<ll>& arr, const vector<ll>& f){ // x^k \pmod f
 	return ans%mod;
 }
 \end{minted}
-\subsection{\torevise{Hirschberg}}
+\subsection{\completed{Hirschberg}}
+Unlike other string algorithms, this assumes that \texttt{s1} and \texttt{s2} is 1-indexed.
 \begin{minted}{cpp}
 string s1, s2;
 
-#define ENDL ""
-
 int dp[3][7010];
 void solve(int i1, int j1, int i2, int j2, bool top = true){
-	//cout << "solve " << i1 << ' ' << j1 << ' ' << i2 << ' ' << j2 << endl;
 	if (i1 > j1 || i2 > j2){ return; }
 	if (i1 == j1){
 		for (int p2 = i2; p2 <= j2; p2++){
@@ -1598,7 +1722,7 @@ void solve(int i1, int j1, int i2, int j2, bool top = true){
 	}
 	else{
 		int p2 = mxp.sc;
-		solve(i1, m1, i2, p2-1, 0); cout << s2[p2] << ENDL; solve(m1+1+1, j1, p2+1, j2, 0);
+		solve(i1, m1, i2, p2-1, 0); cout << s2[p2]; solve(m1+1+1, j1, p2+1, j2, 0);
 	}
 }
 
@@ -2157,6 +2281,78 @@ ll qry(int vi, int wi){
 	return res;
 }
 \end{minted}
+\subsection{\completed{Centroid Tree}}
+Repeatedly apply centroid to the subtrees, and make the tree. The height of the centroid tree is at most $\lfloor \log_2 N \rfloor + 1$.
+
+Also, the path $v \Rightarrow w$ from original tree always pass through LCA of $v$ and $w$ in centroid tree.
+\begin{minted}{cpp}
+vector<int> tree[100020]; int par[100020];
+int dfs(int v){
+	centroid(v); v = cent.fr; chk[v] = 1;
+	for (pi2 e : adj[v]){
+		int w = e.fr; if (chk[w]){ continue; }
+		int p = dfs(w); tree[v].push_back(p); par[p] = v;
+	} return v;
+}
+\end{minted}
+\subsection{\completed{Permutation Tree}}
+\texttt{upd} and \texttt{qry} is range add update and range min query, using LazySeg.
+\begin{minted}{cpp}
+for (int i = 1; i <= n; i++){ val[i] = {arr[i], arr[i]}; pos[i] = {i, i}; }
+vector<int> mxs{0}, mns{0};
+int ni = n+1; vector<int> stk; for (int i = 1; i <= n; i++){
+	while (mxs.size() > 1){
+		int sl = mxs.size(); int j = mxs[sl-1];
+		if (arr[j] > arr[i]){ break; }
+		upd(mxs[sl-2]+1, mxs[sl-1], arr[i]-arr[j]);
+		mxs.pop_back();
+	} mxs.push_back(i);
+	while (mns.size() > 1){
+		int sl = mns.size(); int j = mns[sl-1];
+		if (arr[j] < arr[i]){ break; }
+		upd(mns[sl-2]+1, mns[sl-1], arr[j]-arr[i]);
+		mns.pop_back();
+	} mns.push_back(i);
+	stk.push_back(i); while (stk.size() > 1){
+		int sl = stk.size();
+		int a = stk[sl-2]; int b = stk[sl-1];
+		if (val[a].sc+1 == val[b].fr){
+			if (dir[a] == +1){
+				val[a].sc = val[b].sc; pos[a].sc = pos[b].sc;
+				adj[a].push_back(b); stk.pop_back();
+			} else{
+				val[ni] = {val[a].fr, val[b].sc}; pos[ni] = {pos[a].fr, pos[b].sc};
+				adj[ni].push_back(a); adj[ni].push_back(b); dir[ni] = +1;
+				stk.pop_back(); stk.pop_back(); stk.push_back(ni++);
+			}
+		} else if (val[b].sc+1 == val[a].fr){
+			if (dir[a] == -1){
+				val[a].fr = val[b].fr; pos[a].sc = pos[b].sc;
+				adj[a].push_back(b); stk.pop_back();
+			} else{
+				val[ni] = {val[b].fr, val[a].sc}; pos[ni] = {pos[a].fr, pos[b].sc};
+				adj[ni].push_back(a); adj[ni].push_back(b); dir[ni] = -1;
+				stk.pop_back(); stk.pop_back(); stk.push_back(ni++);
+			}
+		} else{
+			if (qry(1, pos[a].sc) != 0){ break; }
+			val[ni] = {min(val[a].fr, val[b].fr), max(val[a].sc, val[b].sc)};
+			pos[ni] = {min(pos[a].fr, pos[b].fr), max(pos[a].sc, pos[b].sc)};
+			adj[ni].push_back(b); adj[ni].push_back(a); dir[ni] = 0;
+			stk.pop_back(); stk.pop_back(); while (!stk.empty()){
+				if (val[ni].sc-val[ni].fr == pos[ni].sc-pos[ni].fr){ break; }
+				int p = stk.back(); stk.pop_back();
+				val[ni].fr = min(val[ni].fr, val[p].fr);
+				val[ni].sc = max(val[ni].sc, val[p].sc);
+				pos[ni].fr = min(pos[ni].fr, pos[p].fr);
+				pos[ni].sc = max(pos[ni].sc, pos[p].sc);
+				adj[ni].push_back(p);
+			} reverse(adj[ni].begin(), adj[ni].end());
+			stk.push_back(ni++);
+		}
+	} upd(1, i, -1);
+} int r = stk.front();
+\end{minted}
 \section{Query \& Decomposition}
 \subsection{\completed{Heavy-Light Decomposition}}
 \complexity{$\mathcal O(T(N) \log N)$ per update/query.}
@@ -2224,20 +2420,6 @@ ll dnc(int v){
 		int w = e.fr; if (chk[w]){ continue; }
 		ans += dnc(w);
 	} return ans;
-}
-\end{minted}
-\subsection{\completed{Centroid Tree}}
-Repeatedly apply centroid to the subtrees, and make the tree. The height of the centroid tree is at most $\lfloor \log_2 N \rfloor + 1$.
-
-Also, the path $v \Rightarrow w$ from original tree always pass through LCA of $v$ and $w$ in centroid tree.
-\begin{minted}{cpp}
-vector<int> tree[100020]; int par[100020];
-int dfs(int v){
-	centroid(v); v = cent.fr; chk[v] = 1;
-	for (pi2 e : adj[v]){
-		int w = e.fr; if (chk[w]){ continue; }
-		int p = dfs(w); tree[v].push_back(p); par[p] = v;
-	} return v;
 }
 \end{minted}
 \subsection{\completed{Tree Compression}}
@@ -2344,8 +2526,35 @@ ll x = 0; for (int i = 1; i <= n; i++){
 } /* Possible */
 \end{minted}
 \section{Heuristics}
-\subsection{\toadd{Simulated Annealing}}
-\subsection{\toadd{Diversified Late Acceptance Search}}
+Let the candidate be $S$, and $f$ be the scoring function. Lower score is better.
+Hyperparameter can be changed based on the problem.
+
+It is strictly recommended to return the global minimum, rather than the final result.
+If possible, alter the score rather than completely recalculate it.
+\subsection{\completed{Simulated Annealing}}
+Hyperparameter: $d = 0.9999$ (higher = faster cooling), $k = 10$ (higher = more volatile)
+\begin{enumerate}
+	\item Set $t = 1$ and generate random answer $S$, and compute the score $F = f(S)$.
+	\item Repeat the following:
+	\begin{enumerate}
+		\item Randomly change the answer $S$ to generate $S'$.
+		\item Compute $p = e^{(f(S) - f(S'))/kt}$.
+		\item Change the answer to $S'$ with probability $\min(p, 1)$.
+	\end{enumerate}
+\end{enumerate}
+\subsection{\completed{Diversified Late Acceptance Search}}
+Hyperparameter: $l = 5$ (higher = longer memory)
+\begin{enumerate}
+	\item Generate random answer $S$, and compute the score $F = f(S)$.
+	\item Set $P_i = F$ for all $1 \le i \le l$. Set $k = 0$.
+	\item Repeat the following:
+	\begin{enumerate}
+		\item Set $F_{*} = F$ and generate $S'$, and compute $F' = f(S')$.
+		\item If $F' = F$ or $F' < \max P$, change the answer (and score) to $S'$ (and $F'$).
+		\item If $F > P_k$ or ($F < P_i$ and $F < F_{*}$), set $P_i = F$.
+		\item Set $k = (k+1) \bmod l$.
+	\end{enumerate}
+\end{enumerate}
 \section{Code Snippet - C++}
 \subsection{\completed{Default Setting}}
 \begin{minted}{cpp}
@@ -2451,6 +2660,13 @@ tree<pi2, null_type, cmp, rb_tree_tag, tree_order_statistics_node_update> s;
 \end{minted}
 
 %% End %%
+\subsection{\completed{Dynamic Bitset}}
+\begin{minted}{cpp}
+const int MAX = 200000;
+template <int N = 1> void solve(int n){
+	if (N < n){ return solve<min(N*2, MAX)>(n); }
+}
+\end{minted}
 \section{Code Snippet - Python}
 \subsection{\completed{Default Setting}}
 \begin{minted}{python}
@@ -2504,12 +2720,12 @@ l.sort(key=cmp_to_key(cmp)); sorted(l, key=cmp_to_key(cmp))
 	\item $\le 10^9$: $50\,847\,534$ primes, max $999\,999\,937$.
 	\item $\le 10^{12}$: max $999\,999\,999\,989$.
 	\item $\le 10^{18}$: max $999\,999\,999\,999\,999\,989$.
-	\item $998\,244\,353 = 119 \times 2^{23}$ with $\omega = 3$.
-	\item $167\,772\,161 = 5 \times 2^{26}$ with $\omega = 3$.
-	\item $469\,762\,049 = 13 \times 2^{27}$ with $\omega = 3$.
-	\item $2\,281\,701\,377 = 17 \times 2^{27}$ with $\omega = 3$.
-	\item $2\,483\,027\,969 = 37 \times 2^{26}$ with $\omega = 3$.
-	\item $2\,013\,265\,921 = 15 \times 2^{27}$ with $\omega = 31$.
+	\item $998\,244\,353 = 119 \times 2^{23} + 1$ with $\omega = 3$.
+	\item $167\,772\,161 = 5 \times 2^{26} + 1$ with $\omega = 3$.
+	\item $469\,762\,049 = 13 \times 2^{27} + 1$ with $\omega = 3$.
+	\item $2\,281\,701\,377 = 17 \times 2^{27} + 1$ with $\omega = 3$.
+	\item $2\,483\,027\,969 = 37 \times 2^{26} + 1$ with $\omega = 3$.
+	\item $2\,013\,265\,921 = 15 \times 2^{27} + 1$ with $\omega = 31$.
 \end{itemize}
 \subsection{\completed{List of Highly Composite Numbers}}
 \begin{itemize}
@@ -2533,4 +2749,12 @@ l.sort(key=cmp_to_key(cmp)); sorted(l, key=cmp_to_key(cmp))
 6 |  `   a   b   c   d   e   f   g   h   i   j   k   l   m   n   o
 7 |  p   q   r   s   t   u   v   w   x   y   z   {   |   }   ~  DEL
 \end{minted}
+\subsection{\completed{UTF-8 Input}}
+Converting \texttt{U+uvwxyz}. ASCII: \texttt{0} to \texttt{7F}; Korean: \texttt{AC00} to \texttt{D7A3}.
+\begin{itemize}
+	\item \texttt{0} to \texttt{7F}: \texttt{0yyyzzzz}.
+	\item \texttt{80} to \texttt{7FF}: \texttt{110xxxyy} \texttt{10yyzzzz}.
+	\item \texttt{800} to \texttt{FFFF}: \texttt{1110wwww} \texttt{10xxxxyy} \texttt{10yyzzzz}.
+	\item \texttt{10000} to \texttt{10FFFF}: \texttt{11110uvv} \texttt{vvwwww} \texttt{10xxxxyy} \texttt{10yyzzzz}.
+\end{itemize}
 \end{document}
