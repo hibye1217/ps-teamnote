@@ -1964,6 +1964,26 @@ inline alH hsh(int st, int ed){
 	} return res;
 }
 \end{minted}
+\subsection{\completed{Iterating Every Permutation}}
+\begin{minted}{cpp}
+int arr[12]; pi2 pos[12]; // Init = 0
+
+for (int i = 1; i <= n; i++){ arr[i] = i; pos[i] = {i, (i==1 ? 0 : -1)}; }
+arr[0] = arr[n+1] = n+1; while (1){
+	for (int i = 1; i <= n; i++){ cout << arr[i] << ' '; } cout << endl;
+	int x = n; while (x >= 1){
+		if (pos[x].sc == 0){ x -= 1; } else{ break; }
+	} if (x == 0){ break; }
+	int xp = pos[x].fr, xd = pos[x].sc;
+	int yp = xp+xd; int y = arr[yp];
+	pos[x].fr += xd; pos[y].fr -= xd; swap(arr[xp], arr[yp]);
+	if (arr[yp+xd] > x){ pos[x].sc = 0; }
+	for (int y = x+1; y <= n; y++){
+		if (pos[y].sc != 0){ continue; }
+		int yp = pos[y].fr; pos[y].sc = (xp < yp ? -1 : +1);
+	}
+}
+\end{minted}
 \section{Data Structures}
 \subsection{\completed{Li-Chao Tree}}
 Find $\max f_i(x) = a_ix + b_i$, with line insertion update.
