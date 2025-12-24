@@ -45,6 +45,7 @@
 	\item Thinking about why a certain hard technique you tried failed, and/or convincing yourself that it cannot work?
 	\item Start from scratch, with completely different ideas?
 	\item Stop whining and start implementing?
+	\item Intentionally find suboptimal time complexity that passes in order to lower the amount of code you need to write?
 \end{itemize}
 \subsection{\completed{Hard Techniques}}
 \begin{itemize}
@@ -1660,7 +1661,7 @@ ll kth(ll k, const vector<ll>& arr, const vector<ll>& f){ // x^k \pmod f
 	return ans%mod;
 }
 \end{minted}
-\subsection{\completed{Hirschberg}}
+\commented{\subsection{\completed{Hirschberg}}
 Unlike other string algorithms, this assumes that \texttt{s1} and \texttt{s2} is 1-indexed.
 \begin{minted}{cpp}
 string s1, s2;
@@ -1731,7 +1732,7 @@ void Main(){
 	s1 = " " + s1; s2 = " " + s2;
 	solve(1, l1, 1, l2);
 }
-\end{minted}
+\end{minted}}
 \subsection{\completed{Connection Profile}}
 Single Connected Region, with DP condition.
 
@@ -1843,6 +1844,52 @@ j = 0; for (int i = 0; i < n; i++){
 		else{ j += 1; }
 	}
 }
+\end{minted}
+\subsection{\completed{KMP - Compressed Value}}
+\begin{minted}{cpp}
+int pos[130]; int cnt[130];
+inline bool chk(const string& a, int as, int ae, const string& b, int bs, int be){
+	bool an = (pos[a[ae]] == -1), bn = (cnt[b[be]] == 0);
+	if (an || bn){ return an == bn; }
+	int p = pos[a[ae]]; int d = ae-p; // a[p] == a[ae].
+	return (b[be-d] == b[be]);
+}
+
+inline void mvs(const string& s, int& st, int d){
+	while (d--){ if (pos[s[st]] == st){ pos[s[st]] = -1; } st += 1; }
+}
+inline void mvi(const string& s, int& i, int d){
+	while (d--){ pos[s[i]] = i; i += 1; }
+}
+inline void mvj(const string& s, int& j, int d){
+	if (d == +1){ cnt[s[j]] += 1; j += 1; return; }
+	d = -d; while (d--){ j -= 1; cnt[s[j]] -= 1; }
+}
+
+memset(pos, -1, sizeof(pos)); memset(cnt, 0, sizeof(cnt));
+int st = 1, i = 1, j = 0; while (i < tl){
+	while (j != 0){
+		if (chk(t, st, i, t, 0, j)){ break; }
+		else{ int p = jmp[j-1]; int d = j-p; mvs(t, st, +d); mvj(t, j, -d); }
+	} if (chk(t, st, i, t, 0, j)){ mvj(t, j, +1); jmp[i] = j; mvi(t, i, +1); }
+	else{ mvi(t, i, +1); mvs(t, st, +1); }
+}
+memset(pos, -1, sizeof(pos)); memset(cnt, 0, sizeof(cnt));
+st = 0; i = 0; j = 0; int ans = 0; while (i < sl){
+	while (j != 0){
+		if (chk(s, st, i, t, 0, j)){ break; }
+		else{ int p = jmp[j-1]; int d = j-p; mvs(s, st, +d); mvj(t, j, -d); }
+	} if (chk(s, st, i, t, 0, j)){
+		if (j+1 == tl){
+			ans += 1; int p = jmp[j]; int d = j-p; mvs(s, st, +d); mvj(t, j, -d);
+			mvi(s, i, +1); mvs(s, st, +1);
+		}
+		else{ mvj(t, j, +1); mvi(s, i, +1); }
+	} else{
+		int p = jmp[j-1]; int d = j-p; mvs(s, st, +d); mvj(t, j, -d);
+		mvi(s, i, +1); mvs(s, st, +1);
+	}
+} cout << ans;
 \end{minted}
 \subsection{\completed{Z Algorithm}}
 \begin{minted}{cpp}
