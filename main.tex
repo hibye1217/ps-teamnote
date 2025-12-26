@@ -1,6 +1,8 @@
 % Team Note of hibye1217.
 
-\documentclass[landscape, 8pt, a4paper, oneside, twocolumn]{extarticle}
+%\documentclass[landscape, 8pt, a4paper, oneside, twocolumn]{extarticle}
+\documentclass[landscape, 8pt, a4paper, oneside]{extarticle}
+
 \usepackage{teamnote}
 
 \pagestyle{fancy}
@@ -19,11 +21,11 @@
 \definecolor{AT_YELLOW}{RGB}{192, 192, 0}
 
 \title{Team Note of \textcolor{BOJ_RUBY_IV}{\textbf{hibye1217}}}
-\author{SolvedAC: \textcolor{ARENA_SSP}{hibye1217}, CodeForces: \textcolor{CF_RED}{hibye1217}, AtCoder: \textcolor{AT_YELLOW}{hibye1217}}
+\author{SolvedAC: \textcolor{ARENA_SSP}{hibye1217} \\ CodeForces: \textcolor{CF_RED}{hibye1217} \\ AtCoder: \textcolor{AT_YELLOW}{hibye1217}}
 \date{Compiled on \today}
 
 %\usepackage{wasysym}
-\begin{document}
+\begin{document} \begin{multicols*}{3}
 
 \thispagestyle{fancy}
 \maketitlepage
@@ -238,15 +240,15 @@ For Problem 0, define $\alpha = \left< a_0, a_1, \ldots, a_n \right>$. Let $\iot
 
 Let $\alpha! = a_0! a_1! \cdots a_n!$ and $\alpha^+! = a_1! a_2! \cdots a_n!$. Let $\iota! = 1! \cdots 1! 2! \cdots 2! \cdots n! \cdots n!$. \\
 Let $C(k, \alpha) = k! / \alpha!$ and $C(n, \iota) = n! / \iota!$. \\ 
-\begin{tabular}{|c|c|c|c|c|c|c|} \hline
-  & 0                            & 1           & 2                                   & 3                    & 4                                   \\ \hline
-A & $n! C_{k, \alpha}$           & $k_{(n)}$   & $k^{(n)}$                           & $C_{n-1, k-1} n!$    & $2^{n-1} n!$                        \\ \hline
-B & $C_{k, \alpha} C_{n, \iota}$ & $k_{(n)}$   & $k^n$                               & $k! S_{n, k}$        & $\sum_{k=1}^{n} k! S_{n, k}$        \\ \hline
-C & $C_{k, \alpha}$              & $C_{k, n}$  & $H_{k, n}$                          & $C_{n-1, k-1}$       & $2^{n-1}$                           \\ \hline
-D & $m! / \alpha^+!$             & $[n \le k]$ & $\sum_{i=1}^{k} C_{n-1, k-1} n!/i!$ & $C_{n-1, k-1} n!/k!$ & $\sum_{k=1}^{n} C_{n-1, k-1} n!/k!$ \\ \hline
-E & $C_{m, \iota} / \alpha^+!$   & $[n \le k]$ & $\sum_{i=1}^{k} S_{n, i}$           & $S_{n, k}$           & $B_n$                               \\ \hline
-F & $1$                          & $[n \le k]$ & $\sum_{i=1}^{k} p_{n, i}$           & $p_{n, k}$           & $p_n$                               \\ \hline
-\end{tabular}
+\begin{center} \begin{tabular}{|c|c|c|c|c|c|c|} \hline
+  & 0                            & 1           \\ 2                                   & 3                    & 4                                   \\ \hline
+A & $n! C_{k, \alpha}$           & $k_{(n)}$   \\ $k^{(n)}$                           & $C_{n-1, k-1} n!$    & $2^{n-1} n!$                        \\ \hline
+B & $C_{k, \alpha} C_{n, \iota}$ & $k_{(n)}$   \\ $k^n$                               & $k! S_{n, k}$        & $\sum_{k=1}^{n} k! S_{n, k}$        \\ \hline
+C & $C_{k, \alpha}$              & $C_{k, n}$  \\ $H_{k, n}$                          & $C_{n-1, k-1}$       & $2^{n-1}$                           \\ \hline
+D & $m! / \alpha^+!$             & $[n \le k]$ \\ $\sum_{i=1}^{k} C_{n-1, k-1} n!/i!$ & $C_{n-1, k-1} n!/k!$ & $\sum_{k=1}^{n} C_{n-1, k-1} n!/k!$ \\ \hline
+E & $C_{m, \iota} / \alpha^+!$   & $[n \le k]$ \\ $\sum_{i=1}^{k} S_{n, i}$           & $S_{n, k}$           & $B_n$                               \\ \hline
+F & $1$                          & $[n \le k]$ \\ $\sum_{i=1}^{k} p_{n, i}$           & $p_{n, k}$           & $p_n$                               \\ \hline
+\end{tabular} \end{center}
 \subsection{\completed{Lindström-Gessel-Viennot Lemma}}
 Let $w(P)$ be the product of the weights of the edges of the path $P$. Let $D$ be the matrix with $D_{i,j}$ be the sum of $w(P)$s with $i \to j$.
 
@@ -326,7 +328,7 @@ Let $A(x)$ be the GF of the sequence $a_i$. $a$ is $0$-indexed.
 	\item $x$ axis Rotation Volume: Assume $f(x) \ge 0$, $f$ is continuous in $[a, b]$. $\int_{a}^{b} 2 \pi x f(x) dx$.
 \end{itemize}
 
-\begin{tabular}{|c|c|c|} \hline
+\begin{center} \begin{tabular}{|c|c|c|} \hline
 Derivative                  & $f(x)$        & Integral (w/ $+C$)               \\ \hline
 $\cos x$                    & $\sin x$      & $-cos x$                         \\ \hline
 $-\sin x$                   & $\cos x$      & $\sin x$                         \\ \hline
@@ -340,7 +342,7 @@ $1 / (1 + x^2)$             & $\arctan x$   & $x \arctan x - \ln(x^2 + 1)/2$   \
 $1 / (|x| \sqrt{x^2 - 1})$  & $\sec^{-1} x$ & $x \sec^{-1} x - \cosh^{-1} |x|$ \\ \hline
 $-1 / (|x| \sqrt{x^2 - 1})$ & $\csc^{-1} x$ & $x \csc^{-1} x + \cosh^{-1} |x|$ \\ \hline
 $-1 / (1 + x^2)$            & $\cot^{-1} x$ & $x \cos^{-1} x + \ln(x^2+1)/2$   \\ \hline
-\end{tabular}
+\end{tabular} \end{center}
 \subsection{\completed{Modeling - 2-SAT - Operations}}
 \begin{itemize}
 	\item OR: $(a \vee b) \to (\neg a \implies b) \wedge (\neg b \implies a)$.
@@ -1664,7 +1666,7 @@ ll kth(ll k, const vector<ll>& arr, const vector<ll>& f){ // x^k \pmod f
 	return ans%mod;
 }
 \end{minted}
-\commented{\subsection{\completed{Hirschberg}}
+\subsection{\completed{Hirschberg}}
 Unlike other string algorithms, this assumes that \texttt{s1} and \texttt{s2} is 1-indexed.
 \begin{minted}{cpp}
 string s1, s2;
@@ -1735,7 +1737,7 @@ void Main(){
 	s1 = " " + s1; s2 = " " + s2;
 	solve(1, l1, 1, l2);
 }
-\end{minted}}
+\end{minted}
 \subsection{\completed{Connection Profile}}
 Single Connected Region, with DP condition.
 
@@ -2808,16 +2810,25 @@ l.sort(key=cmp_to_key(cmp)); sorted(l, key=cmp_to_key(cmp))
 \end{itemize}
 \subsection{\completed{ASCII Table}}
 \begin{minted}{text}
-  |  0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F 
---+---------------------------------------------------------------- 
-0 | NUL SOH STX ETX EOT ENQ ACK BEL  BS TAB  LF  VT  FF  CR  SO  SI
-1 | DLE DC1 DC2 DC3 DC4 NAK SYN ETB CAN  EM SUB ESC  FS  GS  RS  US
-2 |  SP  !   "   #   $   %   &   '   (   )   *   +   ,   -   .   /
-3 |  0   1   2   3   4   5   6   7   8   9   :   ;   <   =   >   ?
-4 |  @   A   B   C   D   E   F   G   H   I   J   K   L   M   N   O
-5 |  P   Q   R   S   T   U   V   W   X   Y   Z   [   \   ]   ^   _
-6 |  `   a   b   c   d   e   f   g   h   i   j   k   l   m   n   o
-7 |  p   q   r   s   t   u   v   w   x   y   z   {   |   }   ~  DEL
+  |  0   1   2   3   4   5   6   7 
+  |  8   9   A   B   C   D   E   F 
+--+--------------------------------
+0 | NUL SOH STX ETX EOT ENQ ACK BEL
+  |  BS TAB  LF  VT  FF  CR  SO  SI
+1 | DLE DC1 DC2 DC3 DC4 NAK SYN ETB
+  | CAN  EM SUB ESC  FS  GS  RS  US
+2 |  SP  !   "   #   $   %   &   ' 
+  |  (   )   *   +   ,   -   .   / 
+3 |  0   1   2   3   4   5   6   7 
+  |  8   9   :   ;   <   =   >   ? 
+4 |  @   A   B   C   D   E   F   G 
+  |  H   I   J   K   L   M   N   O 
+5 |  P   Q   R   S   T   U   V   W 
+  |  X   Y   Z   [   \   ]   ^   _ 
+6 |  `   a   b   c   d   e   f   g 
+  |  h   i   j   k   l   m   n   o 
+7 |  p   q   r   s   t   u   v   w 
+  |  x   y   z   {   |   }   ~  DEL
 \end{minted}
 \subsection{\completed{UTF-8 Input}}
 Converting \texttt{U+uvwxyz}. ASCII: \texttt{0} to \texttt{7F}; Korean: \texttt{AC00} to \texttt{D7A3}.
@@ -2827,4 +2838,5 @@ Converting \texttt{U+uvwxyz}. ASCII: \texttt{0} to \texttt{7F}; Korean: \texttt{
 	\item \texttt{800} to \texttt{FFFF}: \texttt{1110wwww} \texttt{10xxxxyy} \texttt{10yyzzzz}.
 	\item \texttt{10000} to \texttt{10FFFF}: \texttt{11110uvv} \texttt{vvwwww} \texttt{10xxxxyy} \texttt{10yyzzzz}.
 \end{itemize}
-\end{document}
+
+\end{multicols*} \end{document}
