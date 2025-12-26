@@ -50,7 +50,9 @@
 \subsection{\completed{Hard Techniques}}
 \begin{itemize}
 	\item Any of the algorithms listed below?
-	\item Greedy? or a Network Flow?
+	\item Greedy? or a Network Flow? What about Regret Greedy?
+	\item In terms of Regret Greedy: Let $A_k$ and $A_{k+1}$ be the solution. Does $A_{k+1} - A_k$ cannot have proper subset that sums to $0$?
+	\item In terms of $A_{k+1} - A_k$: for proper subset sums to $0$, $= 0$ means different $A_{k+1}$ picking, $> 0$ and $< 0$ means $A_k$ and $A_{k+1}$ (resp.) is not optimal.
 	\item Randomization?
 	\item Square Root Decomposition? Or other bucket size like $B = O(\sqrt{N \log N})$?
 	\item Sparse Table to bypass $O(\log N)$ query time?
