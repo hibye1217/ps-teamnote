@@ -40,19 +40,21 @@
 	\item Representing it as a formular?
 	\item Finding some global monovariant that does not care about the locality?
 	\item Finding some auxilary property?
+	\item Just play around with the constraint with no or little intention to reach the goal?
 	\item Examining small cases, by hands or using computer?
 	\item Checking the possible range of the answer?
 	\item Checking variants of the problem?
-	\item Trying to come up with a counterexample of the claim? Why does it (or does it not) work?
+	\item Trying to come up with a counterexample of the claim? Why does it or does it not work?
 	\item Thinking about why a certain hard technique you tried failed, and/or convincing yourself that it cannot work?
 	\item Start from scratch, with completely different ideas?
 	\item Stop whining and start implement things?
-	\item Stop whining and write everything?
+	\item Stop whining and start write everything?
 	\item Intentionally find suboptimal time complexity that passes in order to lower the amount of code you need to write?
 \end{itemize}
 \subsection{\completed{Hard Techniques}}
 \begin{itemize}
 	\item Any of the algorithms listed below?
+	\item Dynamic Programming? Divide and Conquer?
 	\item Greedy? or a Network Flow? What about Regret Greedy?
 	\item In terms of Regret Greedy: Let $A_k$ and $A_{k+1}$ be the solution. Does $A_{k+1} - A_k$ cannot have proper subset that sums to $0$?
 	\item In terms of $A_{k+1} - A_k$: for proper subset sums to $0$, $= 0$ means different $A_{k+1}$ picking, $> 0$ and $< 0$ means $A_k$ and $A_{k+1}$ (resp.) is not optimal.
@@ -2673,6 +2675,17 @@ int main(){
 \begin{minted}{cpp}
 inline void icl(istream& in){ in.ignore(998244353, '\n'); } // Between cin and getline
 string s; getline(cin, s); // No newline at the end
+\end{minted}
+\subsection{\completed{Floor/Ceil a Fraction}}
+\begin{minted}{cpp}
+inline ll ffloor(ll a, ll b){
+	if (b < 0){ a = -a; b = -b; }
+	return (a >= 0 ? a/b : (-a+b-1)/b*-1);
+}
+inline ll fceil(ll a, ll b){
+	if (b < 0){ a = -a; b = -b; }
+	return (a >= 0 ? (a+b-1)/b : -a/b*-1);
+}
 \end{minted}
 \subsection{\completed{Vector Manipulation}}
 \begin{minted}{cpp}
