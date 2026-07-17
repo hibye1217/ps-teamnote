@@ -58,6 +58,7 @@
 	\item Greedy? or a Network Flow? What about Regret Greedy?
 	\item In terms of Regret Greedy: Let $A_k$ and $A_{k+1}$ be the solution. Does $A_{k+1} - A_k$ cannot have proper subset that sums to $0$?
 	\item In terms of $A_{k+1} - A_k$: for proper subset sums to $0$, $= 0$ means different $A_{k+1}$ picking, $> 0$ and $< 0$ means $A_k$ and $A_{k+1}$ (resp.) is not optimal.
+	\item Unifying the cost function so every action have nonnegative cost?
 	\item Randomization?
 	\item Square Root Decomposition? Or other bucket size like $B = O(\sqrt{N \log N})$?
 	\item Sparse Table to bypass $O(\log N)$ query time?
@@ -394,7 +395,8 @@ $N$ variables ($x_1$, $x_2$, \ldots, $x_N$) can be done with the following metho
 	\item $y_i \implies \neg x_{i+1}$.
 \end{itemize}
 \subsection{\completed{Modeling - Minimizing Quadratic Pseudo-Boolean Function}}
-Given $N$ boolean variables $x_{1}, x_{2}, \ldots, x_{N}$, minimize the cost $f(x_1, x_2, \ldots, x_N) = c + \sum_{i} b_i(x_i) + \sum_{i<j} a_{i,j}(x_i, x_j)$. Function $a$ must satisfies the condition $a(0,0) + a(1,1) \leq a(0,1) + a(1,0)$.
+Given $N$ boolean variables $x_{1}, x_{2}, \ldots, x_{N}$, minimize the cost $f(x_1, x_2, \ldots, x_N) = c + \sum_{i} b_i(x_i) + \sum_{i<j} a_{i,j}(x_i, x_j)$.
+Function $a$ must satisfies the condition $a(0,0) + a(1,1) \leq a(0,1) + a(1,0)$.
 
 This can be modeled as following. Let there be source $s$, sink $t$, and $N$ vertices $x_1$, $x_2$, \ldots, $x_N$.
 \begin{itemize}
@@ -409,6 +411,21 @@ This can be modeled as following. Let there be source $s$, sink $t$, and $N$ ver
 		\item $v_i \to v_j$ with weight $a_{i,j}(0,1)+a_{i,j}(1,0)-a_{i,j}(0,0)-a_{i,j}(1,1)$.
 	\end{itemize}
 \end{itemize}
+
+Find the minimum cut, then assign $x_i = 0$ if it's in $s$-side, and assign $x_i = 1$ if it's in $t$-side.
+\subsection{\totest{Modeling - Closure Problem}}
+Given a directed acyclic graph $G = (V, E)$, with each vertex $v$ having weight $w_v$,
+maximize the sum of the weight of the selected vertices such that if vertex $v$ were chosen, then you also have to choose the vertex $w$ if $v \rightarrow w$.
+
+This can be modeled as following. Create a source $s$, sink $t$.
+\begin{itemize}
+	\item If $w_v \ge 0$, then $s \to v$ with weight $w_v$.
+	\item If $w_v \le 0$, then $v \to t$ with weight $-w_v$.
+	\item If $v \to w$, then $v \to w$ with weight $\infty$.
+\end{itemize}
+
+Find the minimum cut, then select only the vertices that are in $s$-side.
+The sum itself is the $\sum_{w_v \ge 0} w_v - \mathrm{MaxFlow}$.
 \subsection{\completed{Fast Fourier Transform \& Number Theoretic Transform}}
 \begin{minted}{cpp}
 void dft(vector<cpl>& arr, bool inv = false){ int n = arr.size();
@@ -2169,6 +2186,8 @@ int qry(int y1, int y2, int x1, int x2){ y1 += N-1; y2 += N-1;
 }
 \end{minted}
 \subsection{\completed{Persistent Segment Tree}}
+You can use this to make Persistent Array. You can then use this Persistent Array to make Persistent Queue.
+Persistent Stack is just Trie.
 \begin{minted}{cpp}
 const int N = 1000000;
 struct Node{ int sum; int nxt[2]; };
