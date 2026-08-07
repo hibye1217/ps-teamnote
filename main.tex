@@ -33,6 +33,12 @@
 %% Start %%
 
 \section{Have You Tried...}
+\subsection{\completed{Checklist Before Contest}}
+\begin{itemize}
+	\item is \texttt{bits/stdc++.h} working?
+	\item what about \texttt{ext/pb\char`_ds}?
+	\item is \texttt{int128} working?
+\end{itemize}
 \subsection{\completed{Soft Techniques}}
 \begin{itemize}
 	\item Reading the problem once more? Again?
@@ -50,6 +56,7 @@
 	\item Stop whining and start implement things?
 	\item Stop whining and start write everything?
 	\item Intentionally find suboptimal time complexity that passes in order to lower the amount of code you need to write?
+	\item Believe that you CAN solve this problem?
 \end{itemize}
 \subsection{\completed{Hard Techniques}}
 \begin{itemize}
@@ -338,6 +345,7 @@ Let $A(x)$ be the GF of the sequence $a_i$. $a$ is $0$-indexed.
 	\item Vieta's Formula: Let $r_1$, $r_2$, \dots, $r_n$ be the roots to $P = \sum_{k=0}^{n} a_k x^k$. Then $\sum_{i_1 < i_2 < \cdots < i_k} r_{i_1} r_{i_2} \dots r_{i_k} = (-1)^k a_{n-k}/a_n$.
 	\item Chicken McNugget Theorem: There are exactly $(m-1)(n-1)/2$ different unexpressible numbers. Max is $mn-m-n$. Exactly one of $k$ or $mn-m-n-k$ is unexpressible.
 	\item $1/1 - 1/2 + 1/3 - 1/4 + \cdots + 1/(2n-1) - 1/(2n) = 1/(n+1) + 1/(n+2) + \cdots + 1/(2n)$.
+	\item Lagrange Polynomial: $\sum_{i=1}^{n} y_i \prod_{j=1,j \neq i}^{n} (x-x_j)/(x_i-x_j)$.
 \end{itemize}
 \subsection{\completed{Well-known Linear Algebra}}
 \begin{itemize}
@@ -379,6 +387,11 @@ $1 / (|x| \sqrt{x^2 - 1})$  & $\sec^{-1} x$ & $x \sec^{-1} x - \cosh^{-1} |x|$ \
 $-1 / (|x| \sqrt{x^2 - 1})$ & $\csc^{-1} x$ & $x \csc^{-1} x + \cosh^{-1} |x|$ \\ \hline
 $-1 / (1 + x^2)$            & $\cot^{-1} x$ & $x \cos^{-1} x + \ln(x^2+1)/2$   \\ \hline
 \end{tabular} \end{center}
+\subsection{\completed{Sum of $1^k$ to $n^k$}}
+First, compute $0^k$ to $(k+1)^k$ with binary lifting in $O(k \log k)$ total time.
+
+If $n \le k+1$ then the answer is obvious.
+Otherwise, find the polynomial interpolation, and plug $x = n$.
 \subsection{\completed{Modeling - 2-SAT - Operations}}
 \begin{itemize}
 	\item OR: $(a \vee b) \to (\neg a \implies b) \wedge (\neg b \implies a)$.
@@ -554,6 +567,23 @@ pair<ld, vector<ld>> solve(){
 	vector<ld> x(n); for (int i = 0; i < m; i++){
 		if (piv[i] < n){ x[piv[i]] = mat[i][n+1]; }
 	} return {chk ? mat[m][n+1] : inf, x};
+}
+\end{minted}
+\subsection{\totest{Multipoint Evaluation}}
+\begin{minted}{cpp}
+vector<ll> seg[524288];
+vector<ll> pos; void init(int ni, int ns, int ne){
+	if (ns == ne){ seg[ni] = vector<ll>({(mod-pos[ns])%mod, 1}); return; }
+	int nm = ns+ne >> 1;
+	init(ni<<1, ns, nm); init(ni<<1|1, nm+1, ne);
+	seg[ni] = pmul(seg[ni<<1], seg[ni<<1|1]);
+} inline void init(vector<ll> p){ pos = p; init(1, 0, p.size()-1); }
+vector<ll> res; void eval(int ni, int ns, int ne, vector<ll> arr){
+	if (ns == ne){ res[ns] = eval(arr, pos[ns]); return; }
+	int nm = ns+ne >> 1;
+	eval(ni<<1, ns, nm, pmod(arr, seg[ni<<1])); eval(ni<<1|1, nm+1, ne, pmod(arr, seg[ni<<1|1]));
+} inline vector<ll> eval(vector<ll> p){
+	init(p); res.resize(p.size()); eval(1, 0, p.size()-1, arr);
 }
 \end{minted}
 \section{Mathematics - Geometry}

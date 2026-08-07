@@ -32,35 +32,36 @@
 \setlength{\columnseprule}{0.4pt}
 \pagenumbering{arabic}
 
-\titlespacing*{\section}{0pt}{0pt}{0pt}
-\titlespacing*{\subsection}{0pt}{0pt}{0pt}
+% \titlespacing*{\section}{0pt}{0pt}{0pt}
+% \titlespacing*{\subsection}{0pt}{0pt}{0pt}
 
 \setstretch{1}
 
 \renewcommand{\@listI}{
-	\leftmargin=25pt
+	\leftmargin=20pt
 	\rightmargin=0pt
 	\labelsep=5pt
 	\labelwidth=20pt
 	\itemindent=0pt
 	\listparindent=0pt
-	\topsep=0pt plus 2pt minus 4pt
+	%\topsep=0pt plus 2pt minus 4pt
 	\partopsep=0pt plus 1pt minus 1pt
 	\parsep=0pt plus 1pt
-	\itemsep=\parsep
+	\itemsep=1pt plus \parsep
 }
 \renewcommand{\@listii}{
-	\leftmargin=25pt
+	\leftmargin=20pt
 	\rightmargin=0pt
 	\labelsep=5pt
 	\labelwidth=20pt
 	\itemindent=0pt
 	\listparindent=0pt
-	\topsep=0pt plus 2pt minus 4pt
+	%\topsep=0pt plus 2pt minus 4pt
 	\partopsep=0pt plus 1pt minus 1pt
 	\parsep=0pt plus 1pt
-	\itemsep=\parsep
+	\itemsep=1pt plus \parsep
 }
+\renewcommand{\labelitemii}{\textbullet}
 
 \setlength{\columnseprule}{0.4pt}
 \pagenumbering{arabic}
