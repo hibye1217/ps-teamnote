@@ -1,0 +1,13 @@
+Repeatedly apply centroid to the subtrees, and make the tree. The height of the centroid tree is at most $\lfloor \log_2 N \rfloor + 1$.
+
+Also, the path $v \Rightarrow w$ from original tree always pass through LCA of $v$ and $w$ in centroid tree.
+\begin{minted}{cpp}
+vector<int> tree[100020]; int par[100020];
+int dfs(int v){
+	centroid(v); v = cent.fr; chk[v] = 1;
+	for (pi2 e : adj[v]){
+		int w = e.fr; if (chk[w]){ continue; }
+		int p = dfs(w); tree[v].push_back(p); par[p] = v;
+	} return v;
+}
+\end{minted}

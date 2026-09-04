@@ -1,0 +1,18 @@
+Given $N$ boolean variables $x_{1}, x_{2}, \ldots, x_{N}$, minimize the cost $f(x_1, x_2, \ldots, x_N) = c + \sum_{i} b_i(x_i) + \sum_{i<j} a_{i,j}(x_i, x_j)$.
+Function $a$ must satisfies the condition $a(0,0) + a(1,1) \leq a(0,1) + a(1,0)$.
+
+This can be modeled as following. Let there be source $s$, sink $t$, and $N$ vertices $x_1$, $x_2$, \ldots, $x_N$.
+\begin{itemize}
+	\item $c$ is trivial.
+	\item $b_i(x_i = 0)$ can be modeled as $x_i \to t$ with weight $b_i(0)$.
+	\item $b_i(x_i = 1)$ can be modeled as $s \to x_i$ with weight $b_i(1)$.
+	\item $a_{i,j}(x_i, x_j)$ can be modeled as following:
+	\begin{itemize}
+		\item $s \to v_i$ with weight $a_{i,j}(1,0)$.
+		\item $v_i \to t$ with weight $a_{i,j}(0,0)$.
+		\item $s \to v_j$ with weight $a_{i,j}(1,1)-a_{i,j}(1,0)$.
+		\item $v_i \to v_j$ with weight $a_{i,j}(0,1)+a_{i,j}(1,0)-a_{i,j}(0,0)-a_{i,j}(1,1)$.
+	\end{itemize}
+\end{itemize}
+
+Find the minimum cut, then assign $x_i = 0$ if it's in $s$-side, and assign $x_i = 1$ if it's in $t$-side.

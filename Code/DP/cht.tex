@@ -1,0 +1,23 @@
+$D_i = \max_{j < i} a_j x_i + b_j$.
+
+\complexity{$\mathcal O(N)$ for $N$ insertions, $\mathcal O(\log N)$ for query.}
+\begin{minted}{cpp}
+inline ld crs(pl2 l1, pl2 l2){ return (ld)(l2.sc-l1.sc)/(l1.fr-l2.fr); }
+pair<pl2, ld> stk[1000020]; int sp = 0;
+inline void psh(pl2 p){
+	stk[sp].fr = p; stk[sp].sc = (sp==0 ? 0 : crs(stk[sp-1].fr, stk[sp].fr));
+	sp += 1;
+}
+inline void pop(){ sp -= 1; }
+
+// query: x
+int st = 0, ed = sp; while (st+1 <= ed-1){
+	int mid = st+ed >> 1;
+	if (x < stk[mid].sc){ ed = mid; } else{ st = mid; }
+} pl2 p = stk[st].fr; // A(j)x + B(j)
+dp[i] = p.fr*x + p.sc + C(i);
+// update: p = (A(j), B(j))
+while (sp > 0){
+	if (crs(stk[sp-1].fr, p) <= stk[sp-1].sc){ pop(); } else{ break; }
+} psh(p);
+\end{minted}

@@ -1,0 +1,80 @@
+Simple Polygon version. For Full non-intersection follow the comments instead.
+\begin{minted}{cpp}
+inline ld f(const pl4& l, ll x){
+	return (ld)(l.sc.fr-l.fr.fr)/(l.sc.sc-l.fr.sc) * (x-l.fr.sc) + l.fr.fr;
+}
+ll ptr; bool cmp4(const pl4& l1, const pl4& l2){
+	ld p1 = f(l1, ptr), p2 = f(l2, ptr);
+	return p1 < p2;
+} bool cmp(const pl5& p1, const pl5& p2){ return cmp4(p1.fr, p2.fr); }
+
+// usual No Intersection / Yes Intersection if fully nonintersected.
+int intersect(const pl4& l1, const pl4& l2){
+	pl2 p1 = l1.fr, p2 = l1.sc, p3 = l2.fr, p4 = l2.sc;
+	int c123 = ccw(p1, p2, p3), c124 = ccw(p1, p2, p4);
+	int c341 = ccw(p3, p4, p1), c342 = ccw(p3, p4, p2);
+	if (c123 == 0 && c124 == 0){
+		if (p1 > p2){ swap(p1, p2); } if (p3 > p4){ swap(p3, p4); }
+		if (p2 <= p3 || p4 <= p1){ return 0; } else{ return 1; }
+	}
+	if (p1 == p3 || p2 == p4){ return p1 == p3 ? -1 : -2; }
+	return c123 != c124 && c341 != c342;
+} int intersect(const pl5& l1, const pl5& l2){ return intersect(l1.fr, l2.fr); }
+
+pl4 prr[100020]; pl4 pos[200020];
+multiset<pl5, decltype(&cmp)> lin(cmp);
+pi2 solve(int n){
+	sort(pos+1, pos+n+n+1); lin.clear();
+	for (int i = 1; i <= n+n; i++){
+		ll x = pos[i].fr.fr; bool ed = pos[i].fr.sc;
+		ll y = pos[i].sc.fr; int idx = pos[i].sc.sc;
+		if (prr[idx].fr.sc == prr[idx].sc.sc){ continue; }
+		pl5 l = {prr[idx], idx}; ptr = x;
+		if (!ed){
+			// auto it = lin.insert(l);
+			// if (it != lin.begin()){ if (intersect(*it, *prev(it))){ return {it->sc, prev(it)->sc}; } }
+			// if (next(it) != lin.end()){ if (intersect(*it, *next(it))){ return {it->sc, next(it)->sc}; } }
+			bool flg = 0; auto it = lin.insert(l); again:
+			if (it != lin.begin()){
+				int res = intersect(*it, *prev(it));
+				if (res == 1){ return {it->sc, prev(it)->sc}; }
+				if (res == -1){
+					lin.erase(it); ptr += 1; it = lin.insert(l); ptr -= 1;
+					if (!flg){ flg = 1; goto again; }
+				}
+			}
+			if (next(it) != lin.end()){
+				int res = intersect(*it, *next(it));
+				if (res == 1){ return {it->sc, next(it)->sc}; }
+				if (res == -1){
+					lin.erase(it); ptr += 1; it = lin.insert(l); ptr -= 1;
+					if (!flg){ flg = 1; goto again; }
+				}
+			}
+		} else{
+			// auto it = lin.lower_bound(l);
+			// if (it != lin.begin() && next(it) != lin.end()){
+			//	if (intersect(*prev(it), *next(it))){ return {prev(it)->sc, next(it)->sc}; }
+			// } lin.erase(it);
+			auto it = lin.lower_bound(l); if (*it != l){
+				ptr -= 1; it = lin.lower_bound(l); ptr += 1;
+			}
+			if (it != lin.begin() && next(it) != lin.end()){
+				if (intersect(*prev(it), *next(it)) == 1){ return {prev(it)->sc, next(it)->sc}; }
+			} lin.erase(it);
+		}
+	} return {-1, -1};
+}
+
+pl4 arr[100020]; // (2y, 2x). // (y, x) if fully nonintersected.
+for (int t = 1; t <= 3; t++){
+	for (int i = 1; i <= n; i++){
+		pl2 p1 = arr[i].fr, p2 = arr[i].sc;
+		if (t == 2){ swap(p1.fr, p1.sc); swap(p2.fr, p2.sc); }
+		if (t == 3){ p1 = pl2(p1.fr+p1.sc, p1.fr-p1.sc); p2 = pl2(p2.fr+p2.sc, p2.fr-p2.sc); }
+		if (pl2(p1.sc, p1.fr) > pl2(p2.sc, p2.fr)){ swap(p1, p2); } prr[i] = {p1, p2};
+		pos[2*i-1] = { {p1.sc, 0}, {p1.fr, i} };
+		pos[2*i] = { {p2.sc, -1}, {p2.fr, i} }; // +1 if fully nonintersected.
+	} pi2 res = solve(n); if (res != pi2(-1, -1)){ cout << "NO"; goto done; }
+} cout << "YES";
+\end{minted}

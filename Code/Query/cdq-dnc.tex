@@ -1,0 +1,20 @@
+3D LIS. Find longest chain $(A_i, B_i, C_i)$ s.t. $A_i < A_j$; $B_i < B_j$; $C_i < C_j$ holds.
+\begin{minted}{cpp}
+// upd(p, x, t) / t = 0: A[p] = x / t = 1: A[p] = max(A[p], x)
+// qry(s, e) / max A[s..e]
+// Assume arr is sorted via A.
+void dnc(int st, int ed){
+	if (st == ed){ arr[st].dp = max(arr[st].dp, 1); return; }
+	int mid = st+ed >> 1; dnc(st, mid);
+	sort(arr+st, arr+mid+1, [](const T& a, const T& b){ return a.b < b.b; });
+	vector<int> qrr; for (int i = mid+1; i <= ed; i++){ qrr.push_back(i); }
+	sort(qrr.begin(), qrr.end(), [](int i1, int i2){ return arr[i1].b < arr[i2].b; });
+	int ptr = st; for (int i : qrr){
+		while (ptr <= mid){
+			if (arr[ptr].b < arr[i].b){ upd(arr[ptr].c, arr[ptr].dp); ptr += 1; }
+			else{ break; }
+		} arr[i].dp = max(arr[i].dp, qry(1, arr[i].c)+1);
+	} for (int i = st; i <= mid; i++){ upd(arr[i].c, 0); }
+	return dnc(mid+1, ed);
+}
+\end{minted}

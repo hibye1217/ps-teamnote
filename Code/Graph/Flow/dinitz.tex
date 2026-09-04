@@ -1,0 +1,42 @@
+\begin{minted}{cpp}
+int n, m; int src, snk, nc; ll adj[220][220];
+int dis[220];
+bool bfs(int st, int ed){
+	memset(dis, -1, sizeof(dis)); dis[st] = 0;
+	queue<int> q; q.push(st); while (!q.empty()){
+		int now = q.front(); q.pop();
+		for (int nxt = 0; nxt < nc; nxt++){
+			if (adj[now][nxt] == 0){ continue; }
+			if (dis[nxt] != -1){ continue; }
+			dis[nxt] = dis[now]+1; q.push(nxt);
+		}
+	} return dis[ed] != -1;
+}
+bool chk[220]; int ptr[220];
+int pth[220], pc;
+bool dfs(int now, int idx){
+	pth[idx] = now; chk[now] = 1; if (now == snk){ pc = idx; return 1; }
+	for (int& nxt = ptr[now]; nxt < nc; nxt++){
+		if (adj[now][nxt] == 0){ continue; }
+		if (dis[now]+1 != dis[nxt]){ continue; }
+		if (chk[nxt]){ continue; }
+		if (dfs(nxt, idx+1)){ return 1; }
+	} return 0;
+}
+
+memset(ptr, 0, sizeof(ptr)); memset(chk, 0, sizeof(chk));
+ll ans = 0; while (bfs(src, snk)){
+	memset(ptr, 0, sizeof(ptr)); memset(chk, 0, sizeof(chk));
+	while (dfs(src, 0)){
+		memset(chk, 0, sizeof(chk));
+		ll res = INF; for (int i = 1; i <= pc; i++){
+			int v = pth[i-1], w = pth[i];
+			res = min(res, adj[v][w]);
+		} ans += res;
+		for (int i = 1; i <= pc; i++){
+			int v = pth[i-1], w = pth[i];
+			adj[v][w] -= res; adj[w][v] += res;
+		}
+	}
+}
+\end{minted}

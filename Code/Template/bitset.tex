@@ -1,0 +1,6 @@
+\begin{minted}{cpp}
+const int MAX = 200000;
+template <int N = 1> void solve(int n){
+	if (N < n){ return solve<min(N*2, MAX)>(n); }
+}
+\end{minted}

@@ -1,0 +1,42 @@
+As always, the polygon are in counterclockwise, Except the outer face which is inner.
+If you want to include the inner face, remove \texttt{val > 0}.
+\begin{minted}{cpp}
+pl2 arr[100020]; vector<int> adj[100020];
+vector<int> chk[100020];
+
+vector< vector<int> > res;
+
+vector<int> vtx;
+void dfs(int u, int ui){
+	chk[u][ui] = 1; if (vtx.size() >= 2 && *prev(prev(vtx.end())) == u){
+		vtx.pop_back();
+	} else{ vtx.push_back(u); }
+	int v = adj[u][ui]; int vi = lower_bound(adj[v].begin(), adj[v].end(), u, [&v](int w1, int w2){
+		if ((arr[v] < arr[w1]) != (arr[v] < arr[w2])){ return (arr[v] < arr[w1]) > (arr[v] < arr[w2]); }
+		int res = ccw(arr[v], arr[w1], arr[w2]); return res > 0;
+	}) - adj[v].begin(); int vl = adj[v].size();
+	vi = (vi == 0 ? vl-1 : vi-1); int w = adj[v][vi];
+	int p = (vtx.size() >= 2 ? *prev(prev(vtx.end())) : -1);
+	if (!chk[v][vi]){ dfs(v, vi); }
+}
+
+for (int v = 1; v <= n; v++){
+	chk[v].resize(adj[v].size()); for (int& x : chk[v]){ x = 0; }
+	sort(adj[v].begin(), adj[v].end(), [&v](int w1, int w2){
+		if ((arr[v] < arr[w1]) != (arr[v] < arr[w2])){ return (arr[v] < arr[w1]) > (arr[v] < arr[w2]); }
+		int res = ccw(arr[v], arr[w1], arr[w2]); return res > 0;
+	});
+}
+for (int v = 1; v <= n; v++){
+	int vl = adj[v].size(); for (int vi = 0; vi < vl; vi++){
+		if (chk[v][vi]){ continue; }
+		vtx.clear(); dfs(v, vi); if (!vtx.empty()){
+			int vl = vtx.size(); ll val = 0; for (int i = 0; i < vl; i++){
+				int j = (i+1 == vl ? 0 : i+1);
+				int p1 = vtx[0], p2 = vtx[i], p3 = vtx[j];
+				val += area2(arr[p1], arr[p2], arr[p3]);
+			} if (val > 0){ res.push_back(vtx); }
+		}
+	}
+}
+\end{minted}

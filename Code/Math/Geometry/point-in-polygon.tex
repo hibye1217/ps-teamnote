@@ -1,0 +1,18 @@
+\subsubsection*{Convex Polygon}
+\begin{minted}{cpp}
+int st = 2, ed = n; while (st+1 <= ed-1){
+	int mid = st+ed >> 1;
+	if (ccw(arr[1], arr[mid], p) == +1){ st = mid; } else{ ed = mid; }
+} pl2 p1 = arr[1], p2 = arr[st], p3 = arr[st+1];
+int r12 = ccw(p1, p2, p), r23 = ccw(p2, p3, p), r31 = ccw(p3, p1, p);
+if (r12 < 0 || r23 < 0 || r31 < 0){ /* Outside */ }
+else{
+	if (r23 == 0 || r12 == 0 && st == 2 || r31 == 0 && st == n-1){ /* Line */ }
+	else{ /* Inside */ }
+}
+\end{minted}
+
+\subsubsection*{Non-convex Polygon}
+If the point is on the line, then whatever do what the problem says.
+
+Otherwise, send the straight line $(x, y)$ to $(x+X, y+X+1)$ with $X$ being sufficiently large integer. Then, count the number of intersections.

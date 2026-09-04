@@ -1,0 +1,22 @@
+\texttt{update(pi)}: updates \texttt{pi}-th element on the data structure.
+\begin{minted}{cpp}
+sort(arr+1, arr+n+1); for (int i = 1; i <= n; i++){ pos[i] = i; } // min y first
+for (int i = 1; i <= n; i++){
+	for (int j = i+1; j <= n; j++){
+		pl2 p = {arr[i].fr.fr-arr[j].fr.fr, arr[i].fr.sc-arr[j].fr.sc};
+		p = {p.sc, -p.fr};
+		if (p.sc < 0 || p.sc==0 && p.fr > 0){ p = {-p.fr, -p.sc}; }
+		lin.push_back({p, {i, j}}); // p as directional vector, min y first
+	}
+}
+sort(lin.begin(), lin.end(), [](pl2i2 p1, pl2i2 p2){
+	int res = ccw(pl2(0, 0), p1.fr, p2.fr); // ccw, if same then index
+	if (res != 0){ return res > 0; } else{ return p1.sc < p2.sc; }
+});
+int ans = solve(state); for (pl2i2 p : lin){
+	int i = p.sc.fr, j = p.sc.sc;
+	int pi = pos[i], pj = pos[j];
+	swap(arr[pi], arr[pj]); swap(pos[i], pos[j]); update(pi); update(pj);
+	ans = ans or newState;
+}
+\end{minted}

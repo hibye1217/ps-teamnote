@@ -1,0 +1,39 @@
+Lazy Segtree, but less lazy and more planning.
+
+\complexity{$\mathcal O(Q \log N)$, amortized.}
+\begin{minted}{cpp}
+struct Node{ int mx1, mx2, mxc; int sum; int laz; }; // update on a = min(a, x)
+inline Node mrg(const Node& l, const Node& r){ Node p;
+	p.mx1 = max(l.mx1, r.mx1);
+	p.mx2 = max((l.mx1 == p.mx1 ? l.mx2 : l.mx1), (r.mx1 == p.mx1 ? r.mx2 : r.mx1));
+	p.mxc = (l.mx1 == p.mx1 ? l.mxc : 0) + (r.mx1 == p.mx1 ? r.mxc : 0);
+	p.sum = l.sum + r.sum;
+	p.laz = INF; return p;
+}
+Node seg[2097152];
+inline void pro(int ni, int ns, int ne){
+	if (ns != ne){
+		seg[ni<<1].laz = min(seg[ni<<1].laz, seg[ni].laz);
+		seg[ni<<1|1].laz = min(seg[ni<<1|1].laz, seg[ni].laz);
+	}
+	ll dif = seg[ni].laz - seg[ni].mx1; if (dif <= 0){
+		seg[ni].sum += dif * seg[ni].mxc;
+		seg[ni].mx1 += dif;
+	} seg[ni].laz = INF;
+}
+void upd(int ni, int ns, int ne, int qs, int qe, int qx){
+	pro(ni, ns, ne);
+	if (qe < ns || ne < qs || seg[ni].mx1 <= qx){ return; }
+	if (qs <= ns && ne <= qe && seg[ni].mx2 < qx){ seg[ni].laz = qx; return pro(ni, ns, ne); }
+	int nm = ns+ne >> 1;
+	upd(ni<<1, ns, nm, qs, qe, qx); upd(ni<<1|1, nm+1, ne, qs, qe, qx);
+	seg[ni] = mrg(seg[ni<<1], seg[ni<<1|1]);
+} inline void upd(int st, int ed, int val){ return upd(1, 1, N, st, ed, val); }
+Node qry(int ni, int ns, int ne, int qs, int qe){
+	pro(ni, ns, ne);
+	if (qe < ns || ne < qs){ return {-1, -1, 0, 0, INF}; }
+	if (qs <= ns && ne <= qe){ return seg[ni]; }
+	int nm = ns+ne >> 1;
+	return mrg(qry(ni<<1, ns, nm, qs, qe), qry(ni<<1|1, nm+1, ne, qs, qe));
+} inline Node qry(int st, int ed){ return qry(1, 1, N, st, ed); }
+\end{minted}

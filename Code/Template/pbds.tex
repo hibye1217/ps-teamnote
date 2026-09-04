@@ -1,0 +1,16 @@
+\begin{minted}{cpp}
+#include <ext/pb_ds/tree_policy.hpp>
+#include <ext/pb_ds/assoc_container.hpp>
+using namespace __gnu_pbds;
+template <typename T> using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+template <typename K, typename V> using ordered_map = tree<K, V, less<K>, rb_tree_tag, tree_order_statistics_node_update>;
+
+ordered_set<int> s; s.insert(value);
+s.find_by_order(index); // 0-based, returns iterator
+s.order_of_key(value); // 0-based, lower_bound
+
+ordered_map<int, int> mp;
+mp.insert({1, 4}); mp[4] = 7;
+mp.find_by_order(1)->first // key, 4
+mp.find_by_order(1)->second // value, 7
+\end{minted}

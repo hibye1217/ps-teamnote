@@ -1,0 +1,57 @@
+\texttt{upd} and \texttt{qry} is range add update and range min query, using LazySeg.
+\begin{minted}{cpp}
+for (int i = 1; i <= n; i++){ val[i] = {arr[i], arr[i]}; pos[i] = {i, i}; }
+vector<int> mxs{0}, mns{0};
+int ni = n+1; vector<int> stk; for (int i = 1; i <= n; i++){
+	while (mxs.size() > 1){
+		int sl = mxs.size(); int j = mxs[sl-1];
+		if (arr[j] > arr[i]){ break; }
+		upd(mxs[sl-2]+1, mxs[sl-1], arr[i]-arr[j]);
+		mxs.pop_back();
+	} mxs.push_back(i);
+	while (mns.size() > 1){
+		int sl = mns.size(); int j = mns[sl-1];
+		if (arr[j] < arr[i]){ break; }
+		upd(mns[sl-2]+1, mns[sl-1], arr[j]-arr[i]);
+		mns.pop_back();
+	} mns.push_back(i);
+	stk.push_back(i); while (stk.size() > 1){
+		int sl = stk.size();
+		int a = stk[sl-2]; int b = stk[sl-1];
+		if (val[a].sc+1 == val[b].fr){
+			if (dir[a] == +1){
+				val[a].sc = val[b].sc; pos[a].sc = pos[b].sc;
+				adj[a].push_back(b); stk.pop_back();
+			} else{
+				val[ni] = {val[a].fr, val[b].sc}; pos[ni] = {pos[a].fr, pos[b].sc};
+				adj[ni].push_back(a); adj[ni].push_back(b); dir[ni] = +1;
+				stk.pop_back(); stk.pop_back(); stk.push_back(ni++);
+			}
+		} else if (val[b].sc+1 == val[a].fr){
+			if (dir[a] == -1){
+				val[a].fr = val[b].fr; pos[a].sc = pos[b].sc;
+				adj[a].push_back(b); stk.pop_back();
+			} else{
+				val[ni] = {val[b].fr, val[a].sc}; pos[ni] = {pos[a].fr, pos[b].sc};
+				adj[ni].push_back(a); adj[ni].push_back(b); dir[ni] = -1;
+				stk.pop_back(); stk.pop_back(); stk.push_back(ni++);
+			}
+		} else{
+			if (qry(1, pos[a].sc) != 0){ break; }
+			val[ni] = {min(val[a].fr, val[b].fr), max(val[a].sc, val[b].sc)};
+			pos[ni] = {min(pos[a].fr, pos[b].fr), max(pos[a].sc, pos[b].sc)};
+			adj[ni].push_back(b); adj[ni].push_back(a); dir[ni] = 0;
+			stk.pop_back(); stk.pop_back(); while (!stk.empty()){
+				if (val[ni].sc-val[ni].fr == pos[ni].sc-pos[ni].fr){ break; }
+				int p = stk.back(); stk.pop_back();
+				val[ni].fr = min(val[ni].fr, val[p].fr);
+				val[ni].sc = max(val[ni].sc, val[p].sc);
+				pos[ni].fr = min(pos[ni].fr, pos[p].fr);
+				pos[ni].sc = max(pos[ni].sc, pos[p].sc);
+				adj[ni].push_back(p);
+			} reverse(adj[ni].begin(), adj[ni].end());
+			stk.push_back(ni++);
+		}
+	} upd(1, i, -1);
+} int r = stk.front();
+\end{minted}

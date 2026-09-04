@@ -1,0 +1,89 @@
+$A_n = \prod_{i=1}^{k} A_{n-d} C_{d}$. The code below uses \texttt{arr} as initial terms with index $0$ to $n-1$.
+And \texttt{f} as coefficient of $x^n - \sum_{d=1}^{k} C_{d} x^{n-d}$.
+\begin{minted}{cpp}
+const ll mod = 104857601; const ll r = 3;
+
+ll fpow(ll mul, ll bit){
+	ll res = 1; while (bit){
+		if (bit&1){ res = res*mul % mod; }
+		mul = mul*mul % mod; bit >>= 1;
+	} return res;
+} inline ll finv(ll x){ return fpow(x, mod-2); }
+
+inline void normp(vector<ll>& arr){
+	int l = arr.size(); while (l > 0){
+		if (arr[l-1] == 0){ l -= 1; } else{ break; }
+	} arr.resize(l);
+}
+inline vector<ll> trim(vector<ll> arr, int mx){
+	int l = min<int>(arr.size(), mx); return vector<ll>(arr.begin(), arr.begin()+l);
+}
+void dft(vector<ll>& arr, bool inv = false){
+	int n = arr.size();
+	for (int j=0, i=1; i < n; i++){
+		int bit = n>>1;
+		while (j&bit){ j ^= bit; bit >>= 1; } j ^= bit;
+		if (i < j){ swap(arr[i], arr[j]); }
+	}
+	for (int l = 1; l < n; l*=2){
+		ll w = fpow(r, (mod-1)/(2*l)); if (inv){ w = finv(w); }
+		for (int i = 0; i < n; i += l*2){
+			ll wp = 1; for (int j = 0; j < l; j++){
+				ll a = arr[i+j], b = arr[i+j+l]*wp % mod;
+				arr[i+j] = (a+b) % mod; arr[i+j+l] = (a-b+mod)%mod;
+				wp = wp*w % mod;
+			}
+		}
+	}
+	if (inv){
+		ll invn = finv(n);
+		for (int i = 0; i < n; i++){ arr[i] = arr[i]*invn % mod; }
+	}
+}
+vector<ll> mulp(vector<ll> arr, vector<ll> brr){ // A \times B
+	normp(arr); normp(brr);
+	int al = arr.size(), bl = brr.size();
+	int n = max(al, bl); n = 1 << (bits(n) + 1 - ((n&-n)==n));
+	arr.resize(n); brr.resize(n);
+	dft(arr); dft(brr);
+	for (int i = 0; i < n; i++){ arr[i] = arr[i]*brr[i] % mod; }
+	dft(arr, -1); arr = trim(arr, al+bl-1); return arr;
+}
+vector<ll> invp(vector<ll> arr, int k){ // A^{-1} \pmod{x^k}. Assume A[0] \neq 0.
+	arr = trim(arr, k);
+	vector<ll> res = vector<ll>{finv(arr[0])}; int m = 1;
+	while (m < k){
+		vector<ll> val = trim(mulp(trim(arr, m*2), res), m*2); int vl = val.size();
+		for (int i = 0; i < vl; i++){
+			val[i] = ((i==0)*2 + mod-val[i]) % mod;
+		} res = trim(mulp(res, val), m*2); m *= 2;
+	} res = trim(res, k); return res;
+}
+vector<ll> divp(vector<ll> arr, vector<ll> brr){ // D, where A = BQ + R with \deg R < \deg B.
+	normp(arr); normp(brr);
+	int al = arr.size(), bl = brr.size(); if (al < bl){ return vector<ll>{}; }
+	reverse(arr.begin(), arr.end()); reverse(brr.begin(), brr.end());
+	arr = trim(arr, al-bl+1); brr = trim(brr, al-bl+1);
+	vector<ll> qrr = mulp(arr, invp(brr, al-bl+1)); qrr.resize(al-bl+1);
+	reverse(qrr.begin(), qrr.end()); normp(qrr); return qrr;
+}
+vector<ll> modp(vector<ll> arr, vector<ll> brr){ // R, where A = BQ + R with \deg R < \deg B.
+	normp(arr); normp(brr);
+	int al = arr.size(), bl = brr.size(); if (al < bl){ return arr; }
+	vector<ll> qrr = divp(arr, brr); vector<ll> drr = mulp(brr, qrr);
+	for (int i = 0; i < al; i++){ arr[i] = (arr[i]-drr[i]+mod) % mod; }
+	normp(arr); return arr;
+}
+
+ll arr[30020], crr[30020];
+
+ll kth(ll k, const vector<ll>& arr, const vector<ll>& f){ // x^k \pmod f
+	int n = arr.size(); if (k < n){ return arr[k]; }
+	vector<ll> res{1}, mul{0, 1}; while (k){
+		if (k&1){ res = modp(mulp(res, mul), f); }
+		mul = modp(mulp(mul, mul), f); k >>= 1;
+	}
+	ll ans = 0; for (int i = 0; i < n; i++){ ans += res[i]*arr[i] % mod; }
+	return ans%mod;
+}
+\end{minted}

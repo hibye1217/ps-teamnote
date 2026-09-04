@@ -1,0 +1,5 @@
+\begin{minted}{cpp}
+inv[0] = 0; inv[1] = 1; for (int x = 2; x < X; x++){
+    inv[x] = inv[mod%x]*(mod-mod/x) % mod;
+}
+\end{minted}

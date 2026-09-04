@@ -1,0 +1,14 @@
+If $x \ge B_i$, then $x \leftarrow x + A_i$. $B_i + A_i \ge 0$.
+\begin{minted}{cpp}
+pl2 arr[100020]; // (A[i], B[i])
+sort(arr+1, arr+n+1, [](pl2 p1, pl2 p2){
+	ll a1 = p1.fr, b1 = p1.sc;
+	ll a2 = p2.fr, b2 = p2.sc;
+	if ((a1 >= 0) != (a2 >= 0)){ return (a1 >= 0) > (a2 >= 0); }
+	if (a1 >= 0){ return b1 < b2; } else{ return a1+b1 > a2+b2; }
+});
+ll x = 0; for (int i = 1; i <= n; i++){
+	if (x < arr[i].sc){ /* Impossible; Quit */ }
+	x += arr[i].fr;
+} /* Possible */
+\end{minted}

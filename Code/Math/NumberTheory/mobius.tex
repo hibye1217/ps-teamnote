@@ -1,0 +1,10 @@
+\begin{minted}{cpp}
+int phi[X+20], mob[X+20], prr[X+20];
+memset(mob, -1, sizeof(mob)); mob[1] = 1;
+for (int x = 1; x <= X; x++){ phi[x] = x; }
+for (int x = 2; x <= X; x++){
+	if (prr[x] == 0){
+		for (int a = x; a <= X; a+=x){ prr[a] = x; phi[a] -= phi[a]/x; }
+	} int p = prr[x]; mob[x] = (x/p%p == 0 ? 0 : mob[x/p]*mob[p]);
+}
+\end{minted}

@@ -1,0 +1,17 @@
+\begin{minted}{cpp}
+vector<ll> ans;
+inline ll f(ll x, ll c, ll mod){ return ((i128)x*x + c) % mod; }
+void factor(ll n){
+	if (n == 1){ return; }
+	if (n%2 == 0){ ans.push_back(2); return factor(n/2); }
+	if (prime(n)){ ans.push_back(n); return; }
+	uniform_int_distribution<ll> rnd(1, n);
+	ll x1 = rnd(gen); ll x2 = x1;
+	ll c = rnd(gen); do{
+		x1 = f(x1, c, n); x2 = f(f(x2, c, n), c, n);
+	} while (gcd(abs(x1-x2), n) == 1);
+	ll g = gcd(abs(x1-x2), n);
+	if (g == n){ return factor(n); }
+	else{ factor(g); factor(n/g); }
+}
+\end{minted}

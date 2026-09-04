@@ -1,0 +1,18 @@
+\begin{minted}{cpp}
+for (int i = 1; i <= n; i++){
+	if (arr[1] > arr[i]){ swap(arr[1], arr[i]); }
+} pl2 p0 = arr[1]; sort(arr+2, arr+n+1, [&p0](const pl2& p1, const pl2& p2){
+	int res = ccw(p0, p1, p2); if (res != 0){ return res > 0; }
+	return dis(p0, p1) < dis(p0, p2);
+});
+vector<pl2> stk; for (int i = 1; i <= n; i++){
+	pl2 p3 = arr[i]; while (stk.size() >= 2){
+		pl2 p1 = *prev(prev(stk.end())), p2 = *prev(stk.end());
+		if (ccw(p1, p2, p3) <= 0){ stk.pop_back(); } else{ break; } // < 0 if linear
+	} stk.push_back(p3);
+}
+for (int i = n-1; i > 1; i--){ // if linear only
+	if (ccw(stk.front(), arr[i], stk.back()) == 0){ stk.push_back(arr[i]); }
+	else{ break; }
+}
+\end{minted}

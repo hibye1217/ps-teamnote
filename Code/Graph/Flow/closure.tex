@@ -1,0 +1,12 @@
+Given a directed acyclic graph $G = (V, E)$, with each vertex $v$ having weight $w_v$,
+maximize the sum of the weight of the selected vertices such that if vertex $v$ were chosen, then you also have to choose the vertex $w$ if $v \rightarrow w$.
+
+This can be modeled as following. Create a source $s$, sink $t$.
+\begin{itemize}
+	\item If $w_v \ge 0$, then $s \to v$ with weight $w_v$.
+	\item If $w_v \le 0$, then $v \to t$ with weight $-w_v$.
+	\item If $v \to w$, then $v \to w$ with weight $\infty$.
+\end{itemize}
+
+Find the minimum cut, then select only the vertices that are in $s$-side.
+The sum itself is the $\sum_{w_v \ge 0} w_v - \mathrm{MaxFlow}$.

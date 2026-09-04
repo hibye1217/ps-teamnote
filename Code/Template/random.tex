@@ -1,0 +1,6 @@
+\begin{minted}{cpp}
+const time_t TIME = chrono::high_resolution_clock::now().time_since_epoch().count();
+mt19937 gen(TIME);
+uniform_int_distribution<int> rng(a, b); // [a, b] range
+int value = rng(gen); shuffle(begin, end, gen);
+\end{minted}

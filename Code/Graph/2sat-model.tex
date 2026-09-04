@@ -1,0 +1,50 @@
+\begin{itemize}
+	\item OR: $(a \vee b) \to (\neg a \implies b) \wedge (\neg b \implies a)$.
+	\item AND: $(a \wedge b) \to (a \vee a) \wedge (b \vee b)$.
+	\item NAND: $(a \overline{\wedge} b) \to \neg (a \wedge b) \to (\neg a \vee \neg b)$.
+	\item NOR: $(a \overline{\vee} b) \to (\neg a \wedge \neg b)$.
+	\item XOR: $(a \oplus b) \to (a \vee b) \wedge (\neg a \vee \neg b)$.
+	\item XNOR: $(a \overline{\oplus} b) \to (a \vee \neg b) \wedge (\neg a \vee b)$.
+\end{itemize}
+
+\subsubsection*{Picking at most 1 variable}
+$3$ variables ($a$, $b$, $c$) can be done with $(\neg a \vee \neg b) \wedge (\neg b \vee \neg c) \wedge (\neg c \vee \neg a)$. This can be expanded to make $\mathcal O(N^2)$ clauses.
+
+$N$ variables ($x_1$, $x_2$, \ldots, $x_N$) can be done with the following method. Let $y_i$ be true if one of $x_1$, $x_2$, \ldots, $x_i$ is true. This can be modeled as following:
+\begin{itemize}
+	\item $x_i \implies y_i$.
+	\item $y_i \implies y_{i+1}$.
+	\item $y_i \implies \neg x_{i+1}$.
+\end{itemize}
+
+\subsubsection*{Constructing a Solution}
+\begin{minted}{cpp}
+for (int i = -n; i <= +n; i++){
+	if (i == 0){ continue; }
+	if (ord[i+Z] == 0){ dfs(i+Z); }
+}
+for (int i = 1; i <= n; i++){
+	if (scc[i+Z] == scc[-i+Z]){ cout << -1; return; }
+}
+for (int i = -n; i <= +n; i++){
+	if (i == 0){ continue; }
+	int v = i+Z; for (int w : adj[v]){
+		int pv = scc[v], pw = scc[w]; if (pv == pw){ continue; }
+		dag[pv].push_back(pw); ind[pw] += 1;
+	}
+}
+queue<int> q; for (int i = -n; i <= +n; i++){
+	if (i == 0){ continue; }
+	int v = i+Z; if (scc[v] != v){ continue; }
+	if (ind[v] == 0){ q.push(v); }
+} while (!q.empty()){
+	int v = q.front(); q.pop();
+	for (int p : sccv[v]){
+		if (ans[p] != 0){ continue; }
+		ans[p] = -1; ans[-(p-Z)+Z] = +1;
+	}
+	for (int w : dag[v]){
+		ind[w] -= 1; if (ind[w] == 0){ q.push(w); }
+	}
+}
+\end{minted}

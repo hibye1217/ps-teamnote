@@ -1,0 +1,17 @@
+\begin{minted}{cpp}
+const ll X = 1e9;
+pl2 l = {0, 1}, r = {1, 0}; // assume f(l) = false and f(r) = true
+bool chk = 1; while (chk){
+    chk = 0;
+    ll res = 0; bool flg = 1; for (ll bit = 1; bit; flg ? (bit<<=1) : (bit>>=1)){
+        pl2 mid = {l.fr + r.fr*(res+bit), l.sc + r.sc*(res+bit)};
+        if (mid.fr > X || mid.sc > X){ flg = 0; }
+        else{ if (!f(mid)){ res += bit; } else{ flg = 0; } }
+    } l = {l.fr + r.fr*res, l.sc + r.sc*res}; chk |= (res > 0);
+    res = 0; flg = 1; for (ll bit = 1; bit; flg ? (bit<<=1) : (bit>>=1)){
+        pl2 mid = {l.fr*(res+bit) + r.fr, l.sc*(res+bit) + r.sc};
+        if (mid.fr > X || mid.sc > X){ flg = 0; }
+        else{ if (f(mid)){ res += bit; } else{ flg = 0; } }
+    } r = {l.fr*res + r.fr, l.sc*res + r.sc}; chk |= (res > 0);
+}
+\end{minted}

@@ -1,0 +1,41 @@
+\complexity{$\mathcal O(T(N) \log N)$ per update/query.}
+\begin{minted}{cpp}
+vector<int> adj[500020]; int par[500020];
+int siz[500020], dep[500020];
+void dfs1(int now, int pre){
+	siz[now] = 1; par[now] = pre; erase(adj[now], pre);
+	for (int& nxt : adj[now]){
+		dep[nxt] = dep[now]+1; dfs1(nxt, now);
+		siz[now] += siz[nxt];
+		if (siz[nxt] >= siz[adj[now][0]]){ swap(nxt, adj[now][0]); }
+	}
+}
+pi2 ord[500020]; int ont;
+int chn[500020];
+void dfs2(int now, int pre){
+	ord[now].fr = ++ont;
+	for (int nxt : adj[now]){
+		if (nxt == adj[now][0]){ chn[nxt] = chn[now]; }
+		else{ chn[nxt] = nxt; } dfs2(nxt, now);
+	}
+	ord[now].sc = ont;
+}
+// dfs1(root, root); chn[root] = root; dfs2(root, root);
+void upd_pth(int v, int w, int x){
+	while (chn[v] != chn[w]){
+		if (dep[chn[v]] > dep[chn[w]]){ swap(v, w); }
+		upd(ord[chn[w]].fr, ord[w].fr, x); w = par[chn[w]];
+	}
+	if (dep[v] > dep[w]){ swap(v, w); } upd(ord[v].fr, ord[w].fr, p);
+	// if Edge Weight: if v == w then no update. otherwise v = chl[v][0] before update
+}
+u32 qry_pth(int v, int w){
+	u32 res = 0; while (chn[v] != chn[w]){
+		if (dep[chn[v]] > dep[chn[w]]){ swap(v, w); }
+		res += qry(ord[chn[w]].fr, ord[w].fr); w = par[chn[w]];
+	}
+	if (dep[v] > dep[w]){ swap(v, w); }
+	return res+qry(ord[v].fr, ord[w].fr);
+	// if Edge Weight: if v == w then no query. otherwise v = chl[v][0] before query
+}
+\end{minted}

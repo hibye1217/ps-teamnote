@@ -1,0 +1,11 @@
+$D_S = \sum_{T \subseteq S} A_T$.
+
+\complexity{$\mathcal O(N 2^N)$.}
+\begin{minted}{cpp}
+for (int i = 0; i < X; i++){ dp[i] = arr[i]; }
+for (int b = 0; b < B; b++){
+	for (int bit = 0; bit < X; bit++){
+		if (bit>>b & 1){ dp[bit] += dp[bit ^ 1<<b]; }
+	}
+}
+\end{minted}

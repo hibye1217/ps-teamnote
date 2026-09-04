@@ -1,0 +1,93 @@
+$k$ is $1$-indexed, assuming dummy on both end. \texttt{insert} inserts after $k$-th vertex (front if $k = 0$).
+
+\complexity{$\mathcal O(Q \log N)$, amortized.}
+\begin{minted}{cpp}
+const int INF = 1e9;
+struct Node{
+	int p = -1, l = -1, r = -1; bool flp = 0; int val = 0;
+	int cnt = 1; ll sum = 0; int mn = INF, mx = -INF;
+}; vector<Node> tree; int root = -1;
+Node init(int x){
+	Node p; p.cnt = 1; p.val = x;
+	p.sum = p.mn = p.mx = x; return p;
+} void put(int ni, const Node p){
+	tree[ni].cnt = p.cnt; tree[ni].sum = p.sum; tree[ni].mn = p.mn; tree[ni].mx = p.mx;
+}
+Node mrg(int li, int ri){
+	const Node &l = tree[li], &r = tree[ri];
+	Node p; p.cnt = l.cnt + r.cnt;
+	p.sum = l.sum + r.sum; p.mn = min(l.mn, r.mn); p.mx = max(l.mx, r.mx);
+	return p;
+}
+void propagate(int ni){
+	if (ni == -1){ return; } if (tree[ni].flp == 0){ return; }
+	swap(tree[ni].l, tree[ni].r);
+	if (tree[ni].l != -1){ tree[tree[ni].l].flp ^= 1; }
+	if (tree[ni].r != -1){ tree[tree[ni].r].flp ^= 1; }
+	tree[ni].flp = 0;
+}
+void update(int ni){
+	put(ni, init(tree[ni].val));
+	if (tree[ni].l != -1){ propagate(tree[ni].l); put(ni, mrg(tree[ni].l, ni)); }
+	if (tree[ni].r != -1){ propagate(tree[ni].r); put(ni, mrg(ni, tree[ni].r)); }
+} inline void update(int ni, ll val){ tree[ni].val = val; return update(ni); }
+void rotate(int ni){
+	propagate(tree[ni].p); propagate(ni);
+	int p1 = tree[ni].p; if (p1 == -1){ return; }
+	int p2 = tree[p1].p; if (p2 != -1){
+		(tree[p2].l == p1 ? tree[p2].l : tree[p2].r) = ni;
+		tree[ni].p = p2;
+	} else{ root = ni; tree[ni].p = -1; }
+	int p3 = -1; if (tree[p1].l == ni){
+		tree[p1].l = p3 = tree[ni].r; tree[ni].r = p1;
+	} else{
+		tree[p1].r = p3 = tree[ni].l; tree[ni].l = p1;
+	} tree[p1].p = ni; if (p3 != -1){ tree[p3].p = p1; }
+	update(p1); update(ni);
+}
+int splay(int ni, int top = -1){
+	while (tree[ni].p != top){
+		propagate(tree[tree[ni].p].p); propagate(tree[ni].p); propagate(ni);
+		int p1 = tree[ni].p; int p2 = tree[p1].p;
+		if (p2 != top){ rotate((tree[p2].l==p1) == (tree[p1].l==ni) ? p1 : ni); }
+		rotate(ni);
+	} propagate(ni); return ni;
+}
+int kth(int k){
+	int ni = root; while (1){
+		propagate(ni);
+		int cnt = (tree[ni].l == -1 ? 0 : tree[tree[ni].l].cnt);
+		if (cnt == k){ break; }
+		if (k < cnt){ ni = tree[ni].l; }
+		else{ k -= cnt+1; ni = tree[ni].r; }
+	} return splay(ni);
+}
+int segment(int st, int ed){
+	kth(ed+1); int r = root; kth(st-1); splay(r, root); return tree[tree[root].r].l;
+}
+void insert(int k, int val){
+	if (root == -1){ root = tree.size(); tree.push_back(init(val)); return; }
+	int ni = root; while (1){
+		int cnt = (tree[ni].l == -1 ? 0 : tree[tree[ni].l].cnt);
+		if (k < cnt){
+			if (tree[ni].l == -1){
+				tree[ni].l = tree.size(); tree.push_back(init(val));
+				tree[tree[ni].l].p = ni; ni = tree[ni].l; break;
+			} else{ ni = tree[ni].l; }
+		} else{
+			if (tree[ni].r == -1){
+				tree[ni].r = tree.size(); tree.push_back(init(val));
+				tree[tree[ni].r].p = ni; ni = tree[ni].r; break;
+			} else{ k -= cnt+1; ni = tree[ni].r; }
+		}
+	} splay(ni);
+}
+void erase(int k){
+	segment(k, k); tree[tree[root].r].l = -1; splay(tree[root].r);
+}
+
+void rev(int st, int ed){
+	if (st > ed){ return; }
+	int ni = segment(st, ed); tree[ni].flp ^= 1; propagate(ni);
+}
+\end{minted}

@@ -1,0 +1,15 @@
+\begin{minted}{cpp}
+sort(arr+1, arr+n+1, [](pl2 p1, pl2 p2){ return pl2(p1.sc, p1.fr) < pl2(p2.sc, p2.fr); });
+int ans = dis(arr[1], arr[2]);
+set<pl2> s; s.insert(arr[1]); s.insert(arr[2]);
+int st = 1; for (int i = 3; i <= n; i++){
+	while (st < i){
+		ll x = (p[st].sc-p[i].sc); if (x*x <= ans){ break; }
+		else{ s.erase(arr[st]); st += 1; }
+	} int d = (int)sqrt(ans)+1;
+	auto l = s.lower_bound({p[i].fr-d, -INF-1});
+	auto r = s.upper_bound({p[i].fr+d, INF+1});
+	for (auto j = l; j != r; j++){ ans = min(ans, dis(p[i], *j)); }
+	s.insert(p[i]);
+}
+\end{minted}

@@ -1,0 +1,11 @@
+\begin{minted}{cpp}
+int j = 0; for (int i = 0; i < sp; i++){
+	while (j < sp){
+		int ip = (i+1) % sp, jp = (j+1) % sp;
+		pl2 l = { arr[ip].fr - arr[i].fr, arr[ip].sc - arr[i].sc };
+		pl2 r = { arr[jp].fr - arr[j].fr, arr[jp].sc - arr[j].sc };
+		if (ccw({0, 0}, l, r) < 0){ break; }
+		ans = max(ans, dist(i, j)); j += 1;
+	} if (j < sp){ ans = max(ans, dist(i, j)); }
+}
+\end{minted}

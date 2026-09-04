@@ -1,0 +1,15 @@
+\begin{itemize}
+	\item $\mathrm{req}_i = $ required flow $i$th vertex need to send
+	\begin{itemize}
+		\item $\mathrm{req}_i < 0$: Need to get it from source
+		\item $\mathrm{req}_i > 0$: Need to send it to sink
+	\end{itemize}
+	\item $v \rightarrow w$ with lower/upper bound of $l$ and $u$.
+	\begin{itemize}
+		\item $\mathrm{req}_v = l$; $\mathrm{req}_w = -l$
+		\item Capacity of $v \rightarrow w = u-l$
+	\end{itemize}
+	\item Create new source and sink, and connect the $v$ with source or sink with capacity $|\mathrm{req}_v|$.
+	\item From the old sink to old source, connect an edge with the capacity $\infty$. If there were none, ignore this.
+	\item MaxFlow should be equal to $\sum\limits_{\mathrm{req}_v > 0} \mathrm{req}_v$ in order to satisfy the original graph.
+\end{itemize}

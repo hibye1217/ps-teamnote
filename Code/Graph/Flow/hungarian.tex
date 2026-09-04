@@ -1,0 +1,63 @@
+\begin{minted}{cpp}
+// Max version. for Min, adj[v][w] *= -1, then print -ans.
+ll adj[520][520];
+ll l1[520], l2[520]; ll d[520]; int di[520];
+bool c1[520], c2[520]; int m1[520], m2[520];
+int par[520];
+inline ll cost(int v, int w){ return l1[v] + l2[w] - adj[v][w]; }
+void psh(int n, int v, int p){ // p -> m1[v] -> v
+	c1[v] = 1; par[v] = p;
+	for (int j = 1; j <= n; j++){
+		if (cost(v, j) < d[j]){ d[j] = cost(v, j); di[j] = v; }
+	}
+}
+
+for (int i = 1; i <= n; i++){ l1[i] = *max_element(adj[i]+1, adj[i]+n+1); }
+for (int j = 1; j <= n; j++){ l2[j] = 0; }
+for (int cnt = 0; cnt < n; cnt++){
+	memset(c1, 0, sizeof(c1)); memset(c2, 0, sizeof(c2));
+	memset(par, 0, sizeof(par));
+	queue<int> q; int st = 0;
+	for (int i = 1; i <= n; i++){
+		if (m1[i] == 0){
+			st = i; q.push(i);
+			par[i] = -1; c1[i] = 1; break;
+		}
+	}
+	for (int j = 1; j <= n; j++){ d[j] = cost(st, j); di[j] = st; }
+	int v = 0, w = 0; while (1){
+		while (!q.empty()){
+			v = q.front(); q.pop();
+			for (int j = 1; j <= n; j++){
+				if (cost(v, j) == 0 && !c2[j]){
+					if (m2[j] == 0){ w = j; goto augment; }
+					c2[j] = 1; q.push(m2[j]); psh(n, m2[j], v);
+				}
+			}
+		}
+		ll val = INF; for (int j = 1; j <= n; j++){
+			if (!c2[j]){ val = min(val, d[j]); }
+		}
+		for (int i = 1; i <= n; i++){ if (c1[i]){ l1[i] -= val; } }
+		for (int j = 1; j <= n; j++){
+			if (c2[j]){ l2[j] += val; } else{ d[j] -= val; }
+		}
+		while (!q.empty()){ q.pop(); }
+		for (int j = 1; j <= n; j++){
+			if (!c2[j] && d[j] == 0){
+				if (m2[j] == 0){ v = di[j]; w = j; goto augment; }
+				else{
+					c2[j] = 1; if (!c1[m2[j]]){
+						q.push(m2[j]); psh(n, m2[j], di[j]);
+					}
+				}
+			}
+		}
+	} augment:
+	while (v != -1){
+		int pv = m2[w], pw = m1[v];
+		m1[v] = w; m2[w] = v; v = par[v]; w = pw;
+	}
+}
+ll ans = 0; for (int i = 1; i <= n; i++){ ans += adj[i][m1[i]]; }
+\end{minted}

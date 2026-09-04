@@ -1,0 +1,5 @@
+\begin{minted}{python}
+from functools import cmp_to_key
+def cmp(a, b): return sgn(a-b) # a < b then -, a > b then +, otherwise 0
+l.sort(key=cmp_to_key(cmp)); sorted(l, key=cmp_to_key(cmp))
+\end{minted}

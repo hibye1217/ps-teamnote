@@ -1,5 +1,7 @@
 \ProvidesPackage{teamnote}
 
+\usepackage{teamnote_option}
+
 \usepackage[left=0.8cm, right=0.8cm, top=2cm, bottom=0.3cm, a4paper]{geometry}
 \usepackage{fancyhdr}
 \usepackage{lastpage}
@@ -22,18 +24,13 @@
 \usepackage{eso-pic}
 \usepackage{kotex}
 \usepackage{multicol}
+\usepackage{multirow}
 
 \usepackage[compact]{titlesec}
 \usepackage[dvipsnames]{xcolor}
-% \titlespacing*{\section}{0pt}{0px plus 1px minus 0px}{-2px plus 0px minus 0px}
-% \titlespacing*{\subsection}{0pt}{0px plus 1px minus 0px}{0px plus 3px minus 3px}
-% \titlespacing*{\subsubsection}{0pt}{0px plus 1px minus 0px}{0px plus 3px minus 3px}
 
 \setlength{\columnseprule}{0.4pt}
 \pagenumbering{arabic}
-
-% \titlespacing*{\section}{0pt}{0pt}{0pt}
-% \titlespacing*{\subsection}{0pt}{0pt}{0pt}
 
 \setstretch{1}
 
@@ -44,7 +41,6 @@
 	\labelwidth=20pt
 	\itemindent=0pt
 	\listparindent=0pt
-	%\topsep=0pt plus 2pt minus 4pt
 	\partopsep=0pt plus 1pt minus 1pt
 	\parsep=0pt plus 1pt
 	\itemsep=1pt plus \parsep
@@ -56,7 +52,6 @@
 	\labelwidth=20pt
 	\itemindent=0pt
 	\listparindent=0pt
-	%\topsep=0pt plus 2pt minus 4pt
 	\partopsep=0pt plus 1pt minus 1pt
 	\parsep=0pt plus 1pt
 	\itemsep=1pt plus \parsep
@@ -68,19 +63,74 @@
 \setminted{breaklines=true, tabsize=2, breaksymbolleft=}
 \usemintedstyle{perldoc}
 
-\newcommand{\completed}[1]{\textcolor{teal}{\textbf{\textbullet}} #1}
-\newcommand{\torevise}[1]{\textcolor{brown}{\textbf{\textbullet}} #1}
-\newcommand{\totest}[1]{\textcolor{orange}{\textbf{\textbullet}} #1}
-\newcommand{\toadd}[1]{\textcolor{red}{\textbf{\textbullet}} #1}
-\newcommand{\tolearn}[1]{\textcolor{purple}{\textbf{\textbullet}} #1}
+\newcommand{\bitand}{\vee}
+\newcommand{\bitor}{\wedge}
+\newcommand{\bitxor}{\oplus}
+\newcommand{\opa}{\mathbin{\circ}}
+\newcommand{\opb}{\mathbin{\star}}
+\newcommand{\dotprod}{\mathbin{\cdot}}
+\newcommand{\crossprod}{\times}
 
 \newcommand{\citationneeded}[1]{\textcolor{gray}{#1}}
-\newcommand{\commented}[1]{}
+\newcommand{\warning}[1]{\textbf{\textcolor{red}{#1}}}
+\newcommand{\todo}[1]{\textit{\textcolor{red}{TODO: #1}}}
+\newcommand{\refer}[2]{\textit{Also check \textcolor{cyan}{\hyperref[#1]{#2}} at page \pageref{#1}.}}
 
-\newcommand{\complexity}[1]{\textbf{Time Complexity}: #1}
+\newcommand{\explanation}[1]{
+	\ifthenelse{\boolean{HideExplanation}}{}{
+		#1
+	}
+}
+\newcommand{\variable}[3]{
+	\ifthenelse{\boolean{HideVariable}}{}{
+		\begin{itemize}[label=$\circ$]
+			\item \textbf{#1} \texttt{#2}: #3
+		\end{itemize}
+	}
+}
+\newcommand{\complexity}[1]{
+	\begin{itemize}[label=$\circ$]
+		\item \textbf{Time Complexity}: #1.
+	\end{itemize}
+}
 
 \newcommand{\maketitlepage}{
     \maketitle
     \thispagestyle{fancy}
     \tableofcontents
+}
+
+\definecolor{LED_BLUE}  {RGB}{ 64,  64, 255}
+\definecolor{LED_GREEN} {RGB}{  0, 192,   0}
+\definecolor{LED_YELLOW}{RGB}{255, 192,   0}
+\definecolor{LED_ORANGE}{RGB}{255, 128,   0}
+\definecolor{LED_RED}   {RGB}{255,  64,  64}
+\newcommand{\subject}[3]{
+	\ifthenelse{\( \boolean{HideEasy} \AND \equal{#2}{Easy} \) \OR \( \boolean{HideHard} \AND \equal{#2}{Hard} \) \OR \equal{#2}{Hide}}{}{
+		\section{#1}
+		#3
+	}
+}
+\newcommand{\algorithm}[4]{
+	\ifthenelse{\( \boolean{HideEasy} \AND \equal{#3}{Easy} \) \OR \( \boolean{HideHard} \AND \equal{#3}{Hard} \) \OR \equal{#3}{Hide} \OR \equal{#4}{-}}{}{
+		\ifthenelse{\boolean{TrustedOnly} \AND \NOT \equal{#1}{Completed}}{}{
+			\ifthenelse{\boolean{ExtraInfo}}{
+				\subsection{[#1] #2 (#3)}
+			}{
+				\ifthenelse{\boolean{ShowIndicator}}{
+					\ifthenelse{\equal{#1}{Completed}}{\subsection{\textcolor{LED_BLUE}  {\textbf{\textbullet}} #2}}{}
+					\ifthenelse{\equal{#1}{ToRevise}} {\subsection{\textcolor{LED_GREEN} {\textbf{\textbullet}} #2}}{}
+					\ifthenelse{\equal{#1}{ToTest}}   {\subsection{\textcolor{LED_YELLOW}{\textbf{\textbullet}} #2}}{}
+					\ifthenelse{\equal{#1}{ToAdd}}    {\subsection{\textcolor{LED_ORANGE}{\textbf{\textbullet}} #2}}{}
+					\ifthenelse{\equal{#1}{ToLearn}}  {\subsection{\textcolor{LED_RED}   {\textbf{\textbullet}} #2}}{}
+				}{\subsection{#2}}
+			}
+			\ifthenelse{\boolean{TrustedOnly}}{
+				\immediate\write18{python -u preprocessor.py Code/#4 Code/temp.tmp true}
+			}{
+				\immediate\write18{python -u preprocessor.py Code/#4 Code/temp.tmp false}
+			}
+			\immediate\import{./Code/}{./temp.tmp}
+		}
+	}
 }

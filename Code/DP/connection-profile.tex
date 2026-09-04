@@ -1,0 +1,45 @@
+Single Connected Region, with DP condition.
+
+\complexity{$\mathcal O(NM B_M)$, $B_9 = 21\,147$. \citationneeded{Actual state is about $2\,000$?}}
+\begin{minted}{cpp}
+int n, m; int arr[10][10];
+inline int f(string& bit){
+	int cvt[10] = {}; int val = 0;
+	for (char& c : bit){
+		int x = c-'0'; if (x == 0){ continue; }
+		if (cvt[x] == 0){ cvt[x] = ++val; }
+		c = cvt[x]+'0';  
+	} return val;
+}
+const ll INF = 1e18;
+map<string, ll> dp[10][10];
+ll dpf(int y, int x, string bit){ int cnt = f(bit);
+	if (x == m){ y += 1; x = 0; }
+	if (y == n){ return cnt <= 1 ? 0 : INF; }
+	if (dp[y][x].count(bit)){ return dp[y][x][bit]; }
+	dp[y][x][bit] = INF;
+	bool flg = bit.front() == '0';
+	for (int b = 1; b < m; b++){ flg |= bit[0] == bit[b]; }
+	if (flg){
+		string nxt = bit.substr(1, m-1) + '0';
+		dp[y][x][bit] = min(dp[y][x][bit], dpf(y, x+1, nxt));
+	}
+	char u = bit.front(), l = bit.back(); if (x == 0){ l = '0'; }
+	if (u == '0' && l == '0'){
+		string nxt = bit.substr(1, m-1) + (char)(cnt+1+'0');
+		dp[y][x][bit] = min(dp[y][x][bit], dpf(y, x+1, nxt) + arr[y][x]);
+	}
+	else if (u == '0' || l == '0'){
+		string nxt = bit.substr(1, m-1) + (u=='0' ? l : u);
+		dp[y][x][bit] = min(dp[y][x][bit], dpf(y, x+1, nxt) + arr[y][x]);
+	}
+	else{
+		string nxt = bit.substr(1, m-1) + u;
+		for (char& c : nxt){ if (c == l){ c = u; } }
+		dp[y][x][bit] = min(dp[y][x][bit], dpf(y, x+1, nxt) + arr[y][x]);
+	}
+	if (cnt <= 1){ dp[y][x][bit] = min<ll>(dp[y][x][bit], 0); }
+	return dp[y][x][bit];
+}
+dpf(0, 0, string(m, '0')); // minimize the sum of arr[i][j], connected.
+\end{minted}

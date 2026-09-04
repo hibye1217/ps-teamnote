@@ -1,0 +1,37 @@
+$D_i = \min_{j<i} D_j + A_{j,i}$. For all pair $i < j$, there exists a unique point $p$ that $D_i + C_{i,p}$ and $D_j + C_{j,p}$ changes. So $k < p$ means $<$, and $\ge$ otherwise.
+
+\complexity{$\mathcal O(N \log N)$}.
+
+Code from \textit{BOJ 17439 - Flower Shop}.
+\begin{minted}{cpp}
+ll arr[50020]; ll prf[50020];
+
+deque<int> dq;
+pl2 dp[50020];
+inline ll f(int j, int i){ return (prf[i]-prf[j])*(i-j); }
+inline ll dpf(int j, int i){ return dp[j].fr + f(j, i); }
+inline int crx(int a, int b, int n){ // Assume a < b.
+	int st = b+1, ed = n; int i = n+1; while (st <= ed){
+		int mid = st+ed >> 1;
+		if (dpf(a, mid) >= dpf(b, mid)){ i = mid; ed = mid-1; }
+		else{ st = mid+1; }
+	} return i;
+}
+int solve(int n, ll x){
+	dp[0] = {0, 0}; for (int i = 1; i <= n; i++){
+		while (dq.size() >= 2){
+			int dql = dq.size();
+			int a = dq[dql-2], b = dq[dql-1];
+			if (crx(a, b, n) >= crx(b, i-1, n)){ dq.pop_back(); }
+			else{ break; }
+		} dq.push_back(i-1);
+		while (dq.size() >= 2){
+			int a = dq[0], b = dq[1];
+			if (crx(a, b, n) <= i){ dq.pop_front(); }
+			else{ break; }
+		} int j = dq.front();
+		dp[i] = {dpf(j, i), dp[j].sc+1};
+		//cout << dp[i].fr << " \n"[i==n];
+	} return dp[n].sc;
+}
+\end{minted}

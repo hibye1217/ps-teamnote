@@ -1,0 +1,12 @@
+Hyperparameter: $l = 5$ (higher = longer memory)
+\begin{enumerate}
+	\item Generate random answer $S$, and compute the score $F = f(S)$.
+	\item Set $P_i = F$ for all $1 \le i \le l$. Set $k = 0$.
+	\item Repeat the following:
+	\begin{enumerate}
+		\item Set $F_{*} = F$ and generate $S'$, and compute $F' = f(S')$.
+		\item If $F' = F$ or $F' < \max P$, change the answer (and score) to $S'$ (and $F'$).
+		\item If $F > P_k$ or ($F < P_i$ and $F < F_{*}$), set $P_i = F$.
+		\item Set $k = (k+1) \bmod l$.
+	\end{enumerate}
+\end{enumerate}

@@ -1,0 +1,5 @@
+Let $w(P)$ be the product of the weights of the edges of the path $P$. Let $D$ be the matrix with $D_{i,j}$ be the sum of $w(P)$s with $i \to j$.
+
+Then, $\det(D) = \sum_{(P_1, \ldots, P_N) \colon S \to T} \mathrm{sign}(\sigma(P)) \prod_{i=1}^{N} w(P_i)$, where $(P_1, \ldots, P_N)$ is the $N$ \textit{non-intersecting} paths, with $P_i = A_i \to B_{\sigma(i)}$.
+
+When every edge have weight $1$, $w(P) = 1$. Therefore, the lemma above will just find the number of possible non-intersecting path (with parity of the permutation).

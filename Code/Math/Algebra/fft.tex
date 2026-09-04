@@ -1,0 +1,49 @@
+\begin{minted}{cpp}
+void dft(vector<cpl>& arr, bool inv = false){ int n = arr.size();
+	for (int j=0, i=1; i < n; i++){ int bit = n>>1;
+		while (j & bit){ j ^= bit; bit >>= 1; } j ^= bit;
+		if (i < j){ swap(arr[i], arr[j]); }
+	}
+	for (int l = 1; l < n; l <<= 1){
+		if (complex){
+			ld ang = PI / l; if (inv){ ang *= -1; }
+			cpl w = {cos(ang), sin(ang)};
+		}
+		else{
+			ll w = fpow(r, (mod-1)/(2*l)); if (inv){ w = finv(w); }
+			// r is primitive root of mod. 998244353 -> 3
+		}
+		for (int i = 0; i < n; i += l<<1){
+			cpl wp = 1; for (int j = 0; j < l; j++){
+				cpl a = arr[i+j], b = arr[i+j + l] * wp;
+				arr[i+j] = a+b; arr[i+j + l] = a-b; wp *= w;
+			}
+		}
+	}
+	if (inv){ for (int i = 0; i < n; i++){ arr[i] /= n; } }
+}
+void mul(vector<cpl>& arr, vector<cpl>& brr){
+	int n = max(arr.size(), brr.size()); n = bitp(n) * 2; // power of 2
+	arr.resize(n); brr.resize(n);
+	dft(arr); dft(brr);
+	for (int i = 0; i < n; i++){ arr[i] *= brr[i]; }
+	dft(arr, -1);
+}
+\end{minted}
+
+\subsubsection*{Fast Welsh-hadamard Transform}
+\begin{minted}{cpp}
+void fwht(vector<ll>& arr, bool inv = false){
+	int n = arr.size();
+	for (int l = 1; l < n; l*=2){
+		for (int p = 0; p < n; p+=l*2){
+			for (int i = 0; i < l; i++){
+				ll a = arr[p+i], b = arr[p+l+i];
+				if (XOR){ arr[p+i] = (a+b)%mod; arr[p+l+i] = (a-b+mod)%mod; }
+				if (AND){ arr[p+i] = (a + (inv ? -b : b) + mod) % mod; }
+				if (OR){ arr[p+l+i] = (b + (inv ? -a : a) + mod) % mod; }
+			}
+		}
+	} if (inv && XOR){ for (int i = 0; i < n; i++){ arr[i] *= invn; } }
+}
+\end{minted}

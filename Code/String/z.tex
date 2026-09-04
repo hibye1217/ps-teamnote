@@ -1,0 +1,9 @@
+\begin{minted}{cpp}
+int l = 0, r = 0; for (int i = 1; i < sl; i++){
+	if (i < r){ z[i] = min(r-i, z[i-l]); }
+	while (i+z[i] < sl){
+		if (s[z[i]] == s[i+z[i]]){ z[i] += 1; }
+		else{ break; }
+	} if (r < i+z[i]){ l = i; r = i+z[i]; }
+} z[0] = sl;
+\end{minted}

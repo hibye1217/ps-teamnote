@@ -1,0 +1,27 @@
+$\mathtt{CUT} \ge \log_2 m$ is that $a^{\phi(m)} \not\equiv 1 \pmod m$ can happen. But for $d \ge \log_2 m$, $a^{d+\phi(m)} \equiv a^{d} \pmod m$.
+\begin{minted}{cpp}
+const ll INF = 1e18; // INF > mod^2; might need i128
+ll fpow(ll mul, ll bit, ll mod, ll lim = INF){
+	ll res = 1; while (bit){
+		if (bit&1){ res = min(res*mul, lim) % mod; }
+		mul = mul*mul % mod; bit >>= 1;
+	} return res;
+}
+
+const int CUT = 100, LEN = 4; // CUT >= log2(mod); A = [2 for 1..LEN] > CUT
+int n; int arr[1000020];
+int solve(int idx){
+	int val = 1; for (int i = n; i >= idx; i--){
+		val = fpow(arr[i], val, (CUT+1)*(CUT+2), CUT+1);
+	} return val;
+}
+int solve(int idx, int mod){
+	if (mod == 1){ return 0; }
+	if (idx == n){ return arr[idx] % mod; }
+	if (n-idx+1 <= LEN){
+		if (solve(idx+1) <= CUT){ return fpow(arr[idx], solve(idx+1), mod); }
+	}
+	int m = phi[mod];
+	return fpow(arr[idx], solve(idx+1, m) + CUT*m, mod);
+}
+\end{minted}

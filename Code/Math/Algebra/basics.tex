@@ -1,0 +1,61 @@
+\begin{itemize}
+	\item $\sum_{n=0}^{\infty} n/2^n = 2$.
+	\item Lagrange's Identity: $(\sum_{i} a_i^2)(\sum_{i} b_i^2) - (\sum_{i} a_i b_i)^2 = \sum_{i < j} (a_i b_j - a_j b_i)^2$.
+	\item Vieta's Formula: For a polynomial $\sum_i a_i x^i$, $\sum_{i_1 < i_2 < \cdots < i_k} \prod_{j=1}^{k} r_{i_j} = (-1)^k a_{n-k} / a_n$.
+	\item Let Fibonacci Number be $F_n = n \text{ if } n \le 1 \text{ else } F_{n-1} + F_{n-2}$.
+	\item $\sum_{k=0}^{n} F_k = F_{n+2} - 1$ and $\sum_{k=0}^{n} F_k^2 = F_{n} F_{n-1}$.
+	\item $\sum_{k=0}^{n-1} F_{2k+1} = F_{2n}$ and $\sum_{k=0}^{n} F_{2k} = F_{2n+1}-1$.
+	\item $F_{m} F_{n+1} + F_{m-1} F_{n} = F_{m+n}$ and $F_{m} F_{n+1} - F_{m-1} F_{n} = (-1)^n F_{m-n}$.
+	\item $F_{2n} = F_{n+1}^2 - F_{n-1}^2 = F_n(F_{n+1} + F_{n-1})$.
+	\item $\mathrm{gcd}(F_m, F_n) = F_{\mathrm{gcd}(m, n)}$.
+	\item Fibonacci Number mod $p$ have period with at most $6n$.
+	\item Given $m > n > 0$ with $\mathrm{gcd}(m, n) = 1$ and $2 \mid mn$, $(m^2-n^2, 2mn, m^2+n^2)$ is primitive Pythagorean triple.
+	\item The number of Pythagorean triple with $a, b \le c = n$ is $(\prod_{p^\alpha \mid\mid n} (2\alpha + 1) - 1) / 2$, where $\alpha$ is the highest exponent s.t. $p^\alpha$ divides $n$.
+	\item Bernoulli Number $b_n$: $\sum_{k=1}^{n} k^c = \frac{(-1)^k}{c+1} C_{c+1, k} b_k n^{c+1-k}$; $b_0 = 1$; $b_n = \frac{-1}{c+1} \sum_{r=0}^{r-1} C_{n+1, r} b_r$.
+	\item Vieta's Formula: Let $r_1$, $r_2$, \dots, $r_n$ be the roots to $P = \sum_{k=0}^{n} a_k x^k$. Then $\sum_{i_1 < i_2 < \cdots < i_k} r_{i_1} r_{i_2} \dots r_{i_k} = (-1)^k a_{n-k}/a_n$.
+	\item Chicken McNugget Theorem: There are exactly $(m-1)(n-1)/2$ different unexpressible numbers. Max is $mn-m-n$. Exactly one of $k$ or $mn-m-n-k$ is unexpressible.
+	\item $1/1 - 1/2 + 1/3 - 1/4 + \cdots + 1/(2n-1) - 1/(2n) = 1/(n+1) + 1/(n+2) + \cdots + 1/(2n)$.
+	\item Lagrange Polynomial: $\sum_{i=1}^{n} y_i \prod_{j=1,j \neq i}^{n} (x-x_j)/(x_i-x_j)$.
+\end{itemize}
+
+\subsubsection*{Linear Algebra}
+\begin{itemize}
+	\item Matrix: $\mathrm{tr}(AB) = \mathrm{tr}(BA)$; $(A^{-1})^{\mathrm{T}} = (A^{\mathrm{T}})^{-1}$.
+	\item Determinant: Row Swap $\times -1$; Multiply Row $\times a$; Add to Other Row $\pm 0$.
+	\item Determinant of a Diagonal Matrix is the product of the diagonal entries.
+	\item $\mathrm{det} M = \mathrm{det} M^{\mathrm{T}}$; $\mathrm{det}(AB) = \mathrm{det} A \mathrm{det} B$.
+	\item Adjoint: Let $(\mathrm{adj} M)_{i, j}$ be the cofactor of $M$ at $(i, j)$. $M^{-1} = \mathrm{adj} M / \mathrm{det} M$.
+	\item Characteristic Polynomial: Let $P_M(\lambda) = \mathrm{det}(\lambda I - M)$.
+	\item Eigenvalue: $\lambda$s where $P_M(\lambda) = 0$; Eigenvector: $(M - \lambda I) X = 0$ for each $\lambda$ we got.
+	\item Least Square: $A$ be a matrix and $b$ be a vector. $\min_{x \in \mathbb{R}^n} ||Ax - b||^2$; $A^{\mathrm{T}} A x = A^{\mathrm{T}} b$.
+	\item $AB = C$ using Randomization in $O(N^2)$: Create random vector $v$, and see $A(Bv) = Cv$.
+\end{itemize}
+
+\subsubsection*{Calculus}
+\begin{itemize}
+	\item $(f(x) g(x))' = f'(x) g(x) + f(x) g'(x)$; $(f(x)/g(x))' = (f'(x) g(x) - f(x) g'(x)) / g(x)^2$.
+	\item $(f(g(x)))' = f'(g(x)) g(x)$. $\int u dv = uv - \int v du$.
+	\item Let $x = g(t)$. Then $\int f(x) dx = \int f(g(t)) g'(t) dt$.
+	\item $(a^x)' = a^x \ln a$; $\int a^x \,dx= a^x / \ln a + C$.
+	\item $(\log_b |x|)' = 1/(x \ln b)$. $\int 1/x \,dx = \ln |x| + C$.
+	\item $\sec$, $\csc$, $cot$ is $1/\cos$, $1/\sin$, $1/\tan$ resp.
+	\item $\arcsin$, $\arccos$, $\arctan$ is inverse of $\sin$, $\cos$, $\tan$ resp.
+	\item $\sinh$, $\cosh$, $\tanh$ is $(e^x - e^{-x})/2$, $(e^x + e^{-x})/2$, $\sinh/\cosh$ resp.
+	\item $x$ axis Rotation Volume: Assume $f(x) \ge 0$, $f$ is continuous in $[a, b]$. $\int_{a}^{b} 2 \pi x f(x) dx$.
+\end{itemize}
+
+\begin{center} \begin{tabular}{|c|c|c|} \hline
+Derivative                  & $f(x)$        & Integral (w/ $+C$)               \\ \hline
+$\cos x$                    & $\sin x$      & $-cos x$                         \\ \hline
+$-\sin x$                   & $\cos x$      & $\sin x$                         \\ \hline
+$sec^2 x$                   & $\tan x$      & $\ln |\sec x|$                   \\ \hline
+$\sec x \tan x$             & $\sec x$      & $\ln|\sec x + \tan x|$           \\ \hline
+$-\csc x \cot x$            & $\csc x$      & $\ln|\csc x - \cot x|$           \\ \hline
+$-\csc^2 x$                 & $\cot x$      & $\ln |\sin x|$                   \\ \hline
+$1 / \sqrt{1 - x^2}$        & $\arcsin x$   & $x \arcsin x + \sqrt{1 - x^2}$   \\ \hline
+$-1 / \sqrt{1 - x^2}$       & $\arccos x$   & $x \arccos x - \sqrt{1 - x^2}$   \\ \hline
+$1 / (1 + x^2)$             & $\arctan x$   & $x \arctan x - \ln(x^2 + 1)/2$   \\ \hline
+$1 / (|x| \sqrt{x^2 - 1})$  & $\sec^{-1} x$ & $x \sec^{-1} x - \cosh^{-1} |x|$ \\ \hline
+$-1 / (|x| \sqrt{x^2 - 1})$ & $\csc^{-1} x$ & $x \csc^{-1} x + \cosh^{-1} |x|$ \\ \hline
+$-1 / (1 + x^2)$            & $\cot^{-1} x$ & $x \cos^{-1} x + \ln(x^2+1)/2$   \\ \hline
+\end{tabular} \end{center}

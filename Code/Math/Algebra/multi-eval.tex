@@ -1,0 +1,16 @@
+\begin{minted}{cpp}
+vector<ll> seg[524288];
+vector<ll> pos; void init(int ni, int ns, int ne){
+	if (ns == ne){ seg[ni] = vector<ll>({(mod-pos[ns])%mod, 1}); return; }
+	int nm = ns+ne >> 1;
+	init(ni<<1, ns, nm); init(ni<<1|1, nm+1, ne);
+	seg[ni] = pmul(seg[ni<<1], seg[ni<<1|1]);
+} inline void init(vector<ll> p){ pos = p; init(1, 0, p.size()-1); }
+vector<ll> res; void eval(int ni, int ns, int ne, vector<ll> arr){
+	if (ns == ne){ res[ns] = eval(arr, pos[ns]); return; }
+	int nm = ns+ne >> 1;
+	eval(ni<<1, ns, nm, pmod(arr, seg[ni<<1])); eval(ni<<1|1, nm+1, ne, pmod(arr, seg[ni<<1|1]));
+} inline vector<ll> eval(vector<ll> p){
+	init(p); res.resize(p.size()); eval(1, 0, p.size()-1, arr);
+}
+\end{minted}

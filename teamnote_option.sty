@@ -1,0 +1,23 @@
+\usepackage{ifthen}
+
+
+% Shows Completed Only & Removes Every Gray Texts.
+\newboolean{TrustedOnly} \setboolean{TrustedOnly}{false}
+
+% Shows Indicator (Colored Circle).
+\newboolean{ShowIndicator} \setboolean{ShowIndicator}{true}
+
+% Hides Section deemed "Easy".
+\newboolean{HideEasy} \setboolean{HideEasy}{true}
+
+% Hides Section deemed "Hard".
+\newboolean{HideHard} \setboolean{HideHard}{false}
+
+% Hides Variable Explanations. Note that this does not hide the Complexity.
+\newboolean{HideVariable} \setboolean{HideVariable}{true}
+
+% Hides Variable Explanations. Note that this does not hide the Complexity.
+\newboolean{HideExplanation} \setboolean{HideExplanation}{true}
+
+% Shows Extra Informations on the PDF. Overwrites "ShowIndicator".
+\newboolean{ExtraInfo} \setboolean{ExtraInfo}{false}

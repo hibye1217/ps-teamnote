@@ -1,0 +1,42 @@
+Let $i_1$ and $i_2$ be the result of \texttt{tangent(p, -1)} and \texttt{tangent(p, +1)} respectively. The visible vertices from $p$ is $P_{i_1}$ to $P_{i_2}$.
+Note that the index is cyclic i.e. if $i_1 > i_2$ then the visible vertices are $P_{i_1}$ to $P_n$ and $P_1$ to $P_{i_2}$.
+
+If there are multiple tangent line on the single direction, it returns the nearest one. Test \texttt{prv} and \texttt{nxt} resp. for farthest in dir $-1$ and $+1$, resp.
+\begin{minted}{cpp}
+int n; pl2 arr[100020];
+inline int nxt(int i){ return i==n ? 1 : i+1; }
+inline int prv(int i){ return i==1 ? n : i-1; }
+inline bool locate(const pl2& p, const pl2& p1, const pl2& p2, const pl2& p3, int dir){
+	return dir*ccw(p, p1, p2) <= 0 && dir*ccw(p, p2, p3) >= 0;
+}
+int fix(const pl2& p, int idx, int dir){
+	if (dir > 0 && ccw(p, arr[idx], arr[prv(idx)]) == 0){
+		pl2 p1 = arr[idx], p2 = arr[prv(idx)]; if (p1 > p2){ swap(p1, p2); }
+		if (p1 <= p && p <= p2){ return idx; } else{ return prv(idx); }
+	}
+	if (dir < 0 && ccw(p, arr[idx], arr[nxt(idx)]) == 0){
+		pl2 p1 = arr[idx], p2 = arr[nxt(idx)]; if (p1 > p2){ swap(p1, p2); }
+		if (p1 <= p && p <= p2){ return idx; } else{ return nxt(idx); }
+	}
+	return idx;
+}
+int tangent(const pl2& p, int dir){
+	if (locate(p, arr[prv(1)], arr[1], arr[nxt(1)], dir)){ return fix(p, 1, dir); }
+	int st = 1, ed = n+1; while (st+1 <= ed-1){
+		int mid = st+ed >> 1;
+		if (locate(p, arr[prv(mid)], arr[mid], arr[nxt(mid)], dir)){ return fix(p, mid, dir); }
+		if (dir*ccw(p, arr[st], arr[nxt(st)]) < 0){
+			if (dir*ccw(p, arr[mid], arr[nxt(mid)]) > 0){ ed = mid; }
+			else if (dir*ccw(p, arr[mid], arr[st]) > 0){ st = mid; }
+			else{ ed = mid; }
+		} else{
+			if (dir*ccw(p, arr[mid], arr[nxt(mid)]) < 0){ st = mid; }
+			else if (dir*ccw(p, arr[mid], arr[st]) < 0){ st = mid; }
+			else{ ed = mid; }
+		}
+	}
+	if (st != 1 && locate(p, arr[prv(st)], arr[st], arr[nxt(st)], dir)){ return fix(p, st, dir); }
+	if (ed != n+1 && locate(p, arr[prv(ed)], arr[ed], arr[nxt(ed)], dir)){ return fix(p, ed, dir); }
+	return -1;
+}
+\end{minted}

@@ -1,0 +1,32 @@
+\complexity{$\mathcal O(Q \log X)$.}
+\begin{minted}{cpp}
+// Binary Search: path available after ans-th event.
+// 0-th event: impossible as nothing is active
+// m-th event: possible as everything is connected
+struct Query{ int st, ed; int idx; int v, w; };
+Query qrr[100020];
+while (1){
+	sort(qrr+1, qrr+q+1, [](Query& q1, Query& q2){
+		return (q1.st+q1.ed)/2 < (q2.st+q2.ed)/2;
+	});
+	for (int i = 1; i <= n; i++){ par[i] = -1; }
+	bool flg = 0;
+	int qi = 1; for (int ei = 0; ei <= n; ei++){
+		if (ei > 0){ // Update
+			int v = evt[ei].fr;
+			par[v] = v; for (pi2 p : adj[v]){
+				int w = p.fr; if (par[w] != -1){ uni(v, w); }
+			}
+		}
+		while (qi <= q){ // Try answering the queries
+			if (qrr[qi].st+1 > qrr[qi].ed-1){ qi++; continue; }
+			int mid = qrr[qi].st+qrr[qi].ed >> 1; flg = 1;
+			if (mid != ei){ break; }
+			int v = qrr[qi].v, w = qrr[qi].w;
+			if (par[v] != -1 && par[w] != -1 && fnd(v) == fnd(w)){ qrr[qi].ed = mid; }
+			else{ qrr[qi].st = mid; } qi++;
+		}
+	} if (!flg){ break; }
+} sort(qrr+1, qrr+q+1, [](Query& q1, Query& q2){ return q1.idx < q2.idx; });
+for (int i = 1; i <= q; i++){ cout << evt[qrr[i].ed].sc << endl; } // ed = first possible
+\end{minted}

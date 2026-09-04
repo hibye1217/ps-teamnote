@@ -1,0 +1,25 @@
+\complexity{$\mathcal O(N \log N)$.}
+\begin{minted}{cpp}
+bool chk[100020]; int siz[100020];
+void sizf(int v, int p){
+	siz[v] = 1; for (pi2 e : adj[v]){
+		int w = e.fr; if (chk[w]){ continue; } if (w == p){ continue; }
+		sizf(w, v); siz[v] += siz[w];
+	}
+}
+pi2 cent = {-1, -1}; void centroid(int v, int p, int n){
+	bool flg = 1; for (pi2 e : adj[v]){
+		int w = e.fr; if (chk[w]){ continue; } if (w == p){ continue; }
+		centroid(w, v, n); if (siz[w]*2 > n){ flg = 0; }
+	} if (flg && (n-siz[v])*2 <= n){ (cent.fr == -1 ? cent.fr : cent.sc) = v; }
+} inline void centroid(int v){ cent = {-1, -1}; sizf(v, v); centroid(v, v, siz[v]); }
+
+ll dnc(int v){
+	centroid(v); v = cent.fr;
+	// solve on path that passes v. divide it by subtree, and merge subtree-wise. use top-down.
+	chk[v] = 1; for (pi2 e : adj[v]){
+		int w = e.fr; if (chk[w]){ continue; }
+		ans += dnc(w);
+	} return ans;
+}
+\end{minted}

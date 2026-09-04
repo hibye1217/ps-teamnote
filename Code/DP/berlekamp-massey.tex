@@ -1,0 +1,38 @@
+\refer{sec:DP-kitamasa}{Kitamasa}
+\begin{minted}{cpp}
+vector<ll> mulp(vector<ll> arr, vector<ll> brr){ // A \times B
+	normp(arr); normp(brr);
+	int al = arr.size(), bl = brr.size();
+	vector<ll> res(al+bl-1);
+	for (int i = 0; i < al; i++){
+		for (int j = 0; j < bl; j++){
+			res[i+j] += arr[i]*brr[j] % mod; res[i+j] %= mod;
+		}
+	} return res;
+}
+vector<ll> solve(vector<ll> arr){
+	int n = arr.size();
+	vector<ll> res, val; int pos = -1;
+	for (int i = 0; i < n; i++){
+		int rl = res.size();
+		ll d = arr[i]; for (int j = 0; j < rl; j++){
+			d -= res[j]*arr[i-j-1] % mod; d = (d+mod)%mod;
+		} if (d == 0){ continue; }
+		if (pos == -1){
+			res.resize(i+1); for (int j = 0; j <= i; j++){ res[j] = 1; }
+			pos = i;
+		} else{
+			vector<ll> v{1}; for (ll x : val){ v.push_back((mod-x)%mod); }
+			int vl = v.size();
+			ll c = 0; for (int j = 0; j < vl; j++){
+				c += v[j]*arr[pos-j] % mod; c %= mod;
+			} c = d*finv(c) % mod;
+			for (ll& x : v){ x = x*c % mod; }
+			vector<ll> tmp(i-pos-1, 0); for (ll x : v){ tmp.push_back(x); }
+			if (i - res.size() >= pos - val.size()){ val = res; pos = i; }
+			int rl = max(res.size(), tmp.size()); res.resize(rl); 
+			for (int i = 0; i < rl; i++){ res[i] = (res[i]+tmp[i]) % mod; }
+		}
+	} return res;
+}
+\end{minted}

@@ -1,0 +1,53 @@
+\begin{minted}{cpp}
+int sa[1000020], pos[1000020], lcp[1000020];
+int tmp[1000020], cnt[1000020], res[1000020];
+void init(string s){
+	s.push_back('#'); int sl = s.size();
+	for (int i = 0; i < sl; i++){ sa[i] = i; }
+	sort(sa, sa+sl, [&s](int s1, int s2){ return s[s1] < s[s2]; });
+	res[sa[0]] = 0; for (int i = 1; i < sl; i++){
+		int s1 = sa[i-1], s2 = sa[i]; res[s2] = res[s1] + (s[s1] != s[s2]);
+	}
+	for (int k = 1; ; k *= 2){
+		for (int i = 0; i < sl; i++){ cnt[i] = 0; tmp[i] = (sa[i]-k%sl+sl)%sl; }
+		for (int i = 0; i < sl; i++){ cnt[res[i]] += 1; }
+		for (int i = 1; i < sl; i++){ cnt[i] += cnt[i-1]; }
+		for (int i = sl-1; i >= 0; i--){
+			int sp = tmp[i]; int r = res[sp];
+			int p = cnt[r]; sa[p-1] = sp; cnt[r] -= 1;
+		}
+		tmp[sa[0]] = 0; for (int i = 1; i < sl; i++){
+			int s1 = sa[i-1], s2 = sa[i];
+			int t1 = (s1+k)%sl, t2 = (s2+k)%sl;
+			tmp[s2] = tmp[s1] + (res[s1] != res[s2] || res[t1] != res[t2]);
+		} memcpy(res, tmp, sizeof(res)); if (res[sa[sl-1]] == sl-1){ break; }
+	} s.pop_back(); sl -= 1;
+	for (int i = 0; i < sl; i++){ sa[i] = sa[i+1]; }
+	for (int i = 0; i < sl; i++){ pos[sa[i]] = i; }
+	int l = 0; for (int i = 0; i < sl; i++){
+		l = max(l-1, 0); int p1 = pos[i], p2 = pos[i]-1; if (p2 < 0){ continue; }
+		int s1 = sa[p1], s2 = sa[p2]; while (s1+l < sl && s2+l < sl){
+			if (s[s1+l] != s[s2+l]){ break; } else{ l += 1; }
+		} lcp[p2] = l;
+	}
+}
+\end{minted}
+
+\subsubsection*{Traversing}
+\begin{minted}{cpp}
+int idx[1000020]; // idx[i] = NULL position of sa[i]. Useful when S is multi-string.
+// qry(st, ed) returns pair(min lcp[i], argmin) for [st, ed).
+// solve on sa[st..ed][i..j).
+ll solve(int st, int ed, int i){
+	if (st == ed){ int j = idx[st]; return chk[st].fr <= ed && ed < chk[st].sc ? j-i : 0; }
+	int j = qry(st, ed).fr; vector<int> mid{st};
+	while (mid.back() < ed){
+		pi2 p = qry(mid.back(), ed); if (p.fr != j){ break; }
+		mid.push_back(p.sc+1);
+	} mid.push_back(ed+1);
+	ll ans = (chk[st].fr <= ed && ed < chk[st].sc ? j-i : 0);
+	int len = mid.size(); for (int p = 1; p < len; p++){
+		ans += solve(mid[p-1], mid[p]-1, j);
+	} return ans;
+}
+\end{minted}

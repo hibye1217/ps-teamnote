@@ -1,0 +1,26 @@
+\begin{minted}{cpp}
+inline ll cross(const pl2& v1, const pl2& v2){ return v1.sc*v2.fr - v2.sc*v1.fr; }
+inline pl2 ltov(const pl4& l){ return {l.sc.fr-l.fr.fr, l.sc.sc-l.fr.sc}; }
+int intersect(pl4 l1, pl4 l2){
+	pl2 p1 = l1.fr, p2 = l1.sc; pl2 p3 = l2.fr, p4 = l2.sc;
+	int c123 = ccw(p1, p2, p3), c124 = ccw(p1, p2, p4);
+	int c341 = ccw(p3, p4, p1), c342 = ccw(p3, p4, p2);
+	if (c123 == 0 && c124 == 0){
+		if (p1 > p2){ swap(p1, p2); } if (p3 > p4){ swap(p3, p4); }
+		if (p2 < p3 || p4 < p1){ /* No Intersection */ }
+		if (p2 == p3 || p4 == p1){ /* Endpoint */ }
+		/* Infinitely Many */
+	}
+	int c12 = c123*c124, c34 = c341*c342;
+	if (c12 > 0 || c34 > 0){ /* No Intersection */ }
+	if (c12 == 0 || c34 == 0){ /* Endpoint */ }
+	/* Mid-line */
+}
+pd2 intersection(const pl4& l1, const pl4& l2){
+	pl2 p1 = l1.fr, p2 = l1.sc; pl2 p3 = l2.fr, p4 = l2.sc;
+	if (p1 == p3 || p1 == p4){ return p1; } if (p2 == p3 || p2 == p4){ return p2; }
+	pl2 v1 = ltov(l1), v2 = ltov(l2); pl2 d = {p3.fr-p1.fr, p3.sc-p1.sc};
+	ld a = (ld)cross(d, v2) / cross(v1, v2);
+	return {p1.fr + v1.fr*a, p1.sc + v1.sc*a};
+}
+\end{minted}

@@ -1,0 +1,13 @@
+$D_{k,i} = \min_{j<i} D_{k-1,j} + A_{j,i}$. $D_{k,N}$ must be convex.
+
+\complexity{$\mathcal O(T(N) \log X)$.}
+\begin{minted}{cpp}
+// solve(n, mid) returns the number of used elements
+// Binary Search over Lambda
+ll st = 0, ed = 1e18; ll ans = 1e18;
+while (st <= ed){
+	ll mid = st+ed >> 1;
+	int cnt = solve(n, mid); ans = min<i128>(ans, dp[n] + (i128)mid*k);
+	if (cnt <= k){ ed = mid-1; } else{ st = mid+1; }
+} cout << ans;
+\end{minted}

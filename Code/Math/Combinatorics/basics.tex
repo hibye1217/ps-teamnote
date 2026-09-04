@@ -1,0 +1,72 @@
+Let $x^{(k)}$ be the product of $x$ to $x+k-1$, and $x_{(k)}$ be the product of $x$ to $x-k+1$.
+Let $C_{n, r} = \binom{n}{r}$ and $H_{n, r} = \binom{n+r-1}{r}$. Let $P_{n, r} = n! / r!$.
+
+Derangement is the number of permutation with $\pi_i \neq i$ for all $i$. \\
+$D_0 = 1$; $D_1 = 0$; $D_n = (n-1)(D_{n-1} + D_{n-2})$.
+
+Catalan Number is the number of valid Regular Bracket Sequence with $n$ pairs. \\
+$C_0 = 1$; $C_{n+1} = (4n+2) C_n / (n+2)$. Def: $C_{n+1} = \sum_{k=0}^{n} C_k C_{n-k}$.
+
+Stirling Number of the First Kind is the number of permutation with $n$ elements and $k$ cycles. \\
+$s_{0, 0} = 1$; $s_{n, 0} = s_{0, k} = 0$; $s_{n, k} = (n-1) s_{n-1, k} + s_{n-1, k-1}$.
+
+Stirling Number of the Second Kind is the number of ways to partition a set of $n$ distinct objects onto $k$ non-empty subsets. \\
+$S_{0, 0} = 1$; $S_{n, 0} = S_{0, k} = 0$; $S_{n, k} = k S_{n-1, k} + S_{n-1, k-1}$.
+
+Bell Number is the number of ways to partition a set of $n$ distinct objects. \\
+$B_n = \sum_{k=0}^{n} S_{n, k} = \sum_{k=0}^{n} C_{n, k} B_k$.
+
+Partition Number is the number of ways to partition $n$ nondistinct objects into collection of $k$ non-empty bunches. \\
+$p_{n, k} = p_{n-1, k-1} + p_{n-k, k}$. $p_n = \sum_{k=1}^{n} p_{n, k}$.
+
+\begin{itemize}
+	\item Lucas's Theorem: $C_{n, r} \equiv C_{n \bmod p, r \bmod p} C_{n/p, r/p} \pmod p$.
+	\item Vamdermonde's Identity: $\sum_{k=0}^{r} C_{n, k} C_{m, r-k} = C_{n+m, r}$.
+	\item Hockey-Stick Identity: Assuming $n > r$, $\sum_{k=r}^{n} C_{k, r} = C_{n+1, r+1}$.
+	\item $\sum_{k=r}^{n} C_{n, k} C_{k, r} = 2^{n-k}$.
+	\item $\sum_{k=1}^{n} C_{n, k} C_{c-1, k-1} = C_{2n-1, n-1}$.
+	\item $\sum_{k \text{ is odd}}^{k \le n} C_{n, k} a^{n-k} b^k = ((a+b)^n - (a-b)^n)/2$.
+	\item $\sum_{k=0}^{n} C_{r, k} / C_{n, k} = C_{n+1, n-r+1} / C_{n, r}$.
+	\item Number of involutions: $I_0 = I_1 = 1$; $I_{n} = I_{n-1} + (n-1) I_{n-2}$.
+	\item Number of permutations of size $n$ where every cycles have length $\le k$: $T_{n,k} = n! \text{ if } n \le k \text{ else } n T_{n-1, k} - (n-1)_{(k)} T_{n-k-1, k}$.
+	\item Catalan Number = Number of permutations of length $n$ that avoids the pattern $123$.
+	\item Number of prefix RBS of length $n+k$ with $n$ opens and $k$ closes: $C_{n+k, k} (n-k+1)/(n+1)$.
+	\item Number of RBS of length $2n$ with exactly $k$ `()'s: $C_{n, k} C_{n, k-1} / n$.
+	\item Stirling Number of the Second Kind but each subset's size $\ge r$: \\ $S_{r, n+1, k} = k S_{r, n, k} + C_{n, r-1} S_{r, n-r+1, k-1}$.
+	\item Stirling Number of the Second Kind but pairwise distance $\ge d$: $S_{n-d+1, k-d+1}$, assuming $n \ge k \ge d$.
+	\item Burnside: Let $G$ be a group. $r = \sum_{g \in G} |X_g|/|G|$. $|X_g|$ is the number of elements that $gx = x$ holds.
+	\item Linearity of Expectation: $\mathbb{E}[aX + bY] = a \mathbb{E}[X] + b \mathbb{E}[Y]$. If independent, $\mathbb{E}[XY] = \mathbb{E}[X] \mathbb{E}[Y]$.
+	\item Variance: $\mathrm{Var}(X+a)= \mathrm{Var}(X)$; $\mathrm{Var}(aX) = a^2 \mathrm{Var}(X)$.
+	\item Covariance: $\mathrm{cov}(X, Y) = \mathbb{E}[(X-\mathbb{E}[x])(Y-\mathbb{E}[Y])] = \mathbb{E}[XY] - \mathbb{E}[X] \mathbb{E}[Y]$.
+	\item $\mathrm{Var}(X) = \mathrm{cov}(X, X)$; $\mathrm{cov}(aX + bY, cW + dV) = ac \mathrm{cov}(X, W) + (\text{cyclic})$.
+	\item $\mathrm{Var}(aX + bY) = a^2 \mathrm{Var}(X) + b^2 \mathrm{Var}(Y) + 2ab \mathrm{cov}(X, Y)$.
+\end{itemize}
+
+\subsubsection*{Thirtyfold Way}
+Given $n$ items, divide it up to $k$ batches. $n, k \ge 1$. Batches can be empty on Problem 0, 1, 2.
+\begin{itemize}
+	\item A: Distinguishable items onto Sequence of Lists.
+	\item B: Distinguishable items onto Sequence of Sets.
+	\item C: Indistinguishable items onto Sequence of Bunches.
+	\item D: Distinguishable items onto Collection of Lists.
+	\item E: Distinguishable items onto Collection of Sets.
+	\item F: Indistinguishable items onto Collection of Bunches.
+	\item 0: You are given sequence $a$ that $\sum i a_i = n$ and $\sum a_i = k$. There must be exactly $a_i$ batches that have size $i$.
+	\item 1: Each Batch must contain at most $1$ item.
+	\item 2: It's fine as long as you have $k$ batches.
+	\item 3: Each Batch must contain at least $1$ item.
+	\item 4: You are only given $n$, and are to find sum of Problem 3 for all $b$.
+\end{itemize}
+For Problem 0, define $\alpha = \left< a_0, a_1, \ldots, a_n \right>$. Let $\iota = \left< 1, \ldots, 1, 2, \ldots, 2, \ldots, n, \ldots, n \right>$ where $x$ appears $a_x$ times.
+
+Let $\alpha! = a_0! a_1! \cdots a_n!$ and $\alpha^+! = a_1! a_2! \cdots a_n!$. Let $\iota! = 1! \cdots 1! 2! \cdots 2! \cdots n! \cdots n!$. \\
+Let $C(k, \alpha) = k! / \alpha!$ and $C(n, \iota) = n! / \iota!$. \\ 
+\begin{center} \begin{tabular}{|c|c|c|c|c|c|c|} \hline
+  & 0                            & 1           \\ 2                                   & 3                    & 4                                   \\ \hline
+A & $n! C_{k, \alpha}$           & $k_{(n)}$   \\ $k^{(n)}$                           & $C_{n-1, k-1} n!$    & $2^{n-1} n!$                        \\ \hline
+B & $C_{k, \alpha} C_{n, \iota}$ & $k_{(n)}$   \\ $k^n$                               & $k! S_{n, k}$        & $\sum_{k=1}^{n} k! S_{n, k}$        \\ \hline
+C & $C_{k, \alpha}$              & $C_{k, n}$  \\ $H_{k, n}$                          & $C_{n-1, k-1}$       & $2^{n-1}$                           \\ \hline
+D & $m! / \alpha^+!$             & $[n \le k]$ \\ $\sum_{i=1}^{k} C_{n-1, k-1} n!/i!$ & $C_{n-1, k-1} n!/k!$ & $\sum_{k=1}^{n} C_{n-1, k-1} n!/k!$ \\ \hline
+E & $C_{m, \iota} / \alpha^+!$   & $[n \le k]$ \\ $\sum_{i=1}^{k} S_{n, i}$           & $S_{n, k}$           & $B_n$                               \\ \hline
+F & $1$                          & $[n \le k]$ \\ $\sum_{i=1}^{k} p_{n, i}$           & $p_{n, k}$           & $p_n$                               \\ \hline
+\end{tabular} \end{center}

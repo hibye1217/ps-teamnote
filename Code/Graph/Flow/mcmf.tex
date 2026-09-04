@@ -1,0 +1,34 @@
+\begin{minted}{cpp}
+int src, snk, nc; pi2 adj[220][220]; // (flow, cost)
+int dis[220]; bool chk[220]; int pre[220];
+int pth[220]; int pc;
+bool spfa(int st, int ed){
+	memset(dis, 0x3f, sizeof(dis)); memset(chk, 0, sizeof(chk));
+	queue<int> q; dis[st] = 0; chk[st] = 1; q.push(st);
+	while (!q.empty()){
+		int now = q.front(); q.pop(); chk[now] = 0;
+		for (int nxt = 1; nxt <= nc; nxt++){
+			if (adj[now][nxt].fr == 0){ continue; }
+			if (dis[nxt] <= dis[now] + adj[now][nxt].sc){ continue; }
+			dis[nxt] = dis[now] + adj[now][nxt].sc; pre[nxt] = now;
+			if (!chk[nxt]){ chk[nxt] = 1; q.push(nxt); }
+		}
+	}
+	if (dis[ed] == INF){ return 0; }
+	int ptr = ed; pc = 0;
+	while (ptr != st){ pth[pc++] = ptr; ptr = pre[ptr]; } pth[pc] = ptr;
+	reverse(pth, pth+pc+1); return 1;
+}
+
+int ans = 0, res = 0; while (spfa(src, snk)){
+	int cnt = INF; for (int i = 1; i <= pc; i++){
+		int v = pth[i-1], w = pth[i];
+		cnt = min(cnt, adj[v][w].fr);
+	} res += cnt;
+	for (int i = 1; i <= pc; i++){
+		int v = pth[i-1], w = pth[i];
+		adj[v][w].fr -= cnt; adj[w][v].fr += cnt;
+		ans += cnt*adj[v][w].sc;
+	}
+}
+\end{minted}

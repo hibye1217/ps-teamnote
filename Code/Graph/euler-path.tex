@@ -1,0 +1,12 @@
+Directed version. For undirected use $e_i = (v_i, w_i)$ and save $i$ like BCC.
+\begin{minted}{cpp}
+vector<int> adj[200020]; int ptr[200020];
+int pth[200020]; int len;
+void dfs(int now){
+	pth[++len] = now;
+	for (int& p = ptr[now]; p < adj[now].size();){
+		int nxt = adj[now][p++];
+		dfs(nxt);
+	}
+}
+\end{minted}

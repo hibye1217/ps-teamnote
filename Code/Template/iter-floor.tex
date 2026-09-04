@@ -1,0 +1,12 @@
+\begin{minted}{cpp}
+vector<pl2> v; // saves {floor(k/n), # of k}.
+ll sq = (ll)sqrt(n);
+for (ll i = 1; i <= sq; i++){
+	ll val = n/i; if (v.empty() || v.back().fr != val){ v.push_back({val, 1}); }
+	else{ v.back().sc += 1; }
+}
+for (ll x = sq; x >= 1; x--){
+	ll st = max(sq+1, n/(x+1)+1), ed = n/x;
+	if (st <= ed){ v.push_back({x, ed-st+1}); }
+}
+\end{minted}

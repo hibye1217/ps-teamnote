@@ -1,0 +1,32 @@
+\complexity{$\mathcal O(V+E)$.}
+\begin{minted}{cpp}
+pi3 edg[100020]; // {{v, w}, color}
+vector<int> adj[100020]; // Edge Index
+stack<int> stk;
+int ord[100020], ont = 0;
+int dfs(int now, int pre){
+	int res = ord[now] = ++ont;
+	for (int ei : adj[now]){
+		int nxt = edg[ei].fr.fr ^ edg[ei].fr.sc ^ now;
+		if (nxt == pre){ continue; }
+		if (ord[now] > ord[nxt]){ stk.push(ei); }
+		if (ord[nxt] > 0){ res = min(res, ord[nxt]); }
+		else{
+			int val = dfs(nxt, now); res = min(res, val);
+			if (val >= ord[now]){
+				vector<int> v; while (!stk.empty()){
+					int e = stk.top(); stk.pop();
+					edg[e].sc = ei; if (e == ei){ break; }
+				}
+			}
+		}
+	}
+	return res;
+}
+\end{minted}
+
+\subsubsection*{Articulation Point \& Edge}
+\begin{itemize}
+	\item Articulation Point: Vertex with $2$ or more colors.
+	\item Articulation Edge: Edge that has unique color.
+\end{itemize}

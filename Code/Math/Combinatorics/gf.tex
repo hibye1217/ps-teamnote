@@ -1,0 +1,30 @@
+Let $A(x)$ be the GF of the sequence $a_i$. $a$ is $0$-indexed.
+\begin{itemize}
+	\item If $A$ is OGF, $a_n = A^{(n)}(0)/n!$.
+	\item If $A$ is EGF, $a_n = A^{(n)}(0)$.
+	\item If $C(x) = k A(x) + l B(x)$, then $c_i = k a_i + l b_i$.
+	\item If $B(x) = x A'(x)$, then $b_i = i a_i$.
+	\item Let $\left< b_0, b_1, \ldots, b_{k-1}, b_k, b_{k+1}, \ldots \right> = \left< 0, 0, \ldots, 0, a_0, a_1, \ldots \right>$.
+	\begin{itemize}
+		\item If $A$ and $B$ are both OGF, then $B(x) = x^k A(x)$.
+		\item If $A$ and $B$ are both EGF, then $B(x) = \int^{(k)} A(x) d^kx$.
+	\end{itemize}
+	\item Let $\left< b_0, b_1, \ldots \right> = \left< a_k, a_{k+1}, \ldots \right>$.
+	\begin{itemize}
+		\item If $A$ and $B$ are both OGF, then $B(x) = (A(x) - a_0 - a_1 x - \cdots - a_{k-1} x^{k-1})/x^k$.
+		\item If $A$ and $B$ are both EGF, then $B(x) = \frac{d^k}{d^kx} A(x)$.
+	\end{itemize}
+	\item Let $C(x) = A(x) B(x)$.
+	\begin{itemize}
+		\item If $A$ and $B$ are both OGF, then $c_i = \sum_{k=0}^{i} a_k b_{i-k} = (a*b)_i$.
+		\item If $A$ and $B$ are both EGF, then $c_i = \sum_{k=0}^{i} \binom{i}{k} a_k b_{i-k}$.
+	\end{itemize}
+	\item Let $k$ be a positive integer, and let $B(x) = A(x)^k$.
+	\begin{itemize}
+		\item If $A$ and $B$ are both OGF, then $b_n = \sum_{i_1 + i_2 + \cdots + i_k = n} a_{i_1} a_{i_2} \cdots a_{i_k}$.
+		\item If $A$ and $B$ are both EGF, then $b_n = \sum_{i_1 + i_2 + \cdots + i_k = n} \frac{n!}{i_1! i_2! \cdots i_k!} a_{i_1} a_{i_2} \cdots a_{i_k}$.
+	\end{itemize}
+	\item If $A$ and $B$ are both OGF with $B(x) = \frac{A(x)}{1-x}$, then $b_i = a_0 + a_1 + \cdots + a_i$.
+	\item $(1+x)^k = \sum_{n=0}^{\infty} \binom{k}{n} x^n$.
+	\item $\frac{1}{(1-x)^k} = \sum_{n=0}^{\infty} \binom{n+k-1}{n} x^n = \sum_{n=0}^{\infty} {}_{k}H_{n} x^n$.
+\end{itemize}

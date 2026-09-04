@@ -1,0 +1,13 @@
+\refer{sec:Math-NumberTheory-egcd}{Extended Euclidean Algorithm}
+\begin{minted}{cpp}
+inline ll finv(ll a, ll b){ pl3 p = egcd(a, n); return (p.fr.fr%n+n)%n; }
+pl2 crt(pl2 f1, pl2 f2){
+	if (f1.sc < f2.sc){ swap(f1, f2); }
+	ll a1 = f1.fr, m1 = f1.sc; ll a2 = f2.fr, m2 = f2.sc;
+	ll g = gcd(m1, m2); ll l = lcm(m1, m2);
+	if ((a2-a1)%g != 0){ return {-1, -1}; }
+	ll mg1 = m1/g, mg2 = m2/g, ag = (a2-a1)/g;
+	ll y = ag *finv(mg1, mg2) %mg2;
+	ll x = m1*y + a1; return {(x%l+l)%l, l};
+}
+\end{minted}

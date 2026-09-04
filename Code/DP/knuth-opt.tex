@@ -1,0 +1,17 @@
+$D_{i,j} = D_{i,k} + D_{k+1,j} + A_{i,j}$ where $\mathrm{opt}_{i,j-1} \le \mathrm{opt}_{i,j} \le \mathrm{opt}_{i+1,j}$.
+
+\complexity{$\mathcal O(N^2)$}.
+\begin{minted}{cpp}
+for (int d = 0; d < n; d++){
+	for (int s=1, e=1+d; e <= n; s++, e++){
+		if (d == 0){ dp[s][e] = 0; opt[s][e] = s; }
+		else{
+			opt[s][e] = s; dp[s][e] = INF;
+			for (int p = opt[s][e-1]; p <= opt[s+1][e]; p++){
+				ll res = dp[s][p] + dp[p+1][e] + prf[e]-prf[s-1];
+				if (dp[s][e] > res){ dp[s][e] = res; opt[s][e] = p; }
+			}
+		}
+	}
+} cout << dp[1][n] << endl;
+\end{minted}

@@ -1,0 +1,8 @@
+\begin{minted}{python}
+from fractions import * # Fraction, no limit
+x = Fraction(10)
+
+from decimal import * # Decimal, limited
+getcontext().prec = 28 # Number of precision = digits
+x = Decimal(20)
+\end{minted}

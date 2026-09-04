@@ -1,0 +1,16 @@
+\begin{minted}{cpp}
+const int H = 2;
+typedef array<ll, H> alH;
+const ll mod[H] = {993244853, 998244853};
+const ll mul[H] = {31, 37};
+ll ppw[H][N+20], prf[H][N+20];
+void init(int hi, const string& s){ int sl = s.size();
+	ppw[hi][0] = 1; for (int i = 1; i <= N; i++){ ppw[hi][i] = ppw[hi][i-1]*mul[hi] % mod[hi]; }
+	for (int i = 1; i <= sl; i++){ prf[hi][i] = (prf[hi][i-1]*mul[hi] + s[i]) % mod[hi]; }
+}
+inline alH hsh(int st, int ed){
+	alH res; for (int hi = 0; hi < H; hi++){
+		res[hi] = (prf[hi][ed] - prf[hi][st-1]*ppw[hi][ed-st+1] % mod[hi] + mod[hi]) % mod[hi];
+	} return res;
+}
+\end{minted}

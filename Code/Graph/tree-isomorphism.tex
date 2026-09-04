@@ -1,0 +1,50 @@
+\begin{minted}{cpp}
+int dep[2][100020]; vector<int> vtx[2][100020]; int par[2][100020];
+int dfs(int t, int v, int p){
+	dep[t][v] = dep[t][p]+1; vtx[t][dep[t][v]].push_back(v);
+	par[t][v] = p; erase(adj[t][v], p);
+	int res = dep[t][v]; for (int w : adj[t][v]){
+		if (w == p){ continue; }
+		res = max(res, dfs(t, w, v));
+	} return res;
+}
+
+int val[2][100020]; int ans[100020];
+using pvi = pair<vector<int>, int>;
+
+centroid(0, 1); pi2 c0 = cent; centroid(1, 1); pi2 c1 = cent;
+if ((c0.sc == -1) != (c1.sc == -1)){ cout << "EI"; return; }
+for (int t = 0; t < 2; t++){
+	pi2& c = (t==0 ? c0 : c1); if (c.sc == -1){ continue; }
+	int v = c.fr, w = c.sc; erase(adj[t][v], w); erase(adj[t][w], v);
+	adj[t][v].push_back(n+1); adj[t][w].push_back(n+1);
+	adj[t][n+1].push_back(v); adj[t][n+1].push_back(w);
+	c = {n+1, 0};
+}
+int d0 = dfs(0, c0.fr, c0.fr); int d1 = dfs(1, c1.fr, c1.fr);
+if (d0 != d1){ cout << "EI"; return; }
+for (int d = d0; d > 1; d--){
+	vector<pvi> res[2];
+	for (int t = 0; t < 2; t++){
+		for (int v : vtx[t][d-1]){
+			res[t].emplace_back(); res[t].back().sc = v;
+			for (int w : adj[t][v]){ res[t].back().fr.push_back(val[t][w]); }
+		} for (pvi& p : res[t]){ sort(p.fr.begin(), p.fr.end()); }
+		sort(res[t].begin(), res[t].end());
+	}
+	int l0 = res[0].size(), l1 = res[1].size(); if (l0 != l1){ cout << "EI"; return; }
+	int num = 0; for (int i = 0; i < l0; i++){
+		if (res[0][i].fr != res[1][i].fr){ cout << "EI"; return; }
+		if (i > 0 && res[0][i-1].fr != res[0][i].fr){ num += 1; }
+		int v0 = res[0][i].sc, v1 = res[1][i].sc;
+		val[0][v0] = val[1][v1] = num;
+	}
+}
+queue<pi2> q; q.push({c0.fr, c1.fr}); while (!q.empty()){
+	int r0 = q.front().fr, r1 = q.front().sc; q.pop(); ans[r0] = r1;
+	sort(adj[0][r0].begin(), adj[0][r0].end(), [](int v1, int v2){ return val[0][v1] < val[0][v2]; });
+	sort(adj[1][r1].begin(), adj[1][r1].end(), [](int v1, int v2){ return val[1][v1] < val[1][v2]; });
+	int l = adj[0][r0].size(); for (int i = 0; i < l; i++){ q.push({adj[0][r0][i], adj[1][r1][i]}); }
+}
+cout << "JAH" << endl; for (int i = 1; i <= n; i++){ cout << ans[i]-1 << endl; }
+\end{minted}

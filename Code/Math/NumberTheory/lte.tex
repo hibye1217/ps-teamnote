@@ -1,0 +1,22 @@
+Let $p$ be a prime, and $x$ and $y$ be integers. Let $v_p(x)$ be the number of times you can divide $x$ by $p$.
+\begin{itemize}
+	\item If $p$ is odd:
+	\begin{itemize}
+		\item If $p \mid x-y$, then $v_p(x^n - y^n) = v_p(x-y) + v_p(n)$.
+		\item If $p \mid x+y$ and $n$ is odd, then $v_p(x^n + y^n) = v_p(x+y) + v_p(n)$.
+		\item If $p \mid x+y$ and $n$ is even, then $v_p(x^n + y^n) = 0$.
+	\end{itemize}
+	\item If $p = 2$:
+	\begin{itemize}
+		\item If $p \mid x-y$ and $n$ is odd, then $v_p(x^n - y^n) = v_p(x-y)$.
+		\item If $p \mid x-y$ and $n$ is even, then $v_p(x^n - y^n) = v_p(x-y) + v_p(x+y) + v_p(n) - 1 = v_p((x^2 - y^2)/2) + v_p(n)$.
+		\item If $p^2 \mid x-y$ and $x$ and $y$ are both odd, then $v_p(x^n - y^n) = v_p(x-y) + v_p(n)$.
+		\item If $p \mid x+y$ and $n$ is odd, then $v_p(x^n + y^n) = v_p(x+y)$.
+		\item If $p \mid x+y$ and $n$ is even, then $v_p(x^n + y^n) = 1$.
+	\end{itemize}
+	\item For all $p$:
+	\begin{itemize}
+		\item If $p \mid x-y$ and $p \nmid n$, then $v_p(x^n - y^n) = v_p(x-y)$.
+		\item If $p \mid x+y$ and $p \nmid n$ and $n$ is odd, then $v_p(x^n + y^n) = v_p(x+y)$.
+	\end{itemize}
+\end{itemize}

@@ -1,0 +1,34 @@
+Find $\max f_i(x) = a_ix + b_i$, with line insertion update.
+
+\complexity{$\mathcal O(\log N)$ per update/query.}
+\begin{minted}{cpp}
+// Max version. if Min then use the commentated version.
+inline ll f(pl2 l, ll x){ return l.fr*x + l.sc; }
+struct Node{ pl2 l = {0, -INF /* INF */}; pi2 nxt = {0, 0}; };
+vector<Node> seg;
+void upd(int ni, ll ns, ll ne, pl2 l1){
+	pl2 l2 = seg[ni].l;
+	if (f(l1, ns) < /* > */ f(l2, ns)){ swap(l1, l2); }
+	if (f(l1, ne) >= /* <= */ f(l2, ne)){ seg[ni].l = l1; return; }
+	ll nm = ns+ne >> 1;
+	if (f(l1, nm) >= /* <= */ f(l2, nm)){
+		seg[ni].l = l1; if (seg[ni].nxt.sc == 0){
+			seg[ni].nxt.sc = seg.size(); seg.emplace_back();
+		} upd(seg[ni].nxt.sc, nm+1, ne, l2);
+	}
+	else{
+		seg[ni].l = l2; if (seg[ni].nxt.fr == 0){
+			seg[ni].nxt.fr = seg.size(); seg.emplace_back();
+		} upd(seg[ni].nxt.fr, ns, nm, l1);
+	}
+} inline void upd(pl2 l){ return upd(0, -X, X, l); }
+ll qry(int ni, ll ns, ll ne, ll x){
+	pl2 l = seg[ni].l; ll nm = ns+ne >> 1;
+	int nxt = (x <= nm ? seg[ni].nxt.fr : seg[ni].nxt.sc);
+	if (nxt == 0){ return f(l, x); }
+	else{
+		if (x <= nm){ return max /* min */(f(l, x), qry(nxt, ns, nm, x)); }
+		else{ return max /* min */(f(l, x), qry(nxt, nm+1, ne, x)); }
+	}
+} inline ll qry(ll x){ return qry(0, -X, X, x); }
+\end{minted}

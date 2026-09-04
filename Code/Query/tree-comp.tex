@@ -1,0 +1,15 @@
+\complexity{$\mathcal O(K \log N)$ per query.}
+\begin{minted}{cpp}
+vector<int> arr;
+for (int i = 1; i <= n; i++){ int v; cin >> v; arr.push_back(v); }
+sort(arr.begin(), arr.end(), [](int v, int w){ return ord[v] < ord[w]; });
+for (int i = 1; i < n; i++){
+	int v = arr[i-1], w = arr[i]; arr.push_back(lca(v, w));
+} sort(arr.begin(), arr.end(), [](int v, int w){ return ord[v] < ord[w]; });
+arr.erase(unique(arr.begin(), arr.end()), arr.end());
+int al = arr.size(); for (int i = 1; i < al; i++){
+	ll l = lca(arr[i-1], arr[i]);
+	adj[cvt(arr, l)].push_back({i, dis[arr[i]]-dis[l]});
+	adj[i].push_back({cvt(arr, l), dis[arr[i]]-dis[l]});
+}
+\end{minted}

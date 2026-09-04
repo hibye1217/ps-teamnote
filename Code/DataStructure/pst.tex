@@ -1,0 +1,33 @@
+You can use this to make Persistent Array. You can then use this Persistent Array to make Persistent Queue.
+Persistent Stack is just Trie.
+\begin{minted}{cpp}
+const int N = 1000000;
+struct Node{ int sum; int nxt[2]; };
+vector<Node> seg; vector<int> root;
+
+void upd(int ni, int ns, int ne, int qi, int qx){
+	if (ns == ne){ seg[ni].sum += qx; return; }
+	int nm = ns+ne >> 1; int nxi = (qi <= nm ? 0 : 1);
+	int p = seg[ni].nxt[nxi]; seg[ni].nxt[nxi] = seg.size();
+	seg.push_back(seg[p]);
+	if (qi <= nm){ upd(seg[ni].nxt[nxi], ns, nm, qi, qx); }
+	else{ upd(seg[ni].nxt[nxi], nm+1, ne, qi, qx); }
+	seg[ni].sum += qx;
+}
+inline void upd(int idx, int pos, int val){
+	root.push_back(seg.size()); seg.push_back(seg[root[idx]]);
+	upd(root.back(), 0, N, pos, val);
+}
+
+int qry(int ni, int ns, int ne, int qs, int qe){
+	if (qs <= ns && ne <= qe){ return seg[ni].sum; }
+	int nm = ns+ne >> 1;
+	int res = 0;
+	if (qs <= nm && seg[ni].nxt[0]){ res += qry(seg[ni].nxt[0], ns, nm, qs, qe); }
+	if (nm+1 <= qe && seg[ni].nxt[1]){ res += qry(seg[ni].nxt[1], nm+1, ne, qs, qe); }
+	return res;
+}
+inline int qry(int idx, int st, int ed){
+	return qry(root[idx], 0, N, st, ed);
+}
+\end{minted}

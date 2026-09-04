@@ -1,0 +1,86 @@
+\refer{sec:DataStructure-splay}{Splay Tree}
+\begin{minted}{cpp}
+bool isroot(int ni){
+	if (tree[ni].p == -1){ return 1; }
+	return tree[tree[ni].p].l != ni && tree[tree[ni].p].r != ni;
+}
+void rotate(int ni){
+	propagate(tree[ni].p); propagate(ni);
+	int p1 = tree[ni].p; if (isroot(ni)){ return; }
+	int p2 = tree[p1].p; if (!isroot(p1)){
+		(tree[p2].l == p1 ? tree[p2].l : tree[p2].r) = ni;
+		tree[ni].p = p2;
+	} else{ tree[ni].p = p2; }
+	int p3 = -1; if (tree[p1].l == ni){
+		tree[p1].l = p3 = tree[ni].r; tree[ni].r = p1;
+	} else{
+		tree[p1].r = p3 = tree[ni].l; tree[ni].l = p1;
+	} tree[p1].p = ni; if (p3 != -1){ tree[p3].p = p1; }
+	update(p1); update(ni);
+}
+int splay(int ni, int top = -1){
+	while (!isroot(ni)){
+		propagate(tree[tree[ni].p].p); propagate(tree[ni].p); propagate(ni);
+		int p1 = tree[ni].p; int p2 = tree[p1].p;
+		if (!isroot(p1)){ rotate((tree[p2].l==p1) == (tree[p1].l==ni) ? p1 : ni); }
+		rotate(ni);
+	} propagate(ni); return ni;
+}
+void access(int ni){
+	splay(ni); tree[ni].r = -1;
+	while (tree[ni].p != -1){
+		splay(tree[ni].p); tree[tree[ni].p].r = ni; splay(ni);
+	}
+}
+void reroot(int ni){
+	access(ni); splay(ni); tree[ni].flp ^= 1;
+}
+int parent(int ni){
+	access(ni); propagate(ni);
+	if (tree[ni].l == -1){ return -1; }
+	ni = tree[ni].l; propagate(ni);
+	while (tree[ni].r != -1){ ni = tree[ni].r; propagate(ni); }
+	return splay(ni);
+}
+int find(int ni){
+	access(ni); propagate(ni);
+	if (0){
+		int n = tree.size();
+		for (int i = 0; i < n; i++){
+			cout << "Node " << i << ": " << tree[i].p << ", " << tree[i].l << ' ' << tree[i].r << endl;
+			cout << tree[i].flp << ' ' << tree[i].val << ' ' << tree[i].sum << endl;
+		} cout << endl << flush;
+	}
+	while (tree[ni].l != -1){ ni = tree[ni].l; propagate(ni); }
+	return splay(ni);
+}
+void link(int ni, int pi){
+	reroot(ni); access(ni); access(pi); tree[ni].l = pi; tree[pi].p = ni; update(ni);
+}
+void cut(int ni){
+	access(ni); tree[tree[ni].l].p = -1; tree[ni].l = -1; update(ni);
+}
+int lca(int vi, int wi){
+	access(vi); access(wi); splay(vi);
+	if (tree[vi].p != -1){ return tree[vi].p; } else{ return vi; }
+}
+
+// Connected? find(vi) == find(wi)
+void upd(int vi, ll x){
+	splay(vi); update(vi, x);
+}
+void upd(int vi, int wi, ll x){
+	int r = find(vi);
+	reroot(vi); access(wi); splay(vi); tree[vi].laz += x; propagate(vi);
+	reroot(r);
+	// Edge Update: v - l - w excluding l.
+	int li = lca(vi, wi);
+	access(li); splay(li); propagate(li); update(li, tree[li].val-x);
+}
+ll qry(int vi, int wi){
+	int li = lca(vi, wi); ll res = tree[li].val;
+	access(vi); splay(li); if (tree[li].r != -1){ res += tree[tree[li].r].sum; }
+	access(wi); splay(li); if (tree[li].r != -1){ res += tree[tree[li].r].sum; }
+	return res;
+}
+\end{minted}

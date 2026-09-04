@@ -1,0 +1,35 @@
+\begin{minted}{cpp}
+int gph[220][220];
+const int INF = 1e9;
+int flow(int st, int ed){
+	memcpy(adj, gph, sizeof(adj)); adj[src][st] = INF; adj[ed][snk] = INF;
+	/* Find MinCut between st and ed and return the value */
+}
+
+int par[220]; int val[220];
+vector<int> tree[220]; pi3 edg[220];
+
+int n, m; cin >> n >> m; src = 0; snk = n+1; nc = n+2;
+while (m--){
+	int v, w, x; cin >> v >> w >> x;
+	gph[v][w] += x; gph[w][v] += x;
+}
+for (int v = 2; v <= n; v++){ par[v] = 1; }
+for (int v = 2; v <= n; v++){
+	int p = par[v]; int res = flow(v, p);
+	val[v] = res;
+	for (int i = 1; i <= n; i++){
+		if (i == v){ continue; }
+		if (par[i] != p){ continue; }
+		if (dis[i] != -1){ par[i] = v; }
+	}
+	if (dis[par[p]] != -1){
+		par[v] = par[p]; par[p] = v;
+		val[v] = val[p]; val[p] = res;
+	}
+}
+int cnt = 0; for (int v = 1; v <= n; v++){
+	int p = par[v], x = val[v]; if (p == 0){ continue; }
+	edg[++cnt] = {{v, p}, x}; tree[v].push_back(cnt); tree[p].push_back(cnt);
+}
+\end{minted}

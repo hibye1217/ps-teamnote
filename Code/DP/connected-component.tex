@@ -1,0 +1,9 @@
+Let $D_{i,j}$ be the number of pre-permutations that uses the value from $1$ to $i$, and has $j$ components.
+The transition is to:
+\begin{itemize}
+	\item Create new component: $(i, j) \to (i+1, j+1)$.
+	\item Append $i+1$ to one of the component: $(i, j) \to (i+1, j)$.
+	\item Connect two components using $i+1$: $(i, j) \to (i+1, j-1)$.
+\end{itemize}
+
+When the starting/ending point is specified, you need to be careful about the number of \textit{open}-ended points.

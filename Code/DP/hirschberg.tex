@@ -1,0 +1,71 @@
+Unlike other string algorithms, this assumes that \texttt{s1} and \texttt{s2} is 1-indexed.
+\begin{minted}{cpp}
+string s1, s2;
+
+int dp[3][7010];
+void solve(int i1, int j1, int i2, int j2, bool top = true){
+	if (i1 > j1 || i2 > j2){ return; }
+	if (i1 == j1){
+		for (int p2 = i2; p2 <= j2; p2++){
+			if (s1[i1] == s2[p2]){
+				if (top){ cout << 1 << endl; }
+				cout << s1[j1] << ENDL; return;
+			}
+		}
+		if (top){ cout << 0 << endl; } return;
+	}
+	int m1 = i1+j1 >> 1;
+	for (int p1 = i1-1; p1 <= m1; p1++){
+		int b1 = p1&1; int b0 = 1-b1;
+		for (int p2 = i2-1; p2 <= j2; p2++){
+			if (p1 == i1-1 || p2 == i2-1){ dp[b1][p2] = 0; }
+			else{
+				dp[b1][p2] = max(dp[b0][p2], dp[b1][p2-1]);
+				if (s1[p1] == s2[p2]){ dp[b1][p2] = max(dp[b1][p2], dp[b0][p2-1]+1); }
+			}
+		}
+	}
+	if ((m1&1) == 0){
+		for (int p2 = i2-1; p2 <= j2; p2++){ dp[1][p2] = dp[0][p2]; }
+	}
+	for (int p1 = j1; p1 > m1; p1--){
+		int b1 = p1&1; int b0 = 1-b1; b1 <<= 1; b0 <<= 1;
+		for (int p2 = j2; p2 >= i2-1; p2--){
+			if (p1 == j1 || p2 == j2){ dp[b1][p2] = 0; }
+			else{
+				dp[b1][p2] = max(dp[b0][p2], dp[b1][p2+1]);
+				if (s1[p1+1] == s2[p2+1]){ dp[b1][p2] = max(dp[b1][p2], dp[b0][p2+1]+1); }
+			}
+		}
+	}
+	if ((m1+1&1) == 0){
+		for (int p2 = i2-1; p2 <= j2; p2++){ dp[2][p2] = dp[0][p2]; }
+	}
+	int mx = 0; pi2 mxp = {0, 0}; for (int p2 = i2-1; p2 <= j2; p2++){
+		int x = dp[1][p2]+dp[2][p2];
+		if (x > mx){ mx = x; mxp = {0, p2}; }
+	}
+	for (int p2 = i2; p2 <= j2; p2++){
+		if (s1[m1+1] == s2[p2]){
+			int x = dp[1][p2-1]+dp[2][p2]+1;
+			if (x > mx){ mx = x; mxp = {1, p2}; }
+		}
+	}
+	if (top){ cout << mx << endl; }
+	if (mx == 0){ return; }
+	if (mxp.fr == 0){
+		int p2 = mxp.sc;
+		solve(i1, m1, i2, p2, 0); solve(m1+1+1, j1, p2+1, j2, 0);
+	}
+	else{
+		int p2 = mxp.sc;
+		solve(i1, m1, i2, p2-1, 0); cout << s2[p2]; solve(m1+1+1, j1, p2+1, j2, 0);
+	}
+}
+
+void Main(){
+	cin >> s1 >> s2; int l1 = s1.size(), l2 = s2.size();
+	s1 = " " + s1; s2 = " " + s2;
+	solve(1, l1, 1, l2);
+}
+\end{minted}

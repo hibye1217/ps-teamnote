@@ -1,0 +1,10 @@
+Hyperparameter: $d = 0.9999$ (higher = faster cooling), $k = 10$ (higher = more volatile)
+\begin{enumerate}
+	\item Set $t = 1$ and generate random answer $S$, and compute the score $F = f(S)$.
+	\item Repeat the following:
+	\begin{enumerate}
+		\item Randomly change the answer $S$ to generate $S'$.
+		\item Compute $p = e^{(f(S) - f(S'))/kt}$.
+		\item Change the answer to $S'$ with probability $\min(p, 1)$.
+	\end{enumerate}
+\end{enumerate}

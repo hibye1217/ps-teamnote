@@ -1,0 +1,14 @@
+Tree DP, with changing root. For all direction: Edge $v \rightarrow w$, set root as $v$ and record subtree $w$.
+
+\complexity{$\mathcal O(N)$.}
+\begin{minted}{cpp}
+void reroot(int now, int pre){
+	ans[now] = dp[now]; for (int nxt : adj[now]){
+		if (nxt == pre){ continue; }
+		int dpv = dp[now], dpw = dp[nxt];
+		dp[now] -= (dp[nxt]?); dp[nxt] += (dp[now]?);
+		reroot(nxt, now);
+		dp[now] = dpv; dp[nxt] = dpw;
+	}
+} // dpf(root, root); reroot(root, root)
+\end{minted}

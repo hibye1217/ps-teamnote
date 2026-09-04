@@ -1,0 +1,13 @@
+$D_{k,i} = \max{j<i} D_{k-1,j} + A_{j,i}$. $\mathrm{opt}_i < \mathrm{opt}_{i+1}$.
+
+\complexity{$\mathcal O(KN \log N)$.}
+\begin{minted}{cpp}
+ll dp[2][N+20]; // Sliding Window on first index
+void dnc_opt(ll* dp1, ll* dp0, int is, int ie, int os, int oe){
+	if (is > ie){ return; } int im = is+ie >> 1;
+	int o = os; for (int p = os; p <= min(oe, im-1); p++){
+		if (f(dp0, p, im) < f(dp0, o, im)){ o = p; }
+	} dp1[im] = f(dp0, o, im);
+	dnc_opt(dp1, dp0, is, im-1, os, o); dnc_opt(dp1, dp0, im+1, ie, o, oe);
+}
+\end{minted}

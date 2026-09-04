@@ -1,0 +1,82 @@
+\texttt{v} contains $(y_1, x_1), (y_2, x_2)$. Left side of $\mathbf{v} = p_2 - p_1$ is the halfplane.
+Counterclockwise convex polygon $P = \left< p_1, p_2, \ldots, p_n \right>$ will have intersection equivalent to $P$.
+\begin{minted}{cpp}
+const pl2 O = {0, 0};
+const ld eps = 1e-9;
+const ll INF = 1e9;
+inline bool eqf(ld a, ld b){ return abs(a-b)/max<ld>({abs(a),abs(b),1}) <= eps; }
+inline int sgn(ll x){ return (x > 0) - (x < 0); }
+inline int sgn(ld x){ return eqf(x, 0) ? 0 : (x > 0) - (x < 0); }
+
+inline int ccw(const pl2& p1, const pl2& p2, const pl2& p3){
+	ll a = p1.sc*p2.fr + p2.sc*p3.fr + p3.sc*p1.fr;
+	ll b = p1.sc*p3.fr + p3.sc*p2.fr + p2.sc*p1.fr;
+	return sgn(a-b);
+}
+inline int ccwd(const pd2& p1, const pd2& p2, const pd2& p3){
+	ld a = p1.sc*p2.fr + p2.sc*p3.fr + p3.sc*p1.fr;
+	ld b = p1.sc*p3.fr + p3.sc*p2.fr + p2.sc*p1.fr;
+	return sgn(a-b);
+}
+inline ld area(const pd2& p1, const pd2& p2, const pd2& p3){
+	ld a = p1.sc*p2.fr + p2.sc*p3.fr + p3.sc*p1.fr;
+	ld b = p1.sc*p3.fr + p3.sc*p2.fr + p2.sc*p1.fr;
+	return abs(a-b)/2;
+}
+inline ll cross(const pl2& v1, const pl2& v2){ return v1.sc*v2.fr - v2.sc*v1.fr; }
+
+inline pl2 ltov(const pl4& l){ return pl2{l.sc.fr-l.fr.fr, l.sc.sc-l.fr.sc}; }
+pair<bool, pd2> intersection(const pl4& l1, const pl4& l2){
+	pl2 v1 = ltov(l1), v2 = ltov(l2);
+	if (ccw(O, v1, v2) == 0){ return {0, {0, 0}}; }
+	pl2 p1 = l1.fr, p2 = l2.fr; pl2 dp = {p2.fr-p1.fr, p2.sc-p1.sc};
+	ld a = (ld)cross(dp, v2) / cross(v1, v2);
+	return {1, {p1.fr + v1.fr*a, p1.sc + v1.sc*a}};
+}
+bool out(const pd2& p, const pl4& l){ return ccwd(l.fr, l.sc, p) <= 0; }
+bool out(const pl4& l1, const pl4& l2, const pl4& l){
+	auto res = intersection(l1, l2); if (!res.fr){ return 0; }
+	return out(res.sc, l);
+}
+
+vector<pd2> halfplane(vector<pl4> v){
+	{
+		pl2 p1 = {-INF, -INF}, p2 = {-INF, INF};
+		pl2 p3 = {INF, INF}, p4 = {INF, -INF};
+		v.push_back({p1, p2}); v.push_back({p2, p3});
+		v.push_back({p3, p4}); v.push_back({p4, p1});
+	}
+	sort(v.begin(), v.end(), [](const pl4& l1, const pl4& l2){
+		pl2 v1 = ltov(l1), v2 = ltov(l2);
+		if ((v1 > O) != (v2 > O)){ return (v1 > O) > (v2 > O); }
+		return ccw(O, v1, v2) > 0;
+	});
+	deque<pl4> dq; for (const pl4& l : v){
+		while (dq.size() >= 2){
+			int dql = dq.size();
+			if (out(dq[dql-2], dq[dql-1], l)){ dq.pop_back(); }
+			else{ break; }
+		}
+		while (dq.size() >= 2){
+			int dql = dq.size();
+			if (out(dq[0], dq[1], l)){ dq.pop_front(); }
+			else{ break; }
+		}
+		int dql = dq.size(); if (dql >= 1){
+			pl2 v1 = ltov(l), v2 = ltov(dq[dql-1]);
+			if (ccw(O, v1, v2) == 0){
+				if ((v1 > O) == (v2 > O)){
+					pl2 p1 = l.fr;
+					if (!out(p1, dq[dql-1])){ dq.pop_back(); dq.push_back(l); }
+					continue;
+				} else{ return {}; }
+			}
+		} if (dql < 2 || !out(dq[dql-1], l, dq[0])){ dq.push_back(l); }
+	} int dql = dq.size(); if (dql < 3){ return {}; }
+	vector<pd2> ans; for (int i = 0; i < dql; i++){
+		int j = i+1; if (j == dql){ j = 0; }
+		pl4 l1 = dq[i], l2 = dq[j]; auto res = intersection(l1, l2);
+		if (res.fr){ ans.push_back(res.sc); }
+	} return ans;
+}
+\end{minted}

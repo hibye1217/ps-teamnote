@@ -1,0 +1,16 @@
+\begin{minted}{cpp}
+bool cmp(int a, int b){ return a < b; }
+sort(begin, end, cmp); // a -> b
+set<int, decltype(&cmp)> s(cmp); // a -> b (inorder)
+priority_queue<int, vector<int>, decltype(&cmp)> pq(cmp); // b on top
+
+sort(v.begin(), v.end(), [](pi2 a, pi2 b){ return a.fr+a.sc < b.fr+b.sc; });
+auto st = lower_bound(v.begin(), v.end(), x, [](pi2 p, int x){ return p.fr+p.sc < x; });
+auto ed = upper_bound(v.begin(), v.end(), x, [](int x, pi2 p){ return x < p.fr+p.sc; });
+// [st, ed) is where p.fr+p.sc == x
+
+struct cmp{
+	bool operator()(const pi2& p1, const pi2& p2){ return p1.fr+p1.sc < p2.fr+p2.sc; }
+};
+tree<pi2, null_type, cmp, rb_tree_tag, tree_order_statistics_node_update> s;
+\end{minted}

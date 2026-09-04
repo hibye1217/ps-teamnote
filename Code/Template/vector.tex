@@ -1,0 +1,11 @@
+\begin{minted}{cpp}
+template <typename T> inline void unq(vector<T>& v){
+	sort(v.begin(), v.end()); v.erase(unique(v.begin(), v.end()), v.end());
+}
+template <typename T> inline int cvt(vector<T>& v, T x){
+	return lower_bound(v.begin(), v.end(), x) - v.begin();
+}
+template <typename T> inline void erase(vector<T>& v, const T& x){
+	v.erase(remove(v.begin(), v.end(), x), v.end());
+} // removes every x in v
+\end{minted}

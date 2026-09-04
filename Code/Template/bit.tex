@@ -1,0 +1,9 @@
+\begin{minted}{cpp}
+inline int bit1(int x){ return __builtin_popcount(x); } // # of 1
+inline int bit2(int x){ return x==0 ? 32 : __builtin_ctz(x); } // max k s.t. n | 2^k
+inline int bitl(int x){ return x==0 ? 0 : 32 - __builtin_clz(x); } // # of bits
+inline int bith(int x){ return x==0 ? 0 : 1 << bitl(x)-1; } // max 2^k s.t. 2^k <= n
+inline int bitp(int x){
+	int y = bith(x); return x==0 ? 0 : y << (x!=y);
+} // min 2^k s.t. n <= 2^k
+\end{minted}

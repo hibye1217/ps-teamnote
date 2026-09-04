@@ -1,0 +1,32 @@
+\begin{minted}{cpp}
+pl2 operator+(const pl2& p1, const pl2& p2){ return {p1.y+p2.y, p1.x+p2.x}; }
+pl2 operator-(const pl2& p1, const pl2& p2){ return {p1.y-p2.y, p1.x-p2.x}; }
+
+for (int t = 1; t <= n; t++){
+	for (int i = 0; i < m; i++){
+		int j = i+1; if (j >= m){ j -= m; }
+		pl2 p1 = stk[i], p2 = stk[j];
+		pl2 d = p2-p1; d = {-d.x, d.y};
+		evt.push_back({d, p2-p1});
+	}
+	for (int i = 0; i < m; i++){
+		int jl = i-1; if (jl < 0){ jl += m; }
+		int jr = i+1; if (jr >= m){ jr -= m; }
+		pl2 pl = stk[jl], p = stk[i], pr = stk[jr];
+		pl2 dl = p-pl, dr = pr-p; dl = {-dl.x, dl.y}; dr = {-dr.x, dr.y};
+		if (pl2(-dl.y, dl.x) > pl2(0, 0) && pl2(-dr.y, dr.x) < pl2(0, 0)){ res = res+p; }
+	}
+}
+sort(evt.begin(), evt.end(), [](const pl4& pp1, const pl4& pp2){
+	pl2 p1 = pp1.fr, p2 = pp2.fr;
+	pl2 O = {0, 0}; if ((p1 > O) != (p2 > O)){ return (p1 > O) > (p2 > O); }
+	int res = ccw(O, p1, p2); return res > 0;
+});
+ans = max(ans, dis(res)); for (pl4& p : evt){
+	if (p.fr.y == 0 && p.fr.x > 0){ continue; }
+	res = res+p.sc; ans = max(ans, dis(res));
+} for (pl4& p : evt){
+	if (!(p.fr.y == 0 && p.fr.x > 0)){ continue; }
+	res = res+p.sc; ans = max(ans, dis(res));
+} cout << ans;
+\end{minted}

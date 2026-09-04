@@ -1,0 +1,62 @@
+\begin{minted}{cpp}
+int n, m; vector<int> adj[520]; // Input: Graph
+int res[520]; // Matched Vertex
+
+int par[520]; // BFS path, before v.
+int chk[520]; // Visited? (0: no, 1: yes+odd, 2: yes+even) \
+				odd/even comes from bipartite... kinda. \
+				all v in q satisfies chk[v] = 1.
+void pro(int r, int v){ // Re-Match. a.k.a. Augmenting
+	int p = v; do{
+		p = par[v]; int q = res[p];
+		res[v] = p; res[p] = v; v = q;
+	} while (r != p);
+}
+
+int bls[520]; // Position of a Blossom
+bool vst[520]; // Used for lca.
+int lca(int v, int w){ // LCA on a BFS tree.
+	memset(vst, 0, sizeof(vst));
+	while (1){
+		if (v != 0){
+			if (vst[v]){ return v; }
+			vst[v] = 1; v = bls[par[res[v]]];
+		} swap(v, w);
+	}
+}
+void cyc(int v, int w, queue<int>& q){ // Cycle (fancy term = Blossom) Merging.
+	int l = lca(bls[v], bls[w]);
+	while (bls[v] != l){
+		par[v] = w; w = res[v];
+		if (chk[w] == 2){ q.push(w); chk[w] = 1; }
+		bls[v] = bls[w] = l; v = par[w];
+	}
+}
+bool bfs(int r){ // main BFS.
+	memset(chk, 0, sizeof(chk)); memset(par, 0, sizeof(par));
+	for (int v = 1; v <= n; v++){ bls[v] = v; }
+	queue<int> q; q.push(r); chk[r] = 1; while (!q.empty()){
+		int v = q.front(); q.pop();
+		for (int w : adj[v]){
+			if (chk[w] == 0){
+				par[w] = v; chk[w] = 2;
+				if (res[w] == 0){ pro(r, w); return 1; }
+				q.push(res[w]); chk[res[w]] = 1;
+			}
+			else if (chk[w] == 1 && bls[v] != bls[w]){
+				cyc(w, v, q); cyc(v, w, q);
+			}
+		}
+	} return 0;
+}
+
+void Main(){
+	cin >> n >> m; while (m--){
+		int v, w; cin >> v >> w;
+		adj[v].push_back(w); adj[w].push_back(v);
+	}
+	int ans = 0; for (int v = 1; v <= n; v++){
+		if (res[v] == 0 && bfs(v)){ ans += 1; }
+	} cout << ans;
+}
+\end{minted}

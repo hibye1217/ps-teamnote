@@ -1,0 +1,18 @@
+\complexity{$\mathcal O(V+E)$.}
+\begin{minted}{cpp}
+stack<int> stk; int scc[N+20];
+int ord[N+20], ont;
+int dfs(int now){
+	stk.push(now); int res = ord[now] = ++ont;
+	for (int nxt : adj[now]){
+		if (ord[nxt] == 0){ res = min(res, dfs(nxt)); }
+		else if (scc[nxt] == 0){ res = min(res, ord[nxt]); }
+	}
+	if (res == ord[now]){
+		while (!stk.empty()){
+			int vtx = stk.top(); stk.pop();
+			scc[vtx] = now; if (vtx == now){ break; }
+		}
+	} return res;
+}
+\end{minted}

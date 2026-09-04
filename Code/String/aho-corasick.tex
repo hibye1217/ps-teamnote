@@ -1,0 +1,25 @@
+\begin{minted}{cpp}
+int q; cin >> q; while (q--){
+	string s; cin >> s; /* Trie */ psh(s);
+}
+queue<int> q; q.push(0); /* Root */ while (!q.empty()){
+	int now = q.front(); q.pop();
+	for (int nxi : nxtSet){
+		int nxt = trie[now].nxt[nxi]; if (nxt == 0){ continue; }
+		if (now == 0){ trie[nxt].jmp = now; }
+		else{
+			int ptr = trie[now].jmp; while (ptr != 0){
+				if (trie[ptr].nxt[nxi] != 0){ break; } else{ ptr = trie[ptr].jmp; }
+			} if (trie[ptr].nxt[nxi] != 0){ ptr = trie[ptr].nxt[nxi]; }
+			trie[nxt].jmp = ptr;
+		} q.push(nxt);
+		trie[nxt].chk |= trie[trie[nxt].jmp].chk;
+	}
+}
+int ptr = 0; for (int nxi : s){
+	while (ptr != 0){
+		if (trie[ptr].nxt[nxi] != 0){ break; } else{ ptr = trie[ptr].jmp; }
+	} if (trie[ptr].nxt[nxi] != 0){ ptr = trie[ptr].nxt[nxi]; }
+	if (trie[ptr].chk){ ans += 1; }
+}
+\end{minted}
