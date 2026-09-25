@@ -16,3 +16,22 @@ This can be modeled as following. Let there be source $s$, sink $t$, and $N$ ver
 \end{itemize}
 
 Find the minimum cut, then assign $x_i = 0$ if it's in $s$-side, and assign $x_i = 1$ if it's in $t$-side.
+\begin{minted}{cpp}
+inline void psh(int v, bool b, ll x){
+    if (b == true){ adj[src][v] += x; }
+    if (b == false){ adj[v][snk] += x; }
+}
+inline void psh(int v, ll w0, ll w1){
+    psh(v, false, w0); psh(v, true, w1);
+}
+inline void psh(int i, int j, ll w00, ll w01, ll w10, ll w11){
+    psh(i, true, w10); psh(i, false, w00);
+    psh(j, true, w11-w10);
+    adj[i][j] += w01+w10-w00-w11;
+}
+
+ll ans = 0; for (int i = 1; i <= n; i++){
+	ll &w0 = adj[i][snk], &w1 = adj[src][i];
+	ll mn = min(w0, w1); ans += mn; w0 -= mn; w1 -= mn;
+}
+\end{minted}

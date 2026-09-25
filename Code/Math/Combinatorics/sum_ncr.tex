@@ -1,0 +1,7 @@
+Let $f(n, l, r) = \sum_{k=l}^{r} C_{n, k}$.
+Change from $f(n, l, r)$ to $f(n', l', r')$ takes $O(|n-n'|+|l-l'|+|r-r'|)$.
+\begin{itemize}
+	\item $f(n, l, r) \to f(n, l, r+1)$: Add $C_{n, r+1}$.
+	\item $f(n, l, r) \to f(n, l+1, r)$: Subtract $C_{n, l}$.
+	\item $f(n, l, r) \to f(n+1, l, r)$: Multiply it by $2$, add $C_{n, l-1} - C_{n, r}$.
+\end{itemize}
